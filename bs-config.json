@@ -1,6 +1,6 @@
 {
   "server": {
-    "baseDir": "src",
+    "baseDir": "docs",
     "routes": {
       "/jspm_packages": "jspm_packages"
     }
