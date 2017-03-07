@@ -1,6 +1,6 @@
 This project was based on [jspm-typescript-seed](https://github.com/thatseeyou/jspm-typescript-seed/tree/master).
 
-You can go to [demo sites with github pages](https://thatseeyou.github.io/jspm-typescript-seed/index.html).
+You can go to [demo sites with github pages](https://thatseeyou.github.io/jspm-typescript-samples/index.html).
 
 # Samples
 * [wagerfield/parallax](https://github.com/wagerfield/parallax)
