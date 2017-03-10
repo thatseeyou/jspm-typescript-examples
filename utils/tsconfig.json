@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": true,
+        "sourceMap": true,
+
+        // related to /// <reference types="..." />
+        "typeRoots": [
+            "../node_modules/@types",
+            "../types"
+        ],
+        "types": ["node"],   
+
+        // related to import MODULE
+        "baseUrl": "..",
+        "paths": {
+            "*": [
+                "node_modules/@types/*",
+                "types/*"   // custom declarations
+            ]
+        }
+    }
+}

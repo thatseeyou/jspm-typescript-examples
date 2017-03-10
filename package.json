@@ -3,16 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "jspm": "jspm",
     "tsc": "tsc",
     "build": "tsc -p docs",
     "build:watch": "npm run build && tsc -p docs -w",
     "build:trace": "tsc -p docs --traceResolution",
     "build:debug": "tsc -p docs --listFiles --listEmittedFiles",
+    "build:utils": "tsc -p utils",
     "serve": "lite-server",
-    "bundle:parallax": "( cd docs && jspm bundle ./src-parallax/app/main ./src-parallax/build.js )",
-    "bundle:jquery-parallax.js": "( cd docs && jspm bundle ./src-jquery-parallax.js/app/main ./src-jquery-parallax.js/build.js )",
-    "bundle": "npm run bundle:parallax && npm run bundle:jquery-parallax.js",
-    "unbundle": "jspm unbundle"
+    "bundle": "node utils/bundle.js",
+    "bundle:parallax": "node utils/bundle.js src-parallax",
+    "bundle:jquery-parallax.js": "node utils/bundle.js src-jquery-parallax.js",
+    "bundle:d3-selection": "node utils/bundle.js utils/src-d3-selection",
+    "unbundle": "node utils/bundle.js --unbundle"
   },
   "author": "",
   "license": "ISC",
@@ -21,6 +24,7 @@
   "devDependencies": {
     "jspm": "^0.16.52",
     "lite-server": "^2.2.2",
+    "shelljs": "^0.7.6",
     "typescript": "^2.2.1"
   },
   "jspm": {
@@ -31,6 +35,7 @@
     "configFile": "docs/systemjs.config.js",
     "dependencies": {
       "css": "github:systemjs/plugin-css@^0.1.32",
+      "d3-selection": "npm:d3-selection@^1.0.4",
       "jquery": "npm:jquery@^2.2.4",
       "jquery-parallax.js": "npm:jquery-parallax.js@^1.4.3",
       "parallax": "github:wagerfield/parallax@^2.1.3"
@@ -38,6 +43,8 @@
     "devDependencies": {}
   },
   "dependencies": {
-    "@types/jquery": "^2.0.40"
+    "@types/d3-selection": "^1.0.10",
+    "@types/jquery": "^2.0.40",
+    "@types/shelljs": "^0.7.0"
   }
 }
