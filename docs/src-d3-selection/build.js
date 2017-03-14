@@ -958,75 +958,118 @@ System.registerDynamic("npm:d3-selection@1.0.4.js", ["npm:d3-selection@1.0.4/bui
       GLOBAL = global;
   module.exports = $__require("npm:d3-selection@1.0.4/build/d3-selection.js");
 });
-System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.js"], true, function ($__require, exports, module) {
+System.registerDynamic('npm:domready@1.0.8/ready.js', [], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+  /*!
+    * domready (c) Dustin Diaz 2014 - License MIT
+    */
+
+  var global = this || self,
+      GLOBAL = global;
+  !function (name, definition) {
+
+    if (typeof module != 'undefined') module.exports = definition();else if (typeof undefined == 'function' && typeof define.amd == 'object') define(definition);else this[name] = definition();
+  }('domready', function () {
+
+    var fns = [],
+        listener,
+        doc = document,
+        hack = doc.documentElement.doScroll,
+        domContentLoaded = 'DOMContentLoaded',
+        loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState);
+
+    if (!loaded) doc.addEventListener(domContentLoaded, listener = function () {
+      doc.removeEventListener(domContentLoaded, listener);
+      loaded = 1;
+      while (listener = fns.shift()) listener();
+    });
+
+    return function (fn) {
+      loaded ? setTimeout(fn, 0) : fns.push(fn);
+    };
+  });
+});
+System.registerDynamic("npm:domready@1.0.8.js", ["npm:domready@1.0.8/ready.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:domready@1.0.8/ready.js");
+});
+System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.js", "npm:domready@1.0.8.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     var d3 = $__require("npm:d3-selection@1.0.4.js");
-    // selection.html()
-    (function () {
-        d3.select('body').html("\n      <div id=\"A\">\n        <div id=\"1\">div #1</div>\n        <div id=\"2\">div #2</div>\n        <div id=\"3\">div #3</div>\n    </div>\n    <table>\n    <div id=\"B\">\n        <div id=\"4\">div #4</div>\n        <div id=\"5\">div #5</div>\n        <div id=\"6\">div #6</div>\n    </div>\n  ");
-    })();
-    var div = d3.selectAll('div');
-    // selection.style()
-    (function () {
+    var domready = $__require("npm:domready@1.0.8.js");
+    domready(function () {
+        // selection.html()
+        d3.select('body').html("\n      <div id=\"A\">\n        <div id=\"1\">div #1</div>\n        <div id=\"2\">div #2</div>\n        <div id=\"3\">div #3</div>\n    </div>\n    <div id=\"B\">\n        <div id=\"4\">div #4</div>\n        <div id=\"5\">div #5</div>\n        <div id=\"6\">div #6</div>\n    </div>\n  ");
+        var div = d3.selectAll('div');
+        // selection.style()
         div.selectAll(':nth-child(odd)').style('color', 'red');
         div.selectAll(':nth-child(even)').style('color', 'blue');
-    })();
-    // selection.node()
-    (function () {
-        var s = new XMLSerializer();
-        var n = s.serializeToString(div.node());
-        console.log(n);
-    })();
-    // selection.append(), selection.text()
-    (function () {
-        var count = 0;
-        div.selectAll('div').append('b').text(function (datum, index, group) {
-            return "([" + count++ + "]appended)";
-        });
-    })();
-    // selection.insert(), selection.text()
-    (function () {
-        var count = 0;
-        div.selectAll('div').insert('b', ':first-child').text(function (datum, index, group) {
-            return "([" + count++ + "]inserted after Text)";
-        });
-        count = 0;
-        div.selectAll('div').select(function (datum, index, group) {
-            var n = this;
-            return n.insertBefore(document.createElement('b'), n.firstChild);
-        }).text(function (datum, index, group) {
-            return "([" + count++ + "]inserted before Text)";
-        });
-    })();
-    var svg = d3.select('body').append('svg');
-    svg.html('<circle style="fill: none; stroke: blue;" border="1" cx="5" cy="5" r="10"></circle>');
-    // svg.append('circle');
-    // svg.append('circle');
-    (function () {
-        var data = [{ x: 100, y: 100, r: 100 }, { x: 200, y: 100, r: 50 }];
-        var circle = svg.selectAll("circle");
-        logSelection('circle', circle);
-        var update = circle.data(data);
-        logSelection('update selection = after data()', update);
-        var enter = update.enter();
-        logSelection('enter selection', enter);
-        var exit = update.exit();
-        logSelection('exit selection', exit);
-        // remove 
-        exit.remove();
-        // add & update
-        enter.append('circle').style('fill', 'none').attr('border', 1).style('stroke', 'blue').merge(update).attr('cx', function (d) {
-            return d.x;
-        }).attr('cy', function (d) {
-            return d.y;
-        }).attr('r', function (d) {
-            return d.r;
-        });
-    })();
+        // selection.node()
+        (function () {
+            var s = new XMLSerializer();
+            var n = s.serializeToString(div.node());
+            console.log(n);
+        })();
+        // selection.append(), selection.text()
+        (function () {
+            var count = 0;
+            div.selectAll('div').append('b').text(function (datum, index, group) {
+                return "([" + count++ + "]appended)";
+            });
+            count = 0;
+            div.selectAll('div').select(function (datum, index, group) {
+                var n = this;
+                return n.insertBefore(document.createElement('b'), n.firstChild);
+            }).text(function (datum, index, group) {
+                return "([" + count++ + "]inserted before Text)";
+            });
+        })();
+        // selection.insert(), selection.text()
+        (function () {
+            var count = 0;
+            div.selectAll('div').insert('b', ':first-child').text(function (datum, index, group) {
+                return "([" + count++ + "]inserted after Text)";
+            });
+        })();
+        var svg = d3.select('body').append('svg');
+        svg.html('<circle style="fill: none; stroke: blue;" border="1" cx="5" cy="5" r="10"></circle>');
+        // svg.append('circle');
+        // svg.append('circle');
+        (function () {
+            var data = [{ x: 100, y: 100, r: 100 }, { x: 200, y: 100, r: 50 }, { x: 100, y: 50, r: 70 }];
+            var circle = svg.selectAll("circle");
+            logSelection('circle', circle);
+            var update = circle.data(data);
+            logSelection('update selection = after data()', update);
+            var enter = update.enter();
+            logSelection('enter selection', enter);
+            var exit = update.exit();
+            logSelection('exit selection', exit);
+            // remove 
+            exit.remove();
+            // add & update
+            enter.append('circle').style('fill', 'none').attr('border', 1).style('stroke', 'blue').merge(update).attr('cx', function (d) {
+                return d.x;
+            }).attr('cy', function (d) {
+                return d.y;
+            }).attr('r', function (d) {
+                return d.r;
+            });
+        })();
+        // selection.datum
+        (function () {
+            var circle = svg.selectAll("circle");
+            logSelection('before datum', circle);
+            circle.datum({ x: 5, y: 5 });
+            logSelection('after datum', circle);
+        })();
+    });
     function logSelection(desc, selection) {
         console.log();
         console.log("LOG START {{{ // " + desc + " ----------------------------------------");
@@ -1053,6 +1096,5 @@ System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.
         });
         console.log("}}} LOG END // " + desc);
     }
-    
 });
 //# sourceMappingURL=build.js.map

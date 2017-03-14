@@ -39,7 +39,7 @@ Using unbundled modules requires URL start with /. Github pages which start with
 [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/parallax.html)]
 
     ```
-    $ jspm install parallax=github:wagerfield/parallax
+    $ jspm install parallax=github:wagerfield/parallax -o '{ main: "deploy/jquery.parallax.js" }'
     ```
 
 * [pixelcog/parallax.js](https://github.com/pixelcog/parallax.js) & jquery

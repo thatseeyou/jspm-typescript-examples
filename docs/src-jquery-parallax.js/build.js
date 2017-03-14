@@ -6128,17 +6128,17 @@ System.registerDynamic("npm:jquery-parallax.js@1.4.3.js", ["npm:jquery-parallax.
   module.exports = $__require("npm:jquery-parallax.js@1.4.3/parallax.min.js");
 });
 System.registerDynamic("src-jquery-parallax.js/app/main.js", ["src-jquery-parallax.js/css/styles.css!github:systemjs/plugin-css@0.1.32.js", "npm:jquery@2.2.4.js", "npm:jquery-parallax.js@1.4.3.js"], true, function ($__require, exports, module) {
-  "use strict";
+    "use strict";
 
-  var global = this || self,
-      GLOBAL = global;
-  Object.defineProperty(exports, "__esModule", { value: true });
-  $__require("src-jquery-parallax.js/css/styles.css!github:systemjs/plugin-css@0.1.32.js");
-  // import 'jquery';
-  var $ = $__require("npm:jquery@2.2.4.js");
-  $__require("npm:jquery-parallax.js@1.4.3.js");
-  $('.parallax-container').parallax();
-  
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    $__require("src-jquery-parallax.js/css/styles.css!github:systemjs/plugin-css@0.1.32.js");
+    var $ = $__require("npm:jquery@2.2.4.js");
+    $__require("npm:jquery-parallax.js@1.4.3.js");
+    $(function () {
+        $('.parallax-container').parallax();
+    });
 });
 (function(c){if (typeof document == 'undefined') return; var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';d.getElementsByTagName('head')[0][a](s);s[a](d.createTextNode(c));})
 (".parallax-container{height:500px;width:100%}\n/*# sourceMappingURL=__.css.map */");
