@@ -39,6 +39,7 @@ Using unbundled modules requires URL start with /. Github pages which start with
 [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/parallax.html)]
 
     ```
+    $ jspm install parallax=github:wagerfield/parallax
     $ jspm install parallax=github:wagerfield/parallax -o '{ main: "deploy/jquery.parallax.js" }'
     ```
 
@@ -50,4 +51,11 @@ Using unbundled modules requires URL start with /. Github pages which start with
     ```
     $ jspm install jquery@^2.2.4
     $ jspm install npm:jquery-parallax.js
+    ```
+
+* [gionkunz/chartist-js](https://github.com/gionkunz/chartist-js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/chartist.html)]
+
+    ```
+    $ jspm install chartist
+    $ npm install @types/chartist
     ```

@@ -8,6 +8,7 @@ System.config({
   },
 
   map: {
+    "chartist": "npm:chartist@0.10.1",
     "css": "github:systemjs/plugin-css@0.1.32",
     "d3-selection": "npm:d3-selection@1.0.4",
     "domready": "npm:domready@1.0.8",

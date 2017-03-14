@@ -15,6 +15,7 @@
     "bundle:parallax": "node utils/bundle.js src-parallax",
     "bundle:jquery-parallax.js": "node utils/bundle.js src-jquery-parallax.js",
     "bundle:d3-selection": "node utils/bundle.js utils/src-d3-selection",
+    "bundle:chartist": "node utils/bundle.js utils/src-chartist",
     "unbundle": "node utils/bundle.js --unbundle"
   },
   "author": "",
@@ -34,6 +35,7 @@
     },
     "configFile": "docs/systemjs.config.js",
     "dependencies": {
+      "chartist": "npm:chartist@^0.10.1",
       "css": "github:systemjs/plugin-css@^0.1.32",
       "d3-selection": "npm:d3-selection@^1.0.4",
       "domready": "npm:domready@^1.0.8",
