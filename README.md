@@ -77,3 +77,10 @@ Using unbundled modules requires URL start with /. Github pages which start with
     $ jspm install log=github:adamschwartz/log 
     $ vi types/log/index.d.ts
     ```
+
+* [chinchang/screenlog.js](https://github.com/chinchang/screenlog.js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/screenlog.html)]
+
+    ```
+    $ jspm install npm:screenlog
+    $ vi types/log/index.d.ts
+    ```

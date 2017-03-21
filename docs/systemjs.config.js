@@ -17,6 +17,7 @@ System.config({
     "jquery-parallax.js": "npm:jquery-parallax.js@1.4.3",
     "log": "github:adamschwartz/log@0.3.0",
     "parallax": "github:wagerfield/parallax@2.1.3",
+    "screenlog": "npm:screenlog@0.2.2",
     "npm:jquery-parallax.js@1.4.3": {
       "jquery": "npm:jquery@2.2.4"
     }
