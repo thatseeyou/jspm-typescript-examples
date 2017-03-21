@@ -59,3 +59,21 @@ Using unbundled modules requires URL start with /. Github pages which start with
     $ jspm install chartist
     $ npm install @types/chartist
     ```
+
+* Native Promise [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/promise.html)]
+    ```
+    $ vi docs/tsconfig.json
+    ...
+        "lib": [
+            "es2015",
+            "dom"
+        ],
+    ...
+    ```
+
+* [adamschwartz/log](https://github.com/adamschwartz/log) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/log.html)]
+
+    ```
+    $ jspm install log=github:adamschwartz/log 
+    $ vi types/log/index.d.ts
+    ```
