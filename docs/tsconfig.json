@@ -4,6 +4,10 @@
         "target": "es5",
         "noImplicitAny": true,
         "sourceMap": false,
+        "lib": [
+            "es2015",
+            "dom"
+        ],
 
         // related to Angular2
         "experimentalDecorators": true, 

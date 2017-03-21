@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="system.js"></script>
+    <script src="systemjs.config.js"></script>
+    <script src="src-promise/build.js"></script>
+    <script>
+        SystemJS.import('src-promise/app/main.js');
+    </script>
+</head>
+
+<body>
+    <h2>Native promise used, IE not supported</h2>
+    <h1>See browser console</h1>
+    <script>
+        console.log('END OF BODY');
+    </script>
+</body>
+
+</html>

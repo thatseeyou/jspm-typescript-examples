@@ -16,6 +16,7 @@
     "bundle:jquery-parallax.js": "node utils/bundle.js src-jquery-parallax.js",
     "bundle:d3-selection": "node utils/bundle.js utils/src-d3-selection",
     "bundle:chartist": "node utils/bundle.js utils/src-chartist",
+    "bundle:promise": "node utils/bundle.js utils/src-promise",
     "unbundle": "node utils/bundle.js --unbundle"
   },
   "author": "",
