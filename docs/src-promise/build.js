@@ -1,3 +1,40 @@
+System.registerDynamic('npm:domready@1.0.8/ready.js', [], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+  /*!
+    * domready (c) Dustin Diaz 2014 - License MIT
+    */
+
+  var global = this || self,
+      GLOBAL = global;
+  !function (name, definition) {
+
+    if (typeof module != 'undefined') module.exports = definition();else if (typeof undefined == 'function' && typeof define.amd == 'object') define(definition);else this[name] = definition();
+  }('domready', function () {
+
+    var fns = [],
+        listener,
+        doc = document,
+        hack = doc.documentElement.doScroll,
+        domContentLoaded = 'DOMContentLoaded',
+        loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState);
+
+    if (!loaded) doc.addEventListener(domContentLoaded, listener = function () {
+      doc.removeEventListener(domContentLoaded, listener);
+      loaded = 1;
+      while (listener = fns.shift()) listener();
+    });
+
+    return function (fn) {
+      loaded ? setTimeout(fn, 0) : fns.push(fn);
+    };
+  });
+});
+System.registerDynamic("npm:domready@1.0.8.js", ["npm:domready@1.0.8/ready.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:domready@1.0.8/ready.js");
+});
 System.registerDynamic('src-promise/app/cases.js', [], true, function ($__require, exports, module) {
     "use strict";
 
@@ -153,23 +190,26 @@ System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($
         });
     };
 });
-System.registerDynamic("src-promise/app/main.js", ["src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
+    var domready = $__require("npm:domready@1.0.8.js");
     var t1 = $__require("src-promise/app/cases.js");
     var t2 = $__require("src-promise/app/emitter-observer.js");
     var t3 = $__require("src-promise/app/eventlistener.js");
-    setTimeout(function () {
-        console.log('---- test1 ----');
-        t1();
-    }, 0);
-    setTimeout(function () {
-        console.log('---- test2 ----');
-        t2();
-    }, 2000);
-    t3();
+    domready(function () {
+        setTimeout(function () {
+            console.log('---- test1 ----');
+            t1();
+        }, 0);
+        setTimeout(function () {
+            console.log('---- test2 ----');
+            t2();
+        }, 2000);
+        t3();
+    });
 });
 //# sourceMappingURL=build.js.map
