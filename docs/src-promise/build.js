@@ -1,10 +1,9 @@
-System.registerDynamic('src-promise/app/main.js', [], false, function ($__require, $__exports, $__module) {
-    var _retrieveGlobal = System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
+System.registerDynamic('src-promise/app/cases.js', [], true, function ($__require, exports, module) {
+    "use strict";
 
-    (function ($__global) {
-        var p1 = $__global['p1'],
-            p2 = $__global['p2'],
-            p3 = $__global['p3'];
+    var global = this || self,
+        GLOBAL = global;
+    module.exports = function test() {
         var p1 = new Promise(function (resolve, reject) {
             console.log('p1: RUN resolve');
             resolve(100);
@@ -83,11 +82,94 @@ System.registerDynamic('src-promise/app/main.js', [], false, function ($__requir
             console.log('p3:catch return reject -> catch: ' + reason);
         });
         console.log('p3: END OF DEFINITION');
-        $__global['p1'] = p1;
-        $__global['p2'] = p2;
-        $__global['p3'] = p3;
-    })(this);
+    };
+});
+System.registerDynamic("src-promise/app/emitter-observer.js", [], true, function ($__require, exports, module) {
+    "use strict";
 
-    return _retrieveGlobal();
+    var global = this || self,
+        GLOBAL = global;
+    var count = 0;
+    function emitter(resolve, reject) {
+        setTimeout(function () {
+            console.log("sent value: " + count);
+            resolve(count++);
+        }, 500);
+        // setTimeout(()=> {
+        //     reject(new Error('error at ' + count));
+        // }, 2000)
+    }
+    ;
+    function observer1_resolve(value) {
+        console.log("[1] received value: " + value);
+        return new Promise(emitter);
+    }
+    ;
+    function observer1_reject(reason) {
+        console.log("[1] received error: " + reason);
+        return reason;
+    }
+    ;
+    function observer2_resolve(value) {
+        console.log("[2] received value: " + value);
+        return new Promise(emitter);
+    }
+    ;
+    function observer2_reject(reason) {
+        console.log("[2] received error: " + reason);
+        return reason;
+    }
+    ;
+    module.exports = function test() {
+        var queue1 = new Promise(emitter);
+        var queue2 = queue1.then(observer1_resolve, observer1_reject);
+        var queue3 = queue2.then(observer2_resolve, observer2_reject);
+        var queue23 = queue1.then(observer1_resolve, observer1_reject).then(observer2_resolve, observer2_reject);
+    };
+});
+System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    module.exports = function test() {
+        var button = document.createElement('button');
+        button.innerText = 'Click to resolve one-time promise';
+        var body = document.getElementsByTagName('body')[0];
+        body.appendChild(button);
+        var clickPromise = new Promise(function (resolve, reject) {
+            button.addEventListener('click', function (event) {
+                resolve(event);
+            });
+        });
+        clickPromise.then(function (value) {
+            console.log('1. first clicked');
+        });
+        clickPromise.then(function (value) {
+            console.log('2. first clicked');
+        });
+        clickPromise.then(function (value) {
+            console.log('3. first clicked');
+        });
+    };
+});
+System.registerDynamic("src-promise/app/main.js", ["src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var t1 = $__require("src-promise/app/cases.js");
+    var t2 = $__require("src-promise/app/emitter-observer.js");
+    var t3 = $__require("src-promise/app/eventlistener.js");
+    setTimeout(function () {
+        console.log('---- test1 ----');
+        t1();
+    }, 0);
+    setTimeout(function () {
+        console.log('---- test2 ----');
+        t2();
+    }, 2000);
+    t3();
 });
 //# sourceMappingURL=build.js.map
