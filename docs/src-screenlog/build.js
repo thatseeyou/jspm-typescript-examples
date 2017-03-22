@@ -1,3 +1,40 @@
+System.registerDynamic('npm:domready@1.0.8/ready.js', [], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+  /*!
+    * domready (c) Dustin Diaz 2014 - License MIT
+    */
+
+  var global = this || self,
+      GLOBAL = global;
+  !function (name, definition) {
+
+    if (typeof module != 'undefined') module.exports = definition();else if (typeof undefined == 'function' && typeof define.amd == 'object') define(definition);else this[name] = definition();
+  }('domready', function () {
+
+    var fns = [],
+        listener,
+        doc = document,
+        hack = doc.documentElement.doScroll,
+        domContentLoaded = 'DOMContentLoaded',
+        loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState);
+
+    if (!loaded) doc.addEventListener(domContentLoaded, listener = function () {
+      doc.removeEventListener(domContentLoaded, listener);
+      loaded = 1;
+      while (listener = fns.shift()) listener();
+    });
+
+    return function (fn) {
+      loaded ? setTimeout(fn, 0) : fns.push(fn);
+    };
+  });
+});
+System.registerDynamic("npm:domready@1.0.8.js", ["npm:domready@1.0.8/ready.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:domready@1.0.8/ready.js");
+});
 System.registerDynamic('npm:screenlog@0.2.2/screenlog.js', [], true, function ($__require, exports, module) {
 	/* */
 	"format cjs";
@@ -167,31 +204,34 @@ System.registerDynamic("npm:screenlog@0.2.2.js", ["npm:screenlog@0.2.2/screenlog
       GLOBAL = global;
   module.exports = $__require("npm:screenlog@0.2.2/screenlog.js");
 });
-System.registerDynamic("src-screenlog/app/main.js", ["npm:screenlog@0.2.2.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-screenlog/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
+    var domready = $__require("npm:domready@1.0.8.js");
     $__require("npm:screenlog@0.2.2.js");
     // excerpt from https://github.com/chinchang/screenlog.js/blob/master/example.html 
-    screenLog.init({ autoScroll: false });
-    screenLog.log('String: Hello world');
-    screenLog.log('Numbers: ' + 124);
-    screenLog.log(21, 'multiple arguments');
-    screenLog.log('Arrays', [1, 2, 3]);
-    screenLog.log('Objects', { a: 3 });
-    console.log('console.log also gets logged.');
-    var i = 10;
-    function log() {
-        console.log('Future log', Date.now());
-        console.error('Future error', Date.now());
-        console.warn('Future warn', Date.now());
-        console.info('Future info', Date.now());
-        if (--i) {
-            setTimeout(log, 1000);
+    domready(function () {
+        screenLog.init({ autoScroll: false });
+        screenLog.log('String: Hello world');
+        screenLog.log('Numbers: ' + 124);
+        screenLog.log(21, 'multiple arguments');
+        screenLog.log('Arrays', [1, 2, 3]);
+        screenLog.log('Objects', { a: 3 });
+        console.log('console.log also gets logged.');
+        var i = 10;
+        function log() {
+            console.log('Future log', Date.now());
+            console.error('Future error', Date.now());
+            console.warn('Future warn', Date.now());
+            console.info('Future info', Date.now());
+            if (--i) {
+                setTimeout(log, 1000);
+            }
         }
-    }
-    log();
+        log();
+    });
 });
 //# sourceMappingURL=build.js.map
