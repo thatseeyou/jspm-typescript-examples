@@ -40,7 +40,7 @@ Using unbundled modules requires URL start with /. Github pages which start with
     ...
     ```
 
-* [RxJS](https://github.com/Reactive-Extensions/RxJS) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/reactive.html)]
+* [rxjs](https://github.com/ReactiveX/rxjs) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/reactive.html)]
     ```
     $ jspm install rxjs
     $ vi docs/tsconfig.json
