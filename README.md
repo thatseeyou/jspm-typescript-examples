@@ -28,11 +28,46 @@ $ npm run unbundle
 Using unbundled modules requires URL start with /. Github pages which start with /jspm-typescript-samples is not the case.
 
 # Samples
+
+* [Native Promise](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/promise.html)]
+    ```
+    $ vi docs/tsconfig.json
+    ...
+        "lib": [
+            "es2015",
+            "dom"
+        ],
+    ...
+    ```
+
+* [RxJS](https://github.com/Reactive-Extensions/RxJS) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/reactive.html)]
+    ```
+    $ jspm install rxjs
+    $ vi docs/tsconfig.json
+    ...
+        "baseUrl": "..",
+        "paths": {
+            "rxjs" : ["jspm_packages/npm/rxjs@5.2.0"],
+            "rxjs/*" : ["jspm_packages/npm/rxjs@5.2.0/*"],
+            "*": [
+                "node_modules/@types/*",
+                "types/*"   // custom declarations
+            ]
+        }
+    ...
+    ```
 * [d3/d3-selection](https://github.com/d3/d3-selection) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/d3-selection.html)]
 
     ```
     $ jspm install npm:d3-selection
     $ npm install @types/d3-selection
+    ```
+
+* [gionkunz/chartist-js](https://github.com/gionkunz/chartist-js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/chartist.html)]
+
+    ```
+    $ jspm install chartist
+    $ npm install @types/chartist
     ```
 
 * [wagerfield/parallax](https://github.com/wagerfield/parallax)
@@ -53,34 +88,16 @@ Using unbundled modules requires URL start with /. Github pages which start with
     $ jspm install npm:jquery-parallax.js
     ```
 
-* [gionkunz/chartist-js](https://github.com/gionkunz/chartist-js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/chartist.html)]
+* [chinchang/screenlog.js](https://github.com/chinchang/screenlog.js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/screenlog.html)]
 
     ```
-    $ jspm install chartist
-    $ npm install @types/chartist
-    ```
-
-* Native Promise [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/promise.html)]
-    ```
-    $ vi docs/tsconfig.json
-    ...
-        "lib": [
-            "es2015",
-            "dom"
-        ],
-    ...
+    $ jspm install npm:screenlog
+    $ vi types/log/index.d.ts
     ```
 
 * [adamschwartz/log](https://github.com/adamschwartz/log) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/log.html)]
 
     ```
     $ jspm install log=github:adamschwartz/log 
-    $ vi types/log/index.d.ts
-    ```
-
-* [chinchang/screenlog.js](https://github.com/chinchang/screenlog.js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/screenlog.html)]
-
-    ```
-    $ jspm install npm:screenlog
     $ vi types/log/index.d.ts
     ```

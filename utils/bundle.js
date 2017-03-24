@@ -26,7 +26,7 @@ else {
     // });
 }
 function subRun(action) {
-    shelljs_1.ls('-d', '*/').forEach(function (subDir, index, array) {
+    shelljs_1.ls('-d', 'src-*/').forEach(function (subDir, index, array) {
         action(subDir);
     });
 }

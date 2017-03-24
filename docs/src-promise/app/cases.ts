@@ -1,4 +1,4 @@
-export = function test() {
+export function test1() {
     let p1 = new Promise<number>(function(resolve, reject) {
         console.log('p1: RUN resolve');
         resolve(100);
@@ -12,9 +12,9 @@ export = function test() {
 
     p1.then((value) => { console.log('p1:return Promise: ' + value); return Promise.resolve(value + 1);})
     .then((value) => { console.log('p1:return Promise -> then: ' + value); });
+}
 
-    console.log('p1: END OF DEFINITION');
-
+export function test2() {
     let p2 = new Promise<number>(function(resolve, reject) {
         window.setTimeout(() => { console.log('p2: RUN resolve'); resolve(100) }, 1000);
     });
@@ -25,9 +25,9 @@ export = function test() {
     p2.then((value) => { console.log('p2:return value: ' + value); return value + 1;})
     .catch((reason) => { console.log('p2:MUST NOT CALLED');})
     .then((value) => { console.log('p2:return value -> catch -> then: ' + value); });
+}
 
-    console.log('p2: END OF DEFINITION');
-
+export function test3() {
     let p3 = new Promise<number>((resolve, reject) => {
         try {
             throw new Error('intened exception');
@@ -68,6 +68,4 @@ export = function test() {
     ).catch(
         (reason) => { console.log('p3:catch return reject -> catch: ' + reason); }
     );
-
-    console.log('p3: END OF DEFINITION');
 }

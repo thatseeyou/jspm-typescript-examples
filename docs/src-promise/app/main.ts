@@ -1,19 +1,22 @@
 import domready = require('domready');
+import 'screenlog';
+import { TestItem, makeTestButtons } from '../../libs/testbutton';
 
-import t1 = require('./cases');
+import * as cases from './cases';
 import t2 = require('./emitter-observer');
-import t3  = require('./eventlistener');
+import t3  = require ('./eventlistener');
+
+const tests:TestItem[] = [
+    {text: '---- clear log ----', action: screenLog.clear},
+    {text: 'simple cases - 1', action: cases.test1},
+    {text: 'simple cases - 2', action: cases.test2},
+    {text: 'simple cases - 3', action: cases.test3},
+    {text: 'emitter-observer', action: t2},
+    {text: 'eventlistner to promise', action: t3}
+];
 
 domready(() => {
-    setTimeout(() => {
-        console.log('---- test1 ----')
-        t1();
-    }, 0);
+    screenLog.init({ autoScroll: true });
 
-    setTimeout(() => {
-        console.log('---- test2 ----')
-        t2();
-    }, 2000);
-
-    t3();
+    makeTestButtons(tests);
 });

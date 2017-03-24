@@ -5,7 +5,6 @@ import path = require('path');
 const projDir = path.dirname(path.dirname(require.main.filename));
 cd(projDir + '/docs');
 
-
 // 2. jspm bundle
 if (process.argv.length > 2) {
     let arg = process.argv[2];
@@ -28,7 +27,7 @@ else {
 }
 
 function subRun(action:(subDir:string) => void) {
-    ls('-d', '*/').forEach(function (subDir, index, array) {
+    ls('-d', 'src-*/').forEach(function (subDir, index, array) {
         action(subDir);
     });
 }

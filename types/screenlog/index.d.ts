@@ -11,6 +11,7 @@ interface ScreenLogOptions {
 
 interface ScreenLog {
     init(options:ScreenLogOptions):void;
+    clear():void;
     debug(message?: any, ...optionalParams: any[]): void;
     error(message?: any, ...optionalParams: any[]): void;
     info(message?: any, ...optionalParams: any[]): void;

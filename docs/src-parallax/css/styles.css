@@ -130,5 +130,6 @@ input[type=checkbox]:checked + label:before {
 .layer:nth-child(6) {
   opacity: 0.90;
 }
+
 .layer:nth-child(6) button {
 }

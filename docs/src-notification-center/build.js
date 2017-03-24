@@ -233,167 +233,94 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic("src-promise/app/cases.js", [], true, function ($__require, exports, module) {
+System.registerDynamic("src-notification-center/app/notificatoncenter.js", [], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    function test1() {
-        var p1 = new Promise(function (resolve, reject) {
-            console.log('p1: RUN resolve');
-            resolve(100);
-        });
-        p1.then(function (value) {
-            console.log('p1:return value: ' + value);return value + 1;
-        }).then(function (value) {
-            console.log('p1:return value -> then: ' + value);
-        });
-        p1.then(function (value) {
-            console.log('p1:return undefined:' + value);
-        }).then(function (value) {
-            console.log('p1:return undefined -> then: ' + value);
-        });
-        p1.then(function (value) {
-            console.log('p1:return Promise: ' + value);return Promise.resolve(value + 1);
-        }).then(function (value) {
-            console.log('p1:return Promise -> then: ' + value);
-        });
-    }
-    exports.test1 = test1;
-    function test2() {
-        var p2 = new Promise(function (resolve, reject) {
-            window.setTimeout(function () {
-                console.log('p2: RUN resolve');resolve(100);
-            }, 1000);
-        });
-        p2.then(function (value) {
-            console.log('p2:return value: ' + value);return value + 1;
-        }).then(function (value) {
-            console.log('p2:return value -> then: ' + value);
-        });
-        p2.then(function (value) {
-            console.log('p2:return value: ' + value);return value + 1;
-        }).catch(function (reason) {
-            console.log('p2:MUST NOT CALLED');
-        }).then(function (value) {
-            console.log('p2:return value -> catch -> then: ' + value);
-        });
-    }
-    exports.test2 = test2;
-    function test3() {
-        var p3 = new Promise(function (resolve, reject) {
-            try {
-                throw new Error('intened exception');
-            } catch (e) {
-                reject(e);
-            }
-        });
-        p3.then(function (value) {
-            return value;
-        }, function (reason) {
-            console.log('p3:reject return undefined: ' + reason);
-        }).then(function (value) {
-            console.log('p3:reject return undefined -> then: ' + value);
-        }, function (reason) {
-            console.log('p3:reject return undeined -> reject: ' + reason);
-        });
-        p3.then(function (value) {
-            return value;
-        }, function (reason) {
-            console.log('p3:reject return reject: ' + reason);return Promise.reject(reason);
-        }).then(function (value) {
-            console.log('p3:reject return reject -> then: ' + value);
-        }, function (reason) {
-            console.log('p3:reject return reject -> reject: ' + reason);
-        });
-        p3.then(function (value) {
-            return value;
-        }).catch(function (reason) {
-            console.log('p3:catch return undefined : ' + reason);
-        }).then(function (reason) {
-            console.log('p3:catch return undeined -> then: ' + reason);
-        });
-        p3.then(function (value) {
-            return value;
-        }).catch(function (reason) {
-            console.log('p3:catch return reject: ' + reason);return Promise.reject(reason);
-        }).catch(function (reason) {
-            console.log('p3:catch return reject -> catch: ' + reason);
-        });
-    }
-    exports.test3 = test3;
-});
-System.registerDynamic("src-promise/app/emitter-observer.js", [], true, function ($__require, exports, module) {
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    var count = 0;
-    function emitter(resolve, reject) {
-        setTimeout(function () {
-            console.log("sent value: " + count);
-            resolve(count++);
-        }, 500);
-        // setTimeout(()=> {
-        //     reject(new Error('error at ' + count));
-        // }, 2000)
-    }
-    ;
-    function observer1_resolve(value) {
-        console.log("[1] received value: " + value);
-        return new Promise(emitter);
-    }
-    ;
-    function observer1_reject(reason) {
-        console.log("[1] received error: " + reason);
-        return reason;
-    }
-    ;
-    function observer2_resolve(value) {
-        console.log("[2] received value: " + value);
-        return new Promise(emitter);
-    }
-    ;
-    function observer2_reject(reason) {
-        console.log("[2] received error: " + reason);
-        return reason;
-    }
-    ;
-    module.exports = function test() {
-        var queue1 = new Promise(emitter);
-        var queue2 = queue1.then(observer1_resolve, observer1_reject);
-        var queue3 = queue2.then(observer2_resolve, observer2_reject);
-        var queue23 = queue1.then(observer1_resolve, observer1_reject).then(observer2_resolve, observer2_reject);
-    };
-});
-System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($__require, exports, module) {
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    module.exports = function test() {
-        var button = document.createElement('button');
-        button.innerText = 'Click to resolve one-time promise';
-        var body = document.getElementsByTagName('body')[0];
-        body.appendChild(button);
-        var clickPromise = new Promise(function (resolve, reject) {
-            button.addEventListener('click', function (event) {
-                resolve(event);
+    var NSNotificationCenter = function () {
+        function NSNotificationCenter() {
+            this.useCapture = true;
+            this.el = document;
+        }
+        NSNotificationCenter.defaultCenter = function () {
+            return NSNotificationCenter.nc === null ? new NSNotificationCenter() : NSNotificationCenter.nc;
+        };
+        NSNotificationCenter.prototype.addObserver = function (name, observer) {
+            // add an appropriate event listener
+            var listener = function (e) {
+                observer(e.type, e.detail);
+                e.stopPropagation();
+            };
+            this.el.addEventListener(name, listener, this.useCapture);
+            return listener;
+        };
+        NSNotificationCenter.prototype.removeObserver = function (name, listener) {
+            this.el.removeEventListener(name, listener, this.useCapture);
+        };
+        NSNotificationCenter.prototype.post = function (name, userInfo) {
+            // create and dispatch the event
+            var event = new CustomEvent(name, {
+                detail: userInfo
             });
-        });
-        clickPromise.then(function (value) {
-            console.log('1. first clicked');
-        });
-        clickPromise.then(function (value) {
-            console.log('2. first clicked');
-        });
-        clickPromise.then(function (value) {
-            console.log('3. first clicked');
-        });
-    };
+            this.el.dispatchEvent(event);
+        };
+        return NSNotificationCenter;
+    }();
+    NSNotificationCenter.nc = null;
+    exports.NSNotificationCenter = NSNotificationCenter;
 });
-System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-notification-center/app/tests.js", ["src-notification-center/app/notificatoncenter.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var notificatoncenter_1 = $__require("src-notification-center/app/notificatoncenter.js");
+    var eventString = 'evString';
+    var eventObject = 'evObject';
+    var listeners = [];
+    function addObservers() {
+        var listener1 = notificatoncenter_1.NSNotificationCenter.defaultCenter().addObserver(eventString, stringObserver1);
+        listeners.push({ name: eventString, listener: listener1 });
+        console.log('add stringObserver1');
+        var listener2 = notificatoncenter_1.NSNotificationCenter.defaultCenter().addObserver(eventString, stringObserver2);
+        listeners.push({ name: eventString, listener: listener2 });
+        console.log('add stringObserver2');
+        var listener3 = notificatoncenter_1.NSNotificationCenter.defaultCenter().addObserver(eventObject, objectObserver);
+        listeners.push({ name: eventObject, listener: listener3 });
+        console.log('add objectObserver');
+    }
+    exports.addObservers = addObservers;
+    function removeObservers() {
+        listeners.forEach(function (value) {
+            console.log("remove " + value.name);
+            notificatoncenter_1.NSNotificationCenter.defaultCenter().removeObserver(value.name, value.listener);
+        });
+    }
+    exports.removeObservers = removeObservers;
+    function postString() {
+        console.log('post eventString with \'userInfo\'');
+        notificatoncenter_1.NSNotificationCenter.defaultCenter().post(eventString, 'userInfo');
+    }
+    exports.postString = postString;
+    function postObject() {
+        console.log('post eventObject with object');
+        notificatoncenter_1.NSNotificationCenter.defaultCenter().post(eventObject, { a: '123' });
+    }
+    exports.postObject = postObject;
+    function stringObserver1(name, value) {
+        console.log("[stringObserver1] event '" + name + "' received with " + value);
+    }
+    function stringObserver2(name, value) {
+        console.log("[stringObserver2] event '" + name + "' received with " + value);
+    }
+    function objectObserver(name, value) {
+        console.log("[objectObserver] event '" + name + "' received with " + value.a);
+    }
+});
+System.registerDynamic("src-notification-center/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-notification-center/app/tests.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -402,10 +329,8 @@ System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "npm
     var domready = $__require("npm:domready@1.0.8.js");
     $__require("npm:screenlog@0.2.2.js");
     var testbutton_1 = $__require("libs/testbutton.js");
-    var cases = $__require("src-promise/app/cases.js");
-    var t2 = $__require("src-promise/app/emitter-observer.js");
-    var t3 = $__require("src-promise/app/eventlistener.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'simple cases - 1', action: cases.test1 }, { text: 'simple cases - 2', action: cases.test2 }, { text: 'simple cases - 3', action: cases.test3 }, { text: 'emitter-observer', action: t2 }, { text: 'eventlistner to promise', action: t3 }];
+    var notification = $__require("src-notification-center/app/tests.js");
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'add observers', action: notification.addObservers }, { text: 'post string ', action: notification.postString }, { text: 'post object', action: notification.postObject }, { text: 'remove all observers', action: notification.removeObservers }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

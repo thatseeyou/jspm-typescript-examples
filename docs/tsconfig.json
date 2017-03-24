@@ -23,6 +23,8 @@
         // related to import MODULE
         "baseUrl": "..",
         "paths": {
+            "rxjs" : ["jspm_packages/npm/rxjs@5.2.0"],
+            "rxjs/*" : ["jspm_packages/npm/rxjs@5.2.0/*"],
             "*": [
                 "node_modules/@types/*",
                 "types/*"   // custom declarations

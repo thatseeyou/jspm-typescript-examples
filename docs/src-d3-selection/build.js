@@ -1,3 +1,238 @@
+System.registerDynamic('npm:domready@1.0.8/ready.js', [], true, function ($__require, exports, module) {
+  /* */
+  "format cjs";
+  /*!
+    * domready (c) Dustin Diaz 2014 - License MIT
+    */
+
+  var global = this || self,
+      GLOBAL = global;
+  !function (name, definition) {
+
+    if (typeof module != 'undefined') module.exports = definition();else if (typeof undefined == 'function' && typeof define.amd == 'object') define(definition);else this[name] = definition();
+  }('domready', function () {
+
+    var fns = [],
+        listener,
+        doc = document,
+        hack = doc.documentElement.doScroll,
+        domContentLoaded = 'DOMContentLoaded',
+        loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState);
+
+    if (!loaded) doc.addEventListener(domContentLoaded, listener = function () {
+      doc.removeEventListener(domContentLoaded, listener);
+      loaded = 1;
+      while (listener = fns.shift()) listener();
+    });
+
+    return function (fn) {
+      loaded ? setTimeout(fn, 0) : fns.push(fn);
+    };
+  });
+});
+System.registerDynamic("npm:domready@1.0.8.js", ["npm:domready@1.0.8/ready.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:domready@1.0.8/ready.js");
+});
+System.registerDynamic('npm:screenlog@0.2.2/screenlog.js', [], true, function ($__require, exports, module) {
+	/* */
+	"format cjs";
+
+	var global = this || self,
+	    GLOBAL = global;
+	(function () {
+
+		var logEl,
+		    isInitialized = false,
+		    _console = {}; // backup console obj to contain references of overridden fns.
+		_options = {
+			bgColor: 'black',
+			logColor: 'lightgreen',
+			infoColor: 'blue',
+			warnColor: 'orange',
+			errorColor: 'red',
+			freeConsole: false,
+			css: '',
+			autoScroll: true
+		};
+
+		function createElement(tag, css) {
+			var element = document.createElement(tag);
+			element.style.cssText = css;
+			return element;
+		}
+
+		function createPanel() {
+			var div = createElement('div', 'z-index:2147483647;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:bold;padding:5px;text-align:left;opacity:0.8;position:fixed;right:0;top:0;min-width:200px;max-height:50vh;overflow:auto;background:' + _options.bgColor + ';' + _options.css);
+			return div;
+		}
+
+		function genericLogger(color) {
+			return function () {
+				var el = createElement('div', 'line-height:18px;min-height:18px;background:' + (logEl.children.length % 2 ? 'rgba(255,255,255,0.1)' : '') + ';color:' + color); // zebra lines
+				var val = [].slice.call(arguments).reduce(function (prev, arg) {
+					return prev + ' ' + (typeof arg === "object" ? JSON.stringify(arg) : arg);
+				}, '');
+				el.textContent = val;
+
+				logEl.appendChild(el);
+
+				// Scroll to last element, if autoScroll option is set.
+				if (_options.autoScroll) {
+					logEl.scrollTop = logEl.scrollHeight - logEl.clientHeight;
+				}
+			};
+		}
+
+		function clear() {
+			logEl.innerHTML = '';
+		}
+
+		function log() {
+			return genericLogger(_options.logColor).apply(null, arguments);
+		}
+
+		function info() {
+			return genericLogger(_options.infoColor).apply(null, arguments);
+		}
+
+		function warn() {
+			return genericLogger(_options.warnColor).apply(null, arguments);
+		}
+
+		function error() {
+			return genericLogger(_options.errorColor).apply(null, arguments);
+		}
+
+		function setOptions(options) {
+			for (var i in options) if (options.hasOwnProperty(i) && _options.hasOwnProperty(i)) {
+				_options[i] = options[i];
+			}
+		}
+
+		function init(options) {
+			if (isInitialized) {
+				return;
+			}
+
+			isInitialized = true;
+
+			if (options) {
+				setOptions(options);
+			}
+
+			logEl = createPanel();
+			document.body.appendChild(logEl);
+
+			if (!_options.freeConsole) {
+				// Backup actual fns to keep it working together
+				_console.log = console.log;
+				_console.clear = console.clear;
+				_console.info = console.info;
+				_console.warn = console.warn;
+				_console.error = console.error;
+				console.log = originalFnCallDecorator(log, 'log');
+				console.clear = originalFnCallDecorator(clear, 'clear');
+				console.info = originalFnCallDecorator(info, 'info');
+				console.warn = originalFnCallDecorator(warn, 'warn');
+				console.error = originalFnCallDecorator(error, 'error');
+			}
+		}
+
+		function destroy() {
+			isInitialized = false;
+			console.log = _console.log;
+			console.clear = _console.clear;
+			console.info = _console.info;
+			console.warn = _console.warn;
+			console.error = _console.error;
+			logEl.remove();
+		}
+
+		/**
+   * Checking if isInitialized is set
+   */
+		function checkInitialized() {
+			if (!isInitialized) {
+				throw 'You need to call `screenLog.init()` first.';
+			}
+		}
+
+		/**
+   * Decorator for checking if isInitialized is set
+   * @param  {Function} fn Fn to decorate
+   * @return {Function}      Decorated fn.
+   */
+		function checkInitDecorator(fn) {
+			return function () {
+				checkInitialized();
+				return fn.apply(this, arguments);
+			};
+		}
+
+		/**
+   * Decorator for calling the original console's fn at the end of
+   * our overridden fn definitions.
+   * @param  {Function} fn Fn to decorate
+   * @param  {string} fn Name of original function
+   * @return {Function}      Decorated fn.
+   */
+		function originalFnCallDecorator(fn, fnName) {
+			return function () {
+				fn.apply(this, arguments);
+				if (typeof _console[fnName] === 'function') {
+					_console[fnName].apply(console, arguments);
+				}
+			};
+		}
+
+		// Public API
+		window.screenLog = {
+			init: init,
+			log: originalFnCallDecorator(checkInitDecorator(log), 'log'),
+			clear: originalFnCallDecorator(checkInitDecorator(clear), 'clear'),
+			info: originalFnCallDecorator(checkInitDecorator(clear), 'info'),
+			warn: originalFnCallDecorator(checkInitDecorator(warn), 'warn'),
+			error: originalFnCallDecorator(checkInitDecorator(error), 'error'),
+			destroy: checkInitDecorator(destroy)
+		};
+	})();
+});
+System.registerDynamic("npm:screenlog@0.2.2.js", ["npm:screenlog@0.2.2/screenlog.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:screenlog@0.2.2/screenlog.js");
+});
+System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function makeTestButtons(items) {
+        var container = document.getElementById('test-buttons');
+        items.forEach(function (item) {
+            makeTestButton(container, item.text, function (targetButton) {
+                console.log(">>> START of " + item.text);
+                item.action(targetButton);
+                console.log("<<< END of " + item.text);
+                console.log();
+            });
+        });
+    }
+    exports.makeTestButtons = makeTestButtons;
+    function makeTestButton(parent, text, action) {
+        var _this = this;
+        var button = document.createElement('button');
+        button.innerText = text;
+        button.style.display = 'block';
+        parent.appendChild(button);
+        button.addEventListener('click', function (event) {
+            action(_this);
+        });
+    }
+});
 System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
@@ -958,86 +1193,64 @@ System.registerDynamic("npm:d3-selection@1.0.4.js", ["npm:d3-selection@1.0.4/bui
       GLOBAL = global;
   module.exports = $__require("npm:d3-selection@1.0.4/build/d3-selection.js");
 });
-System.registerDynamic('npm:domready@1.0.8/ready.js', [], true, function ($__require, exports, module) {
-  /* */
-  "format cjs";
-  /*!
-    * domready (c) Dustin Diaz 2014 - License MIT
-    */
-
-  var global = this || self,
-      GLOBAL = global;
-  !function (name, definition) {
-
-    if (typeof module != 'undefined') module.exports = definition();else if (typeof undefined == 'function' && typeof define.amd == 'object') define(definition);else this[name] = definition();
-  }('domready', function () {
-
-    var fns = [],
-        listener,
-        doc = document,
-        hack = doc.documentElement.doScroll,
-        domContentLoaded = 'DOMContentLoaded',
-        loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState);
-
-    if (!loaded) doc.addEventListener(domContentLoaded, listener = function () {
-      doc.removeEventListener(domContentLoaded, listener);
-      loaded = 1;
-      while (listener = fns.shift()) listener();
-    });
-
-    return function (fn) {
-      loaded ? setTimeout(fn, 0) : fns.push(fn);
-    };
-  });
-});
-System.registerDynamic("npm:domready@1.0.8.js", ["npm:domready@1.0.8/ready.js"], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("npm:domready@1.0.8/ready.js");
-});
-System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.js", "npm:domready@1.0.8.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-d3-selection/app/tests.js", ["npm:d3-selection@1.0.4.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     var d3 = $__require("npm:d3-selection@1.0.4.js");
-    var domready = $__require("npm:domready@1.0.8.js");
-    domready(function () {
+    function testHtml() {
         // selection.html()
-        d3.select('body').html("\n      <div id=\"A\">\n        <div id=\"1\">div #1</div>\n        <div id=\"2\">div #2</div>\n        <div id=\"3\">div #3</div>\n    </div>\n    <div id=\"B\">\n        <div id=\"4\">div #4</div>\n        <div id=\"5\">div #5</div>\n        <div id=\"6\">div #6</div>\n    </div>\n  ");
-        var div = d3.selectAll('div');
+        d3.select('#container').html("\n      <div id=\"A\">\n        <div id=\"1\">div #1</div>\n        <div id=\"2\">div #2</div>\n        <div id=\"3\">div #3</div>\n    </div>\n    <div id=\"B\">\n        <div id=\"4\">div #4</div>\n        <div id=\"5\">div #5</div>\n        <div id=\"6\">div #6</div>\n    </div>\n  ");
+    }
+    exports.testHtml = testHtml;
+    function testStyle() {
+        var div = d3.select('#container').selectAll('div');
         // selection.style()
         div.selectAll(':nth-child(odd)').style('color', 'red');
         div.selectAll(':nth-child(even)').style('color', 'blue');
+    }
+    exports.testStyle = testStyle;
+    function testNode() {
+        var div = d3.select('#container').selectAll('div');
         // selection.node()
-        (function () {
-            var s = new XMLSerializer();
-            var n = s.serializeToString(div.node());
-            console.log(n);
-        })();
+        var s = new XMLSerializer();
+        var n = s.serializeToString(div.node());
+        console.log(n);
+    }
+    exports.testNode = testNode;
+    function testAppend() {
+        var div = d3.select('#container').selectAll('div');
         // selection.append(), selection.text()
-        (function () {
-            var count = 0;
-            div.selectAll('div').append('b').text(function (datum, index, group) {
-                return "([" + count++ + "]appended)";
-            });
-            count = 0;
-            div.selectAll('div').select(function (datum, index, group) {
-                var n = this;
-                return n.insertBefore(document.createElement('b'), n.firstChild);
-            }).text(function (datum, index, group) {
-                return "([" + count++ + "]inserted before Text)";
-            });
-        })();
+        var count = 0;
+        div.selectAll('div').append('b').text(function (datum, index, group) {
+            return "([" + count++ + "]appended)";
+        });
+    }
+    exports.testAppend = testAppend;
+    function testInsert() {
+        var count = 0;
+        var div = d3.select('#container').selectAll('div');
         // selection.insert(), selection.text()
-        (function () {
-            var count = 0;
-            div.selectAll('div').insert('b', ':first-child').text(function (datum, index, group) {
-                return "([" + count++ + "]inserted after Text)";
-            });
-        })();
-        var svg = d3.select('body').append('svg');
+        div.selectAll('div').insert('b', ':first-child').text(function (datum, index, group) {
+            return "([" + count++ + "]inserted before first-child)";
+        });
+    }
+    exports.testInsert = testInsert;
+    function testPrepend() {
+        var count = 0;
+        var div = d3.select('#container').selectAll('div');
+        div.selectAll('div').select(function (datum, index, group) {
+            var n = this;
+            return n.insertBefore(document.createElement('b'), n.firstChild);
+        }).text(function (datum, index, group) {
+            return "([" + count++ + "]inserted before Text)";
+        });
+    }
+    exports.testPrepend = testPrepend;
+    function testData() {
+        var svg = d3.select('#container').append('svg');
         svg.html('<circle style="fill: none; stroke: blue;" border="1" cx="5" cy="5" r="10"></circle>');
         // svg.append('circle');
         // svg.append('circle');
@@ -1062,14 +1275,17 @@ System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.
                 return d.r;
             });
         })();
+    }
+    exports.testData = testData;
+    function testDatum() {
+        var svg = d3.select('#container > svg');
         // selection.datum
-        (function () {
-            var circle = svg.selectAll("circle");
-            logSelection('before datum', circle);
-            circle.datum({ x: 5, y: 5 });
-            logSelection('after datum', circle);
-        })();
-    });
+        var circle = svg.selectAll("circle");
+        logSelection('before datum', circle);
+        circle.datum({ x: 5, y: 5 });
+        logSelection('after datum', circle);
+    }
+    exports.testDatum = testDatum;
     function logSelection(desc, selection) {
         console.log();
         console.log("LOG START {{{ // " + desc + " ----------------------------------------");
@@ -1096,5 +1312,21 @@ System.registerDynamic("src-d3-selection/app/main.js", ["npm:d3-selection@1.0.4.
         });
         console.log("}}} LOG END // " + desc);
     }
+});
+System.registerDynamic("src-d3-selection/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-d3-selection/app/tests.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var domready = $__require("npm:domready@1.0.8.js");
+    $__require("npm:screenlog@0.2.2.js");
+    var testbutton_1 = $__require("libs/testbutton.js");
+    var t = $__require("src-d3-selection/app/tests.js");
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'Selection.html()', action: t.testHtml }, { text: 'Selection.style()', action: t.testStyle }, { text: 'Selection.node()', action: t.testNode }, { text: 'Selection.append()', action: t.testAppend }, { text: 'Selection.insert()', action: t.testInsert }, { text: 'Prepend: insertBefore with select', action: t.testPrepend }, { text: 'Selection.data()/enter()/exit()', action: t.testData }, { text: 'Selection.datum()', action: t.testDatum }];
+    domready(function () {
+        screenLog.init({ autoScroll: true });
+        testbutton_1.makeTestButtons(tests);
+    });
 });
 //# sourceMappingURL=build.js.map

@@ -1,16 +1,15 @@
-import '../css/chartist.css!css';
-
 import domready = require('domready');
 import 'screenlog';
 import { TestItem, makeTestButtons } from '../../libs/testbutton';
 
-import * as t from './tests';
+import * as notification from './tests';
 
 const tests:TestItem[] = [
     {text: '---- clear log ----', action: screenLog.clear},
-    {text: 'line chart', action: t.testLine},
-    {text: 'pie chart', action: t.testPie},
-    {text: 'bar chart', action: t.testBar}
+    {text: 'add observers', action: notification.addObservers},
+    {text: 'post string ', action: notification.postString},
+    {text: 'post object', action: notification.postObject},
+    {text: 'remove all observers', action: notification.removeObservers}
 ];
 
 domready(() => {
