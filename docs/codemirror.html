@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="system.js"></script>
+    <script src="systemjs.config.js"></script>
+    <script src="src-codemirror/build.js"></script>
+    <script>
+        SystemJS.import('src-codemirror/app/main.js');
+    </script>
+</head>
+
+<body>
+    <p><a href="index.html">Go to DEMO home</a></p>
+    <h1>DEMO: CodeMirror</h1>
+    <p>refs:
+        <a href="https://github.com/thatseeyou/jspm-typescript-samples/blob/master/docs/codemirror.html">[index.html]</a>
+        <a href="https://github.com/thatseeyou/jspm-typescript-samples/tree/master/docs/src-codemirror/app">[app sources]</a>
+    </p>
+    <textarea class="code" rows="8" cols="80">
+function(console) {
+    var names = ["Ben", "Jafar", "Matt", "Priya", "Brian"],
+        counter;
+
+    for(counter = 0; counter < names.length; counter++) {
+        console.log(names[counter]);
+    }
+}
+	</textarea>
+    <script>
+        console.log('END OF BODY');
+    </script>
+</body>
+
+</html>

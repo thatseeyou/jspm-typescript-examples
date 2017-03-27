@@ -367,12 +367,13 @@ System.registerDynamic("src-promise/app/emitter-observer.js", [], true, function
         var queue23 = queue1.then(observer1_resolve, observer1_reject).then(observer2_resolve, observer2_reject);
     };
 });
-System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($__require, exports, module) {
+System.registerDynamic("src-promise/app/eventlistener.js", [], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
-    module.exports = function test() {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    function test1() {
         var button = document.createElement('button');
         button.innerText = 'Click to resolve one-time promise';
         var body = document.getElementsByTagName('body')[0];
@@ -384,6 +385,7 @@ System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($
         });
         clickPromise.then(function (value) {
             console.log('1. first clicked');
+            return Promise.resolve(value);
         });
         clickPromise.then(function (value) {
             console.log('2. first clicked');
@@ -391,9 +393,81 @@ System.registerDynamic('src-promise/app/eventlistener.js', [], true, function ($
         clickPromise.then(function (value) {
             console.log('3. first clicked');
         });
+    }
+    exports.test1 = test1;
+    function test2() {
+        var button = document.createElement('button');
+        button.innerText = 'Click to resolve one-time promise';
+        var body = document.getElementsByTagName('body')[0];
+        body.appendChild(button);
+        button.addEventListener('click', function (event) {
+            var clickPromise = new Promise(function (resolve, reject) {
+                resolve(event);
+            });
+            clickPromise.then(observer1);
+            clickPromise.then(observer2);
+            clickPromise.then(observer3);
+        });
+        function observer1(value) {
+            console.log('1. first clicked');
+        }
+        function observer2(value) {
+            console.log('2. first clicked');
+        }
+        function observer3(value) {
+            console.log('3. first clicked');
+        }
+    }
+    exports.test2 = test2;
+});
+System.registerDynamic("src-promise/app/function2promise.js", [], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    function add(left, right) {
+        return left + right;
+    }
+    function fn2promise(fn) {
+        var input = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            input[_i - 1] = arguments[_i];
+        }
+        var pipe = new Promise(function open(stdout /* resolve */, stderr /* reject */) {
+            var output = fn.apply(this, input);
+            try {
+                console.log(output + " sent");
+                stdout(output);
+            } catch (e) {
+                stderr(e);
+            }
+        });
+        return pipe;
+    }
+    module.exports = function test() {
+        var output = add(10, 20);
+        console.log("output is " + output);
+        var p1 = fn2promise(add, 10, 20);
+        p1.then(function (value) {
+            console.log(value + " received");
+        });
+        var p2 = fn2promise(add, 1, 2);
+        p2.then(function (value) {
+            console.log(value + " received");
+            return fn2promise(add, value, 3);
+        }).then(function (value) {
+            console.log(value + " received");
+            return fn2promise(add, value, 4);
+        }).then(function (value) {
+            console.log(value + " received");
+            return value + 5;
+        }).then(function (value) {
+            /* nothing received */
+            console.log(value + " received");
+        });
     };
 });
-System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-promise/app/cases.js", "src-promise/app/emitter-observer.js", "src-promise/app/eventlistener.js", "src-promise/app/function2promise.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -405,7 +479,8 @@ System.registerDynamic("src-promise/app/main.js", ["npm:domready@1.0.8.js", "npm
     var cases = $__require("src-promise/app/cases.js");
     var t2 = $__require("src-promise/app/emitter-observer.js");
     var t3 = $__require("src-promise/app/eventlistener.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'simple cases - 1', action: cases.test1 }, { text: 'simple cases - 2', action: cases.test2 }, { text: 'simple cases - 3', action: cases.test3 }, { text: 'emitter-observer', action: t2 }, { text: 'eventlistner to promise', action: t3 }];
+    var t4 = $__require("src-promise/app/function2promise.js");
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'simple cases - 1', action: cases.test1 }, { text: 'simple cases - 2', action: cases.test2 }, { text: 'simple cases - 3', action: cases.test3 }, { text: 'emitter-observer', action: t2 }, { text: 'function to promise', action: t4 }, { text: 'eventlistener to one-time promise', action: t3.test1 }, { text: 'eventlistener to continuous promise', action: t3.test2 }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

@@ -10,6 +10,7 @@ System.config({
   map: {
     "adamschwartz/log": "github:adamschwartz/log@0.3.0",
     "chartist": "npm:chartist@0.10.1",
+    "codemirror": "npm:codemirror@5.25.0",
     "css": "github:systemjs/plugin-css@0.1.32",
     "d3-selection": "npm:d3-selection@1.0.4",
     "domready": "npm:domready@1.0.8",
@@ -46,6 +47,10 @@ System.config({
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "ieee754": "npm:ieee754@1.1.8",
       "isarray": "npm:isarray@1.0.0",
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:codemirror@5.25.0": {
+      "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:inherits@2.0.1": {

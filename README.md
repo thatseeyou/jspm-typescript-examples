@@ -60,14 +60,14 @@ Using unbundled modules requires URL start with /. Github pages which start with
 
     ```
     $ jspm install npm:d3-selection
-    $ npm install @types/d3-selection
+    $ npm install --save @types/d3-selection
     ```
 
 * [gionkunz/chartist-js](https://github.com/gionkunz/chartist-js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/chartist.html)]
 
     ```
     $ jspm install chartist
-    $ npm install @types/chartist
+    $ npm install --save @types/chartist
     ```
 
 * [wagerfield/parallax](https://github.com/wagerfield/parallax)
@@ -100,4 +100,11 @@ Using unbundled modules requires URL start with /. Github pages which start with
     ```
     $ jspm install log=github:adamschwartz/log 
     $ vi types/log/index.d.ts
+    ```
+
+* [codemirror/CodeMirror](https://github.com/codemirror/CodeMirror) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/codemirror.html)]
+
+    ```
+    $ jspm install npm:codemirror
+    $ npm install --save @types/codemirror
     ```
