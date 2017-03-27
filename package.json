@@ -57,6 +57,7 @@
     }
   },
   "dependencies": {
+    "@types/chartist": "^0.9.34",
     "@types/d3-selection": "^1.0.10",
     "@types/jquery": "^2.0.40",
     "@types/shelljs": "^0.7.0"
