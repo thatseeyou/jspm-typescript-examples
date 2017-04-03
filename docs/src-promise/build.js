@@ -398,8 +398,7 @@ System.registerDynamic("src-promise/app/eventlistener.js", [], true, function ($
     function test2() {
         var button = document.createElement('button');
         button.innerText = 'Click to resolve one-time promise';
-        var body = document.getElementsByTagName('body')[0];
-        body.appendChild(button);
+        document.body.appendChild(button);
         button.addEventListener('click', function (event) {
             var clickPromise = new Promise(function (resolve, reject) {
                 resolve(event);

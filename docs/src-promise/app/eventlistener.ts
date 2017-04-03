@@ -27,8 +27,7 @@ export function test1() {
 export function test2() {
     let button = document.createElement('button');
     button.innerText = 'Click to resolve one-time promise';
-    let body = document.getElementsByTagName('body')[0];
-    body.appendChild(button);
+    document.body.appendChild(button);
 
     button.addEventListener('click', (event) => {
         let clickPromise = new Promise<MouseEvent>((resolve, reject) => {
