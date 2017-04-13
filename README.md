@@ -78,14 +78,20 @@ Using unbundled modules requires URL start with /. Github pages which start with
     $ jspm install parallax=github:wagerfield/parallax -o '{ main: "deploy/jquery.parallax.js" }'
     ```
 
-* [pixelcog/parallax.js](https://github.com/pixelcog/parallax.js) & jquery
-[[Demo](https://thatseeyou.github.io/jspm-typescript-samples/jquery-parallax.js.html)]
+* [pixelcog/parallax.js](https://github.com/pixelcog/parallax.js) & jquery [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/jquery-parallax.js.html)]
 
     jquery-parallax.js does not support jquery 3.X.
 
     ```
     $ jspm install jquery@^2.2.4
     $ jspm install npm:jquery-parallax.js
+    ```
+
+* [stevenwanderski/bxslider-4](https://github.com/stevenwanderski/bxslider-4) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/bxslider.html)]
+
+    ```
+    $ jspm install npm:bxslider -o '{ main: "dist/jquery.bxslider.js" }'
+    $ npm install -S @types/dw-bxslider-4
     ```
 
 * [chinchang/screenlog.js](https://github.com/chinchang/screenlog.js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/screenlog.html)]
