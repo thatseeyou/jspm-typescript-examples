@@ -25,6 +25,7 @@
         "paths": {
             "rxjs" : ["jspm_packages/npm/rxjs@5.2.0"],
             "rxjs/*" : ["jspm_packages/npm/rxjs@5.2.0/*"],
+            "immutable" : ["jspm_packages/npm/immutable@3.8.1/dist"],
             "*": [
                 "node_modules/@types/*",
                 "types/*"   // custom declarations

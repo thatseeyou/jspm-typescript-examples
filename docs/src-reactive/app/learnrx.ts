@@ -17,25 +17,7 @@ import 'rxjs/add/operator/throttleTime';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/scan';
 
-function buttonForTest(text: string):HTMLButtonElement {
-    let button = document.createElement('button');
-    button.innerText = text;
-    button.style.height = '80px';
-    document.body.appendChild(button);
-
-    return button;
-}
-
-function inputForTest(label: string):HTMLInputElement {
-    let labelEl = document.createElement('label');
-    labelEl.innerText = label;
-    let inputEl = document.createElement('input');
-    labelEl.appendChild(inputEl);
-
-    document.body.appendChild(labelEl);
-
-    return inputEl;
-}
+import { buttonForTest, inputForTest } from './helper';
 
 export function ex5() {
     var newReleases = [

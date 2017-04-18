@@ -56,6 +56,21 @@ Using unbundled modules requires URL start with /. Github pages which start with
         }
     ...
     ```
+
+* [immutable](https://github.com/facebook/immutable-js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/immutable.html)]
+    ```
+    $ jspm install immutable
+    $ vi docs/tsconfig.json
+    ...
+        "baseUrl": "..",
+        "paths": {
+            ...
+            "immutable" : ["jspm_packages/npm/immutable@3.8.1/dist"],
+            ...
+        }
+    ...
+    ```
+
 * [d3/d3-selection](https://github.com/d3/d3-selection) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/d3-selection.html)]
 
     ```
