@@ -1,6 +1,9 @@
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/operator/pluck';
 import { Map, fromJS } from 'immutable';
+import 'rxjs/add/operator/pluck';
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeAll';
 
 import { buttonForTest, inputForTest } from './helper';
 
@@ -69,10 +72,9 @@ export function stateStore() {
 
     // We merge the three state change producing observables
     let stateObservable = Observable.merge(
-        increase,
-        decrease,
-        input
+        [increase, decrease, input]
     )
+        .mergeAll()
         .scan((state:State, changeFn) => changeFn(state), {
             count: 0,
             inputValue: '',

@@ -233,429 +233,6 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic('npm:rxjs@5.2.0/Subject.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
-  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
-  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
-  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
-  var SubjectSubscriber = function (_super) {
-    __extends(SubjectSubscriber, _super);
-    function SubjectSubscriber(destination) {
-      _super.call(this, destination);
-      this.destination = destination;
-    }
-    return SubjectSubscriber;
-  }(Subscriber_1.Subscriber);
-  exports.SubjectSubscriber = SubjectSubscriber;
-  var Subject = function (_super) {
-    __extends(Subject, _super);
-    function Subject() {
-      _super.call(this);
-      this.observers = [];
-      this.closed = false;
-      this.isStopped = false;
-      this.hasError = false;
-      this.thrownError = null;
-    }
-    Subject.prototype[rxSubscriber_1.$$rxSubscriber] = function () {
-      return new SubjectSubscriber(this);
-    };
-    Subject.prototype.lift = function (operator) {
-      var subject = new AnonymousSubject(this, this);
-      subject.operator = operator;
-      return subject;
-    };
-    Subject.prototype.next = function (value) {
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      }
-      if (!this.isStopped) {
-        var observers = this.observers;
-        var len = observers.length;
-        var copy = observers.slice();
-        for (var i = 0; i < len; i++) {
-          copy[i].next(value);
-        }
-      }
-    };
-    Subject.prototype.error = function (err) {
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      }
-      this.hasError = true;
-      this.thrownError = err;
-      this.isStopped = true;
-      var observers = this.observers;
-      var len = observers.length;
-      var copy = observers.slice();
-      for (var i = 0; i < len; i++) {
-        copy[i].error(err);
-      }
-      this.observers.length = 0;
-    };
-    Subject.prototype.complete = function () {
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      }
-      this.isStopped = true;
-      var observers = this.observers;
-      var len = observers.length;
-      var copy = observers.slice();
-      for (var i = 0; i < len; i++) {
-        copy[i].complete();
-      }
-      this.observers.length = 0;
-    };
-    Subject.prototype.unsubscribe = function () {
-      this.isStopped = true;
-      this.closed = true;
-      this.observers = null;
-    };
-    Subject.prototype._trySubscribe = function (subscriber) {
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      } else {
-        return _super.prototype._trySubscribe.call(this, subscriber);
-      }
-    };
-    Subject.prototype._subscribe = function (subscriber) {
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      } else if (this.hasError) {
-        subscriber.error(this.thrownError);
-        return Subscription_1.Subscription.EMPTY;
-      } else if (this.isStopped) {
-        subscriber.complete();
-        return Subscription_1.Subscription.EMPTY;
-      } else {
-        this.observers.push(subscriber);
-        return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-      }
-    };
-    Subject.prototype.asObservable = function () {
-      var observable = new Observable_1.Observable();
-      observable.source = this;
-      return observable;
-    };
-    Subject.create = function (destination, source) {
-      return new AnonymousSubject(destination, source);
-    };
-    return Subject;
-  }(Observable_1.Observable);
-  exports.Subject = Subject;
-  var AnonymousSubject = function (_super) {
-    __extends(AnonymousSubject, _super);
-    function AnonymousSubject(destination, source) {
-      _super.call(this);
-      this.destination = destination;
-      this.source = source;
-    }
-    AnonymousSubject.prototype.next = function (value) {
-      var destination = this.destination;
-      if (destination && destination.next) {
-        destination.next(value);
-      }
-    };
-    AnonymousSubject.prototype.error = function (err) {
-      var destination = this.destination;
-      if (destination && destination.error) {
-        this.destination.error(err);
-      }
-    };
-    AnonymousSubject.prototype.complete = function () {
-      var destination = this.destination;
-      if (destination && destination.complete) {
-        this.destination.complete();
-      }
-    };
-    AnonymousSubject.prototype._subscribe = function (subscriber) {
-      var source = this.source;
-      if (source) {
-        return this.source.subscribe(subscriber);
-      } else {
-        return Subscription_1.Subscription.EMPTY;
-      }
-    };
-    return AnonymousSubject;
-  }(Subject);
-  exports.AnonymousSubject = AnonymousSubject;
-});
-System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueAction.js", ["npm:rxjs@5.2.0/scheduler/AsyncAction.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var AsyncAction_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncAction.js");
-  var QueueAction = function (_super) {
-    __extends(QueueAction, _super);
-    function QueueAction(scheduler, work) {
-      _super.call(this, scheduler, work);
-      this.scheduler = scheduler;
-      this.work = work;
-    }
-    QueueAction.prototype.schedule = function (state, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      if (delay > 0) {
-        return _super.prototype.schedule.call(this, state, delay);
-      }
-      this.delay = delay;
-      this.state = state;
-      this.scheduler.flush(this);
-      return this;
-    };
-    QueueAction.prototype.execute = function (state, delay) {
-      return delay > 0 || this.closed ? _super.prototype.execute.call(this, state, delay) : this._execute(state, delay);
-    };
-    QueueAction.prototype.requestAsyncId = function (scheduler, id, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      if (delay !== null && delay > 0 || delay === null && this.delay > 0) {
-        return _super.prototype.requestAsyncId.call(this, scheduler, id, delay);
-      }
-      return scheduler.flush(this);
-    };
-    return QueueAction;
-  }(AsyncAction_1.AsyncAction);
-  exports.QueueAction = QueueAction;
-});
-System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueScheduler.js", ["npm:rxjs@5.2.0/scheduler/AsyncScheduler.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var AsyncScheduler_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncScheduler.js");
-  var QueueScheduler = function (_super) {
-    __extends(QueueScheduler, _super);
-    function QueueScheduler() {
-      _super.apply(this, arguments);
-    }
-    return QueueScheduler;
-  }(AsyncScheduler_1.AsyncScheduler);
-  exports.QueueScheduler = QueueScheduler;
-});
-System.registerDynamic('npm:rxjs@5.2.0/scheduler/queue.js', ['npm:rxjs@5.2.0/scheduler/QueueAction.js', 'npm:rxjs@5.2.0/scheduler/QueueScheduler.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var QueueAction_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueAction.js');
-  var QueueScheduler_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueScheduler.js');
-  exports.queue = new QueueScheduler_1.QueueScheduler(QueueAction_1.QueueAction);
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    var __extends = this && this.__extends || function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-    /**
-     * An error thrown when an action is invalid because the object has been
-     * unsubscribed.
-     *
-     * @see {@link Subject}
-     * @see {@link BehaviorSubject}
-     *
-     * @class ObjectUnsubscribedError
-     */
-    var ObjectUnsubscribedError = function (_super) {
-        __extends(ObjectUnsubscribedError, _super);
-        function ObjectUnsubscribedError() {
-            var err = _super.call(this, 'object unsubscribed');
-            this.name = err.name = 'ObjectUnsubscribedError';
-            this.stack = err.stack;
-            this.message = err.message;
-        }
-        return ObjectUnsubscribedError;
-    }(Error);
-    exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
-    
-});
-System.registerDynamic("npm:rxjs@5.2.0/SubjectSubscription.js", ["npm:rxjs@5.2.0/Subscription.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscription_1 = $__require("npm:rxjs@5.2.0/Subscription.js");
-  var SubjectSubscription = function (_super) {
-    __extends(SubjectSubscription, _super);
-    function SubjectSubscription(subject, subscriber) {
-      _super.call(this);
-      this.subject = subject;
-      this.subscriber = subscriber;
-      this.closed = false;
-    }
-    SubjectSubscription.prototype.unsubscribe = function () {
-      if (this.closed) {
-        return;
-      }
-      this.closed = true;
-      var subject = this.subject;
-      var observers = subject.observers;
-      this.subject = null;
-      if (!observers || observers.length === 0 || subject.isStopped || subject.closed) {
-        return;
-      }
-      var subscriberIndex = observers.indexOf(this.subscriber);
-      if (subscriberIndex !== -1) {
-        observers.splice(subscriberIndex, 1);
-      }
-    };
-    return SubjectSubscription;
-  }(Subscription_1.Subscription);
-  exports.SubjectSubscription = SubjectSubscription;
-});
-System.registerDynamic('npm:rxjs@5.2.0/ReplaySubject.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/scheduler/queue.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
-  var queue_1 = $__require('npm:rxjs@5.2.0/scheduler/queue.js');
-  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
-  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
-  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
-  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
-  var ReplaySubject = function (_super) {
-    __extends(ReplaySubject, _super);
-    function ReplaySubject(bufferSize, windowTime, scheduler) {
-      if (bufferSize === void 0) {
-        bufferSize = Number.POSITIVE_INFINITY;
-      }
-      if (windowTime === void 0) {
-        windowTime = Number.POSITIVE_INFINITY;
-      }
-      _super.call(this);
-      this.scheduler = scheduler;
-      this._events = [];
-      this._bufferSize = bufferSize < 1 ? 1 : bufferSize;
-      this._windowTime = windowTime < 1 ? 1 : windowTime;
-    }
-    ReplaySubject.prototype.next = function (value) {
-      var now = this._getNow();
-      this._events.push(new ReplayEvent(now, value));
-      this._trimBufferThenGetEvents();
-      _super.prototype.next.call(this, value);
-    };
-    ReplaySubject.prototype._subscribe = function (subscriber) {
-      var _events = this._trimBufferThenGetEvents();
-      var scheduler = this.scheduler;
-      var subscription;
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      } else if (this.hasError) {
-        subscription = Subscription_1.Subscription.EMPTY;
-      } else if (this.isStopped) {
-        subscription = Subscription_1.Subscription.EMPTY;
-      } else {
-        this.observers.push(subscriber);
-        subscription = new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-      }
-      if (scheduler) {
-        subscriber.add(subscriber = new observeOn_1.ObserveOnSubscriber(subscriber, scheduler));
-      }
-      var len = _events.length;
-      for (var i = 0; i < len && !subscriber.closed; i++) {
-        subscriber.next(_events[i].value);
-      }
-      if (this.hasError) {
-        subscriber.error(this.thrownError);
-      } else if (this.isStopped) {
-        subscriber.complete();
-      }
-      return subscription;
-    };
-    ReplaySubject.prototype._getNow = function () {
-      return (this.scheduler || queue_1.queue).now();
-    };
-    ReplaySubject.prototype._trimBufferThenGetEvents = function () {
-      var now = this._getNow();
-      var _bufferSize = this._bufferSize;
-      var _windowTime = this._windowTime;
-      var _events = this._events;
-      var eventsCount = _events.length;
-      var spliceCount = 0;
-      while (spliceCount < eventsCount) {
-        if (now - _events[spliceCount].time < _windowTime) {
-          break;
-        }
-        spliceCount++;
-      }
-      if (eventsCount > _bufferSize) {
-        spliceCount = Math.max(spliceCount, eventsCount - _bufferSize);
-      }
-      if (spliceCount > 0) {
-        _events.splice(0, spliceCount);
-      }
-      return _events;
-    };
-    return ReplaySubject;
-  }(Subject_1.Subject);
-  exports.ReplaySubject = ReplaySubject;
-  var ReplayEvent = function () {
-    function ReplayEvent(time, value) {
-      this.time = time;
-      this.value = value;
-    }
-    return ReplayEvent;
-  }();
-});
 System.registerDynamic("npm:rxjs@5.2.0/observable/RangeObservable.js", ["npm:rxjs@5.2.0/Observable.js"], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -1261,6 +838,814 @@ System.registerDynamic("src-reactive/app/creating.js", ["npm:rxjs@5.2.0/Observab
     }
     exports.testMerge = testMerge;
 });
+System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueAction.js", ["npm:rxjs@5.2.0/scheduler/AsyncAction.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var AsyncAction_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncAction.js");
+  var QueueAction = function (_super) {
+    __extends(QueueAction, _super);
+    function QueueAction(scheduler, work) {
+      _super.call(this, scheduler, work);
+      this.scheduler = scheduler;
+      this.work = work;
+    }
+    QueueAction.prototype.schedule = function (state, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      if (delay > 0) {
+        return _super.prototype.schedule.call(this, state, delay);
+      }
+      this.delay = delay;
+      this.state = state;
+      this.scheduler.flush(this);
+      return this;
+    };
+    QueueAction.prototype.execute = function (state, delay) {
+      return delay > 0 || this.closed ? _super.prototype.execute.call(this, state, delay) : this._execute(state, delay);
+    };
+    QueueAction.prototype.requestAsyncId = function (scheduler, id, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      if (delay !== null && delay > 0 || delay === null && this.delay > 0) {
+        return _super.prototype.requestAsyncId.call(this, scheduler, id, delay);
+      }
+      return scheduler.flush(this);
+    };
+    return QueueAction;
+  }(AsyncAction_1.AsyncAction);
+  exports.QueueAction = QueueAction;
+});
+System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueScheduler.js", ["npm:rxjs@5.2.0/scheduler/AsyncScheduler.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var AsyncScheduler_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncScheduler.js");
+  var QueueScheduler = function (_super) {
+    __extends(QueueScheduler, _super);
+    function QueueScheduler() {
+      _super.apply(this, arguments);
+    }
+    return QueueScheduler;
+  }(AsyncScheduler_1.AsyncScheduler);
+  exports.QueueScheduler = QueueScheduler;
+});
+System.registerDynamic('npm:rxjs@5.2.0/scheduler/queue.js', ['npm:rxjs@5.2.0/scheduler/QueueAction.js', 'npm:rxjs@5.2.0/scheduler/QueueScheduler.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var QueueAction_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueAction.js');
+  var QueueScheduler_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueScheduler.js');
+  exports.queue = new QueueScheduler_1.QueueScheduler(QueueAction_1.QueueAction);
+});
+System.registerDynamic('npm:rxjs@5.2.0/ReplaySubject.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/scheduler/queue.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
+  var queue_1 = $__require('npm:rxjs@5.2.0/scheduler/queue.js');
+  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
+  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
+  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
+  var ReplaySubject = function (_super) {
+    __extends(ReplaySubject, _super);
+    function ReplaySubject(bufferSize, windowTime, scheduler) {
+      if (bufferSize === void 0) {
+        bufferSize = Number.POSITIVE_INFINITY;
+      }
+      if (windowTime === void 0) {
+        windowTime = Number.POSITIVE_INFINITY;
+      }
+      _super.call(this);
+      this.scheduler = scheduler;
+      this._events = [];
+      this._bufferSize = bufferSize < 1 ? 1 : bufferSize;
+      this._windowTime = windowTime < 1 ? 1 : windowTime;
+    }
+    ReplaySubject.prototype.next = function (value) {
+      var now = this._getNow();
+      this._events.push(new ReplayEvent(now, value));
+      this._trimBufferThenGetEvents();
+      _super.prototype.next.call(this, value);
+    };
+    ReplaySubject.prototype._subscribe = function (subscriber) {
+      var _events = this._trimBufferThenGetEvents();
+      var scheduler = this.scheduler;
+      var subscription;
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      } else if (this.hasError) {
+        subscription = Subscription_1.Subscription.EMPTY;
+      } else if (this.isStopped) {
+        subscription = Subscription_1.Subscription.EMPTY;
+      } else {
+        this.observers.push(subscriber);
+        subscription = new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+      }
+      if (scheduler) {
+        subscriber.add(subscriber = new observeOn_1.ObserveOnSubscriber(subscriber, scheduler));
+      }
+      var len = _events.length;
+      for (var i = 0; i < len && !subscriber.closed; i++) {
+        subscriber.next(_events[i].value);
+      }
+      if (this.hasError) {
+        subscriber.error(this.thrownError);
+      } else if (this.isStopped) {
+        subscriber.complete();
+      }
+      return subscription;
+    };
+    ReplaySubject.prototype._getNow = function () {
+      return (this.scheduler || queue_1.queue).now();
+    };
+    ReplaySubject.prototype._trimBufferThenGetEvents = function () {
+      var now = this._getNow();
+      var _bufferSize = this._bufferSize;
+      var _windowTime = this._windowTime;
+      var _events = this._events;
+      var eventsCount = _events.length;
+      var spliceCount = 0;
+      while (spliceCount < eventsCount) {
+        if (now - _events[spliceCount].time < _windowTime) {
+          break;
+        }
+        spliceCount++;
+      }
+      if (eventsCount > _bufferSize) {
+        spliceCount = Math.max(spliceCount, eventsCount - _bufferSize);
+      }
+      if (spliceCount > 0) {
+        _events.splice(0, spliceCount);
+      }
+      return _events;
+    };
+    return ReplaySubject;
+  }(Subject_1.Subject);
+  exports.ReplaySubject = ReplaySubject;
+  var ReplayEvent = function () {
+    function ReplayEvent(time, value) {
+      this.time = time;
+      this.value = value;
+    }
+    return ReplayEvent;
+  }();
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    var __extends = this && this.__extends || function (d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+    /**
+     * An error thrown when an action is invalid because the object has been
+     * unsubscribed.
+     *
+     * @see {@link Subject}
+     * @see {@link BehaviorSubject}
+     *
+     * @class ObjectUnsubscribedError
+     */
+    var ObjectUnsubscribedError = function (_super) {
+        __extends(ObjectUnsubscribedError, _super);
+        function ObjectUnsubscribedError() {
+            var err = _super.call(this, 'object unsubscribed');
+            this.name = err.name = 'ObjectUnsubscribedError';
+            this.stack = err.stack;
+            this.message = err.message;
+        }
+        return ObjectUnsubscribedError;
+    }(Error);
+    exports.ObjectUnsubscribedError = ObjectUnsubscribedError;
+    
+});
+System.registerDynamic("npm:rxjs@5.2.0/SubjectSubscription.js", ["npm:rxjs@5.2.0/Subscription.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscription_1 = $__require("npm:rxjs@5.2.0/Subscription.js");
+  var SubjectSubscription = function (_super) {
+    __extends(SubjectSubscription, _super);
+    function SubjectSubscription(subject, subscriber) {
+      _super.call(this);
+      this.subject = subject;
+      this.subscriber = subscriber;
+      this.closed = false;
+    }
+    SubjectSubscription.prototype.unsubscribe = function () {
+      if (this.closed) {
+        return;
+      }
+      this.closed = true;
+      var subject = this.subject;
+      var observers = subject.observers;
+      this.subject = null;
+      if (!observers || observers.length === 0 || subject.isStopped || subject.closed) {
+        return;
+      }
+      var subscriberIndex = observers.indexOf(this.subscriber);
+      if (subscriberIndex !== -1) {
+        observers.splice(subscriberIndex, 1);
+      }
+    };
+    return SubjectSubscription;
+  }(Subscription_1.Subscription);
+  exports.SubjectSubscription = SubjectSubscription;
+});
+System.registerDynamic('npm:rxjs@5.2.0/Subject.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
+  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
+  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
+  var SubjectSubscriber = function (_super) {
+    __extends(SubjectSubscriber, _super);
+    function SubjectSubscriber(destination) {
+      _super.call(this, destination);
+      this.destination = destination;
+    }
+    return SubjectSubscriber;
+  }(Subscriber_1.Subscriber);
+  exports.SubjectSubscriber = SubjectSubscriber;
+  var Subject = function (_super) {
+    __extends(Subject, _super);
+    function Subject() {
+      _super.call(this);
+      this.observers = [];
+      this.closed = false;
+      this.isStopped = false;
+      this.hasError = false;
+      this.thrownError = null;
+    }
+    Subject.prototype[rxSubscriber_1.$$rxSubscriber] = function () {
+      return new SubjectSubscriber(this);
+    };
+    Subject.prototype.lift = function (operator) {
+      var subject = new AnonymousSubject(this, this);
+      subject.operator = operator;
+      return subject;
+    };
+    Subject.prototype.next = function (value) {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      }
+      if (!this.isStopped) {
+        var observers = this.observers;
+        var len = observers.length;
+        var copy = observers.slice();
+        for (var i = 0; i < len; i++) {
+          copy[i].next(value);
+        }
+      }
+    };
+    Subject.prototype.error = function (err) {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      }
+      this.hasError = true;
+      this.thrownError = err;
+      this.isStopped = true;
+      var observers = this.observers;
+      var len = observers.length;
+      var copy = observers.slice();
+      for (var i = 0; i < len; i++) {
+        copy[i].error(err);
+      }
+      this.observers.length = 0;
+    };
+    Subject.prototype.complete = function () {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      }
+      this.isStopped = true;
+      var observers = this.observers;
+      var len = observers.length;
+      var copy = observers.slice();
+      for (var i = 0; i < len; i++) {
+        copy[i].complete();
+      }
+      this.observers.length = 0;
+    };
+    Subject.prototype.unsubscribe = function () {
+      this.isStopped = true;
+      this.closed = true;
+      this.observers = null;
+    };
+    Subject.prototype._trySubscribe = function (subscriber) {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      } else {
+        return _super.prototype._trySubscribe.call(this, subscriber);
+      }
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      } else if (this.hasError) {
+        subscriber.error(this.thrownError);
+        return Subscription_1.Subscription.EMPTY;
+      } else if (this.isStopped) {
+        subscriber.complete();
+        return Subscription_1.Subscription.EMPTY;
+      } else {
+        this.observers.push(subscriber);
+        return new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+      }
+    };
+    Subject.prototype.asObservable = function () {
+      var observable = new Observable_1.Observable();
+      observable.source = this;
+      return observable;
+    };
+    Subject.create = function (destination, source) {
+      return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+  }(Observable_1.Observable);
+  exports.Subject = Subject;
+  var AnonymousSubject = function (_super) {
+    __extends(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+      _super.call(this);
+      this.destination = destination;
+      this.source = source;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+      var destination = this.destination;
+      if (destination && destination.next) {
+        destination.next(value);
+      }
+    };
+    AnonymousSubject.prototype.error = function (err) {
+      var destination = this.destination;
+      if (destination && destination.error) {
+        this.destination.error(err);
+      }
+    };
+    AnonymousSubject.prototype.complete = function () {
+      var destination = this.destination;
+      if (destination && destination.complete) {
+        this.destination.complete();
+      }
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+      var source = this.source;
+      if (source) {
+        return this.source.subscribe(subscriber);
+      } else {
+        return Subscription_1.Subscription.EMPTY;
+      }
+    };
+    return AnonymousSubject;
+  }(Subject);
+  exports.AnonymousSubject = AnonymousSubject;
+});
+System.registerDynamic('npm:rxjs@5.2.0/observable/ConnectableObservable.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Subscription.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+  var ConnectableObservable = function (_super) {
+    __extends(ConnectableObservable, _super);
+    function ConnectableObservable(source, subjectFactory) {
+      _super.call(this);
+      this.source = source;
+      this.subjectFactory = subjectFactory;
+      this._refCount = 0;
+    }
+    ConnectableObservable.prototype._subscribe = function (subscriber) {
+      return this.getSubject().subscribe(subscriber);
+    };
+    ConnectableObservable.prototype.getSubject = function () {
+      var subject = this._subject;
+      if (!subject || subject.isStopped) {
+        this._subject = this.subjectFactory();
+      }
+      return this._subject;
+    };
+    ConnectableObservable.prototype.connect = function () {
+      var connection = this._connection;
+      if (!connection) {
+        connection = this._connection = new Subscription_1.Subscription();
+        connection.add(this.source.subscribe(new ConnectableSubscriber(this.getSubject(), this)));
+        if (connection.closed) {
+          this._connection = null;
+          connection = Subscription_1.Subscription.EMPTY;
+        } else {
+          this._connection = connection;
+        }
+      }
+      return connection;
+    };
+    ConnectableObservable.prototype.refCount = function () {
+      return this.lift(new RefCountOperator(this));
+    };
+    return ConnectableObservable;
+  }(Observable_1.Observable);
+  exports.ConnectableObservable = ConnectableObservable;
+  exports.connectableObservableDescriptor = {
+    operator: { value: null },
+    _refCount: {
+      value: 0,
+      writable: true
+    },
+    _subscribe: { value: ConnectableObservable.prototype._subscribe },
+    getSubject: { value: ConnectableObservable.prototype.getSubject },
+    connect: { value: ConnectableObservable.prototype.connect },
+    refCount: { value: ConnectableObservable.prototype.refCount }
+  };
+  var ConnectableSubscriber = function (_super) {
+    __extends(ConnectableSubscriber, _super);
+    function ConnectableSubscriber(destination, connectable) {
+      _super.call(this, destination);
+      this.connectable = connectable;
+    }
+    ConnectableSubscriber.prototype._error = function (err) {
+      this._unsubscribe();
+      _super.prototype._error.call(this, err);
+    };
+    ConnectableSubscriber.prototype._complete = function () {
+      this._unsubscribe();
+      _super.prototype._complete.call(this);
+    };
+    ConnectableSubscriber.prototype._unsubscribe = function () {
+      var connectable = this.connectable;
+      if (connectable) {
+        this.connectable = null;
+        var connection = connectable._connection;
+        connectable._refCount = 0;
+        connectable._subject = null;
+        connectable._connection = null;
+        if (connection) {
+          connection.unsubscribe();
+        }
+      }
+    };
+    return ConnectableSubscriber;
+  }(Subject_1.SubjectSubscriber);
+  var RefCountOperator = function () {
+    function RefCountOperator(connectable) {
+      this.connectable = connectable;
+    }
+    RefCountOperator.prototype.call = function (subscriber, source) {
+      var connectable = this.connectable;
+      connectable._refCount++;
+      var refCounter = new RefCountSubscriber(subscriber, connectable);
+      var subscription = source.subscribe(refCounter);
+      if (!refCounter.closed) {
+        refCounter.connection = connectable.connect();
+      }
+      return subscription;
+    };
+    return RefCountOperator;
+  }();
+  var RefCountSubscriber = function (_super) {
+    __extends(RefCountSubscriber, _super);
+    function RefCountSubscriber(destination, connectable) {
+      _super.call(this, destination);
+      this.connectable = connectable;
+    }
+    RefCountSubscriber.prototype._unsubscribe = function () {
+      var connectable = this.connectable;
+      if (!connectable) {
+        this.connection = null;
+        return;
+      }
+      this.connectable = null;
+      var refCount = connectable._refCount;
+      if (refCount <= 0) {
+        this.connection = null;
+        return;
+      }
+      connectable._refCount = refCount - 1;
+      if (refCount > 1) {
+        this.connection = null;
+        return;
+      }
+      var connection = this.connection;
+      var sharedConnection = connectable._connection;
+      this.connection = null;
+      if (sharedConnection && (!connection || sharedConnection === connection)) {
+        sharedConnection.unsubscribe();
+      }
+    };
+    return RefCountSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/multicast.js', ['npm:rxjs@5.2.0/observable/ConnectableObservable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var ConnectableObservable_1 = $__require('npm:rxjs@5.2.0/observable/ConnectableObservable.js');
+  function multicast(subjectOrSubjectFactory, selector) {
+    var subjectFactory;
+    if (typeof subjectOrSubjectFactory === 'function') {
+      subjectFactory = subjectOrSubjectFactory;
+    } else {
+      subjectFactory = function subjectFactory() {
+        return subjectOrSubjectFactory;
+      };
+    }
+    if (typeof selector === 'function') {
+      return this.lift(new MulticastOperator(subjectFactory, selector));
+    }
+    var connectable = Object.create(this, ConnectableObservable_1.connectableObservableDescriptor);
+    connectable.source = this;
+    connectable.subjectFactory = subjectFactory;
+    return connectable;
+  }
+  exports.multicast = multicast;
+  var MulticastOperator = function () {
+    function MulticastOperator(subjectFactory, selector) {
+      this.subjectFactory = subjectFactory;
+      this.selector = selector;
+    }
+    MulticastOperator.prototype.call = function (subscriber, source) {
+      var selector = this.selector;
+      var subject = this.subjectFactory();
+      var subscription = selector(subject).subscribe(subscriber);
+      subscription.add(source.subscribe(subject));
+      return subscription;
+    };
+    return MulticastOperator;
+  }();
+  exports.MulticastOperator = MulticastOperator;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/multicast.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/multicast.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var multicast_1 = $__require('npm:rxjs@5.2.0/operator/multicast.js');
+  Observable_1.Observable.prototype.multicast = multicast_1.multicast;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/timestamp.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/scheduler/async.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var async_1 = $__require('npm:rxjs@5.2.0/scheduler/async.js');
+  function timestamp(scheduler) {
+    if (scheduler === void 0) {
+      scheduler = async_1.async;
+    }
+    return this.lift(new TimestampOperator(scheduler));
+  }
+  exports.timestamp = timestamp;
+  var Timestamp = function () {
+    function Timestamp(value, timestamp) {
+      this.value = value;
+      this.timestamp = timestamp;
+    }
+    return Timestamp;
+  }();
+  exports.Timestamp = Timestamp;
+  ;
+  var TimestampOperator = function () {
+    function TimestampOperator(scheduler) {
+      this.scheduler = scheduler;
+    }
+    TimestampOperator.prototype.call = function (observer, source) {
+      return source.subscribe(new TimestampSubscriber(observer, this.scheduler));
+    };
+    return TimestampOperator;
+  }();
+  var TimestampSubscriber = function (_super) {
+    __extends(TimestampSubscriber, _super);
+    function TimestampSubscriber(destination, scheduler) {
+      _super.call(this, destination);
+      this.scheduler = scheduler;
+    }
+    TimestampSubscriber.prototype._next = function (value) {
+      var now = this.scheduler.now();
+      this.destination.next(new Timestamp(value, now));
+    };
+    return TimestampSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/timestamp.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/timestamp.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var timestamp_1 = $__require('npm:rxjs@5.2.0/operator/timestamp.js');
+  Observable_1.Observable.prototype.timestamp = timestamp_1.timestamp;
+});
+System.registerDynamic("src-reactive/app/subject.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/Subject.js", "npm:rxjs@5.2.0/ReplaySubject.js", "npm:rxjs@5.2.0/add/operator/multicast.js", "npm:rxjs@5.2.0/add/operator/timestamp.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    // Rx.Observable.from(args);
+    var Observable_1 = $__require("npm:rxjs@5.2.0/Observable.js");
+    var Subject_1 = $__require("npm:rxjs@5.2.0/Subject.js");
+    var ReplaySubject_1 = $__require("npm:rxjs@5.2.0/ReplaySubject.js");
+    $__require("npm:rxjs@5.2.0/add/operator/multicast.js");
+    $__require("npm:rxjs@5.2.0/add/operator/timestamp.js");
+    var helper_1 = $__require("src-reactive/app/helper.js");
+    function testSubject1() {
+        var myObservable = new Subject_1.Subject();
+        myObservable.subscribe(function (value) {
+            return console.log(value);
+        });
+        myObservable.next('after subscribe');
+    }
+    exports.testSubject1 = testSubject1;
+    function testSubject2() {
+        var myObservable = new Subject_1.Subject();
+        myObservable.next('before subscribe');
+        myObservable.subscribe(function (value) {
+            return console.log(value);
+        });
+    }
+    exports.testSubject2 = testSubject2;
+    function testSubject3() {
+        var myObservable = new Subject_1.Subject();
+        myObservable.subscribe(function (value) {
+            return console.log("1: " + value);
+        });
+        myObservable.subscribe(function (value) {
+            return console.log("2: " + value);
+        });
+        myObservable.subscribe(function (value) {
+            return console.log("3: " + value);
+        });
+        myObservable.next('multiple subscribe');
+    }
+    exports.testSubject3 = testSubject3;
+    function testReplaySubject1() {
+        var myObservable = new ReplaySubject_1.ReplaySubject();
+        myObservable.next('before subscribe');
+        myObservable.subscribe(function (value) {
+            return console.log(value);
+        });
+    }
+    exports.testReplaySubject1 = testReplaySubject1;
+    function testReplaySubject2() {
+        var myObservable = new ReplaySubject_1.ReplaySubject();
+        myObservable.subscribe(function (value) {
+            return console.log("1: " + value);
+        });
+        myObservable.next('multiple subscribe');
+        myObservable.subscribe(function (value) {
+            return console.log("2: " + value);
+        });
+        myObservable.subscribe(function (value) {
+            return console.log("3: " + value);
+        });
+    }
+    exports.testReplaySubject2 = testReplaySubject2;
+    function testReplaySubject3() {
+        var myObservable = new ReplaySubject_1.ReplaySubject();
+        myObservable.subscribe(function (value) {
+            return console.log("1: " + value);
+        });
+        myObservable.next('multiple subscribe');
+        myObservable.complete();
+        myObservable.subscribe(function (value) {
+            return console.log("2: " + value);
+        });
+        myObservable.subscribe(function (value) {
+            return console.log("3: " + value);
+        });
+    }
+    exports.testReplaySubject3 = testReplaySubject3;
+    function testReplaySubject4() {
+        var myObservable = new ReplaySubject_1.ReplaySubject(2);
+        myObservable.subscribe(function (value) {
+            return console.log("1: " + value);
+        });
+        myObservable.next('multiple subscribe 1');
+        myObservable.next('multiple subscribe 2');
+        myObservable.next('multiple subscribe 3');
+        myObservable.subscribe(function (value) {
+            return console.log("2: " + value);
+        });
+        myObservable.subscribe(function (value) {
+            return console.log("3: " + value);
+        });
+    }
+    exports.testReplaySubject4 = testReplaySubject4;
+    function testMulticast() {
+        (function () {
+            var button = helper_1.buttonForTest('Observable(num of handler = 2');
+            var buttonObservable = Observable_1.Observable.fromEvent(button, 'click').map(function (value) {
+                console.log('map Called');
+                return value;
+            });
+            buttonObservable.subscribe(function (ev) {
+                return console.log("click from Observable - 1");
+            });
+            buttonObservable.subscribe(function (ev) {
+                return console.log("click from Observable - 2");
+            });
+        })();
+        (function () {
+            var button = helper_1.buttonForTest('ConnectableObservable(num of handler = 1');
+            var buttonObservable = Observable_1.Observable.fromEvent(button, 'click').map(function (value) {
+                console.log('map Called');
+                return value;
+            }).multicast(new Subject_1.Subject());
+            buttonObservable.subscribe(function (ev) {
+                return console.log("click from ConnectableObservable - 1");
+            });
+            buttonObservable.subscribe(function (ev) {
+                return console.log("click from ConnectableObservable - 2");
+            });
+            buttonObservable.connect();
+        })();
+    }
+    exports.testMulticast = testMulticast;
+});
 System.registerDynamic('npm:rxjs@5.2.0/observable/PromiseObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -1836,16 +2221,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/of.js', ['npm:rxjs@5.2.0/O
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var of_1 = $__require('npm:rxjs@5.2.0/observable/of.js');
   Observable_1.Observable.of = of_1.of;
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/pluck.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/pluck.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var pluck_1 = $__require('npm:rxjs@5.2.0/operator/pluck.js');
-  Observable_1.Observable.prototype.pluck = pluck_1.pluck;
 });
 System.registerDynamic("npm:rxjs@5.2.0/util/isDate.js", [], true, function ($__require, exports, module) {
     /* */
@@ -2573,75 +2948,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/filter.js', ['npm:rxjs@5.2.0
   var filter_1 = $__require('npm:rxjs@5.2.0/operator/filter.js');
   Observable_1.Observable.prototype.filter = filter_1.filter;
 });
-System.registerDynamic('npm:rxjs@5.2.0/operator/mergeAll.js', ['npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
-  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
-  function mergeAll(concurrent) {
-    if (concurrent === void 0) {
-      concurrent = Number.POSITIVE_INFINITY;
-    }
-    return this.lift(new MergeAllOperator(concurrent));
-  }
-  exports.mergeAll = mergeAll;
-  var MergeAllOperator = function () {
-    function MergeAllOperator(concurrent) {
-      this.concurrent = concurrent;
-    }
-    MergeAllOperator.prototype.call = function (observer, source) {
-      return source.subscribe(new MergeAllSubscriber(observer, this.concurrent));
-    };
-    return MergeAllOperator;
-  }();
-  exports.MergeAllOperator = MergeAllOperator;
-  var MergeAllSubscriber = function (_super) {
-    __extends(MergeAllSubscriber, _super);
-    function MergeAllSubscriber(destination, concurrent) {
-      _super.call(this, destination);
-      this.concurrent = concurrent;
-      this.hasCompleted = false;
-      this.buffer = [];
-      this.active = 0;
-    }
-    MergeAllSubscriber.prototype._next = function (observable) {
-      if (this.active < this.concurrent) {
-        this.active++;
-        this.add(subscribeToResult_1.subscribeToResult(this, observable));
-      } else {
-        this.buffer.push(observable);
-      }
-    };
-    MergeAllSubscriber.prototype._complete = function () {
-      this.hasCompleted = true;
-      if (this.active === 0 && this.buffer.length === 0) {
-        this.destination.complete();
-      }
-    };
-    MergeAllSubscriber.prototype.notifyComplete = function (innerSub) {
-      var buffer = this.buffer;
-      this.remove(innerSub);
-      this.active--;
-      if (buffer.length > 0) {
-        this._next(buffer.shift());
-      } else if (this.active === 0 && this.hasCompleted) {
-        this.destination.complete();
-      }
-    };
-    return MergeAllSubscriber;
-  }(OuterSubscriber_1.OuterSubscriber);
-  exports.MergeAllSubscriber = MergeAllSubscriber;
-});
 System.registerDynamic("npm:rxjs@5.2.0/operator/concatAll.js", ["npm:rxjs@5.2.0/operator/mergeAll.js"], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -2889,141 +3195,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/reduce.js', ['npm:rxjs@5.2.0
   var reduce_1 = $__require('npm:rxjs@5.2.0/operator/reduce.js');
   Observable_1.Observable.prototype.reduce = reduce_1.reduce;
 });
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/map.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
-  Observable_1.Observable.prototype.map = map_1.map;
-});
-System.registerDynamic('npm:rxjs@5.2.0/observable/FromEventObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/Subscription.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  /* */
-  (function (process) {
-    "use strict";
-
-    var __extends = this && this.__extends || function (d, b) {
-      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-      function __() {
-        this.constructor = d;
-      }
-      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-    var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-    var tryCatch_1 = $__require('npm:rxjs@5.2.0/util/tryCatch.js');
-    var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
-    var errorObject_1 = $__require('npm:rxjs@5.2.0/util/errorObject.js');
-    var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
-    var toString = Object.prototype.toString;
-    function isNodeStyleEventEmitter(sourceObj) {
-      return !!sourceObj && typeof sourceObj.addListener === 'function' && typeof sourceObj.removeListener === 'function';
-    }
-    function isJQueryStyleEventEmitter(sourceObj) {
-      return !!sourceObj && typeof sourceObj.on === 'function' && typeof sourceObj.off === 'function';
-    }
-    function isNodeList(sourceObj) {
-      return !!sourceObj && toString.call(sourceObj) === '[object NodeList]';
-    }
-    function isHTMLCollection(sourceObj) {
-      return !!sourceObj && toString.call(sourceObj) === '[object HTMLCollection]';
-    }
-    function isEventTarget(sourceObj) {
-      return !!sourceObj && typeof sourceObj.addEventListener === 'function' && typeof sourceObj.removeEventListener === 'function';
-    }
-    var FromEventObservable = function (_super) {
-      __extends(FromEventObservable, _super);
-      function FromEventObservable(sourceObj, eventName, selector, options) {
-        _super.call(this);
-        this.sourceObj = sourceObj;
-        this.eventName = eventName;
-        this.selector = selector;
-        this.options = options;
-      }
-      FromEventObservable.create = function (target, eventName, options, selector) {
-        if (isFunction_1.isFunction(options)) {
-          selector = options;
-          options = undefined;
-        }
-        return new FromEventObservable(target, eventName, selector, options);
-      };
-      FromEventObservable.setupSubscription = function (sourceObj, eventName, handler, subscriber, options) {
-        var unsubscribe;
-        if (isNodeList(sourceObj) || isHTMLCollection(sourceObj)) {
-          for (var i = 0, len = sourceObj.length; i < len; i++) {
-            FromEventObservable.setupSubscription(sourceObj[i], eventName, handler, subscriber, options);
-          }
-        } else if (isEventTarget(sourceObj)) {
-          var source_1 = sourceObj;
-          sourceObj.addEventListener(eventName, handler, options);
-          unsubscribe = function () {
-            return source_1.removeEventListener(eventName, handler);
-          };
-        } else if (isJQueryStyleEventEmitter(sourceObj)) {
-          var source_2 = sourceObj;
-          sourceObj.on(eventName, handler);
-          unsubscribe = function () {
-            return source_2.off(eventName, handler);
-          };
-        } else if (isNodeStyleEventEmitter(sourceObj)) {
-          var source_3 = sourceObj;
-          sourceObj.addListener(eventName, handler);
-          unsubscribe = function () {
-            return source_3.removeListener(eventName, handler);
-          };
-        } else {
-          throw new TypeError('Invalid event target');
-        }
-        subscriber.add(new Subscription_1.Subscription(unsubscribe));
-      };
-      FromEventObservable.prototype._subscribe = function (subscriber) {
-        var sourceObj = this.sourceObj;
-        var eventName = this.eventName;
-        var options = this.options;
-        var selector = this.selector;
-        var handler = selector ? function () {
-          var args = [];
-          for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-          }
-          var result = tryCatch_1.tryCatch(selector).apply(void 0, args);
-          if (result === errorObject_1.errorObject) {
-            subscriber.error(errorObject_1.errorObject.e);
-          } else {
-            subscriber.next(result);
-          }
-        } : function (e) {
-          return subscriber.next(e);
-        };
-        FromEventObservable.setupSubscription(sourceObj, eventName, handler, subscriber, options);
-      };
-      return FromEventObservable;
-    }(Observable_1.Observable);
-    exports.FromEventObservable = FromEventObservable;
-  })($__require('github:jspm/nodelibs-process@0.1.2.js'));
-});
-System.registerDynamic("npm:rxjs@5.2.0/observable/fromEvent.js", ["npm:rxjs@5.2.0/observable/FromEventObservable.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var FromEventObservable_1 = $__require("npm:rxjs@5.2.0/observable/FromEventObservable.js");
-  exports.fromEvent = FromEventObservable_1.FromEventObservable.create;
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/observable/fromEvent.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/fromEvent.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var fromEvent_1 = $__require('npm:rxjs@5.2.0/observable/fromEvent.js');
-  Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
-});
 System.registerDynamic('npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js', [], true, function ($__require, exports, module) {
     /* */
     "use strict";
@@ -3165,211 +3336,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/take.js', ['npm:rxjs@5.2.0/O
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var take_1 = $__require('npm:rxjs@5.2.0/operator/take.js');
   Observable_1.Observable.prototype.take = take_1.take;
-});
-System.registerDynamic("npm:rxjs@5.2.0/OuterSubscriber.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
-  var OuterSubscriber = function (_super) {
-    __extends(OuterSubscriber, _super);
-    function OuterSubscriber() {
-      _super.apply(this, arguments);
-    }
-    OuterSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
-      this.destination.next(innerValue);
-    };
-    OuterSubscriber.prototype.notifyError = function (error, innerSub) {
-      this.destination.error(error);
-    };
-    OuterSubscriber.prototype.notifyComplete = function (innerSub) {
-      this.destination.complete();
-    };
-    return OuterSubscriber;
-  }(Subscriber_1.Subscriber);
-  exports.OuterSubscriber = OuterSubscriber;
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/isArrayLike.js", [], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  exports.isArrayLike = function (x) {
-    return x && typeof x.length === 'number';
-  };
-  
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/isPromise.js', [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    function isPromise(value) {
-        return value && typeof value.subscribe !== 'function' && typeof value.then === 'function';
-    }
-    exports.isPromise = isPromise;
-    
-});
-System.registerDynamic('npm:rxjs@5.2.0/symbol/iterator.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  function symbolIteratorPonyfill(root) {
-    var Symbol = root.Symbol;
-    if (typeof Symbol === 'function') {
-      if (!Symbol.iterator) {
-        Symbol.iterator = Symbol('iterator polyfill');
-      }
-      return Symbol.iterator;
-    } else {
-      var Set_1 = root.Set;
-      if (Set_1 && typeof new Set_1()['@@iterator'] === 'function') {
-        return '@@iterator';
-      }
-      var Map_1 = root.Map;
-      if (Map_1) {
-        var keys = Object.getOwnPropertyNames(Map_1.prototype);
-        for (var i = 0; i < keys.length; ++i) {
-          var key = keys[i];
-          if (key !== 'entries' && key !== 'size' && Map_1.prototype[key] === Map_1.prototype['entries']) {
-            return key;
-          }
-        }
-      }
-      return '@@iterator';
-    }
-  }
-  exports.symbolIteratorPonyfill = symbolIteratorPonyfill;
-  exports.$$iterator = symbolIteratorPonyfill(root_1.root);
-});
-System.registerDynamic("npm:rxjs@5.2.0/InnerSubscriber.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
-  var InnerSubscriber = function (_super) {
-    __extends(InnerSubscriber, _super);
-    function InnerSubscriber(parent, outerValue, outerIndex) {
-      _super.call(this);
-      this.parent = parent;
-      this.outerValue = outerValue;
-      this.outerIndex = outerIndex;
-      this.index = 0;
-    }
-    InnerSubscriber.prototype._next = function (value) {
-      this.parent.notifyNext(this.outerValue, value, this.outerIndex, this.index++, this);
-    };
-    InnerSubscriber.prototype._error = function (error) {
-      this.parent.notifyError(error, this);
-      this.unsubscribe();
-    };
-    InnerSubscriber.prototype._complete = function () {
-      this.parent.notifyComplete(this);
-      this.unsubscribe();
-    };
-    return InnerSubscriber;
-  }(Subscriber_1.Subscriber);
-  exports.InnerSubscriber = InnerSubscriber;
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/subscribeToResult.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/util/isArrayLike.js', 'npm:rxjs@5.2.0/util/isPromise.js', 'npm:rxjs@5.2.0/util/isObject.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/symbol/iterator.js', 'npm:rxjs@5.2.0/InnerSubscriber.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  var isArrayLike_1 = $__require('npm:rxjs@5.2.0/util/isArrayLike.js');
-  var isPromise_1 = $__require('npm:rxjs@5.2.0/util/isPromise.js');
-  var isObject_1 = $__require('npm:rxjs@5.2.0/util/isObject.js');
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
-  var InnerSubscriber_1 = $__require('npm:rxjs@5.2.0/InnerSubscriber.js');
-  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
-  function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
-    var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
-    if (destination.closed) {
-      return null;
-    }
-    if (result instanceof Observable_1.Observable) {
-      if (result._isScalar) {
-        destination.next(result.value);
-        destination.complete();
-        return null;
-      } else {
-        return result.subscribe(destination);
-      }
-    } else if (isArrayLike_1.isArrayLike(result)) {
-      for (var i = 0, len = result.length; i < len && !destination.closed; i++) {
-        destination.next(result[i]);
-      }
-      if (!destination.closed) {
-        destination.complete();
-      }
-    } else if (isPromise_1.isPromise(result)) {
-      result.then(function (value) {
-        if (!destination.closed) {
-          destination.next(value);
-          destination.complete();
-        }
-      }, function (err) {
-        return destination.error(err);
-      }).then(null, function (err) {
-        root_1.root.setTimeout(function () {
-          throw err;
-        });
-      });
-      return destination;
-    } else if (result && typeof result[iterator_1.$$iterator] === 'function') {
-      var iterator = result[iterator_1.$$iterator]();
-      do {
-        var item = iterator.next();
-        if (item.done) {
-          destination.complete();
-          break;
-        }
-        destination.next(item.value);
-        if (destination.closed) {
-          break;
-        }
-      } while (true);
-    } else if (result && typeof result[observable_1.$$observable] === 'function') {
-      var obs = result[observable_1.$$observable]();
-      if (typeof obs.subscribe !== 'function') {
-        destination.error(new TypeError('Provided object does not correctly implement Symbol.observable'));
-      } else {
-        return obs.subscribe(new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex));
-      }
-    } else {
-      var value = isObject_1.isObject(result) ? 'an invalid object' : "'" + result + "'";
-      var msg = "You provided " + value + " where a stream was expected." + ' You can provide an Observable, Promise, Array, or Iterable.';
-      destination.error(new TypeError(msg));
-    }
-    return null;
-  }
-  exports.subscribeToResult = subscribeToResult;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/takeUntil.js', ['npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
   /* */
@@ -4354,922 +4320,6 @@ System.registerDynamic("src-reactive/app/learnrx.js", ["npm:rxjs@5.2.0/Observabl
         });
     }
     exports.ex40 = ex40;
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/toSubscriber.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js', 'npm:rxjs@5.2.0/Observer.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
-  var Observer_1 = $__require('npm:rxjs@5.2.0/Observer.js');
-  function toSubscriber(nextOrObserver, error, complete) {
-    if (nextOrObserver) {
-      if (nextOrObserver instanceof Subscriber_1.Subscriber) {
-        return nextOrObserver;
-      }
-      if (nextOrObserver[rxSubscriber_1.$$rxSubscriber]) {
-        return nextOrObserver[rxSubscriber_1.$$rxSubscriber]();
-      }
-    }
-    if (!nextOrObserver && !error && !complete) {
-      return new Subscriber_1.Subscriber(Observer_1.empty);
-    }
-    return new Subscriber_1.Subscriber(nextOrObserver, error, complete);
-  }
-  exports.toSubscriber = toSubscriber;
-});
-System.registerDynamic('npm:rxjs@5.2.0/symbol/observable.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  function getSymbolObservable(context) {
-    var $$observable;
-    var Symbol = context.Symbol;
-    if (typeof Symbol === 'function') {
-      if (Symbol.observable) {
-        $$observable = Symbol.observable;
-      } else {
-        $$observable = Symbol('observable');
-        Symbol.observable = $$observable;
-      }
-    } else {
-      $$observable = '@@observable';
-    }
-    return $$observable;
-  }
-  exports.getSymbolObservable = getSymbolObservable;
-  exports.$$observable = getSymbolObservable(root_1.root);
-});
-System.registerDynamic('npm:rxjs@5.2.0/Observable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/util/toSubscriber.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  var toSubscriber_1 = $__require('npm:rxjs@5.2.0/util/toSubscriber.js');
-  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
-  var Observable = function () {
-    function Observable(subscribe) {
-      this._isScalar = false;
-      if (subscribe) {
-        this._subscribe = subscribe;
-      }
-    }
-    Observable.prototype.lift = function (operator) {
-      var observable = new Observable();
-      observable.source = this;
-      observable.operator = operator;
-      return observable;
-    };
-    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
-      var operator = this.operator;
-      var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
-      if (operator) {
-        operator.call(sink, this.source);
-      } else {
-        sink.add(this._trySubscribe(sink));
-      }
-      if (sink.syncErrorThrowable) {
-        sink.syncErrorThrowable = false;
-        if (sink.syncErrorThrown) {
-          throw sink.syncErrorValue;
-        }
-      }
-      return sink;
-    };
-    Observable.prototype._trySubscribe = function (sink) {
-      try {
-        return this._subscribe(sink);
-      } catch (err) {
-        sink.syncErrorThrown = true;
-        sink.syncErrorValue = err;
-        sink.error(err);
-      }
-    };
-    Observable.prototype.forEach = function (next, PromiseCtor) {
-      var _this = this;
-      if (!PromiseCtor) {
-        if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
-          PromiseCtor = root_1.root.Rx.config.Promise;
-        } else if (root_1.root.Promise) {
-          PromiseCtor = root_1.root.Promise;
-        }
-      }
-      if (!PromiseCtor) {
-        throw new Error('no Promise impl found');
-      }
-      return new PromiseCtor(function (resolve, reject) {
-        var subscription = _this.subscribe(function (value) {
-          if (subscription) {
-            try {
-              next(value);
-            } catch (err) {
-              reject(err);
-              subscription.unsubscribe();
-            }
-          } else {
-            next(value);
-          }
-        }, reject, resolve);
-      });
-    };
-    Observable.prototype._subscribe = function (subscriber) {
-      return this.source.subscribe(subscriber);
-    };
-    Observable.prototype[observable_1.$$observable] = function () {
-      return this;
-    };
-    Observable.create = function (subscribe) {
-      return new Observable(subscribe);
-    };
-    return Observable;
-  }();
-  exports.Observable = Observable;
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/isArray.js", [], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  exports.isArray = Array.isArray || function (x) {
-    return x && typeof x.length === 'number';
-  };
-  
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/isObject.js", [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    function isObject(x) {
-        return x != null && typeof x === 'object';
-    }
-    exports.isObject = isObject;
-    
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/isFunction.js", [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    function isFunction(x) {
-        return typeof x === 'function';
-    }
-    exports.isFunction = isFunction;
-    
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/tryCatch.js", ["npm:rxjs@5.2.0/util/errorObject.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var errorObject_1 = $__require("npm:rxjs@5.2.0/util/errorObject.js");
-  var tryCatchTarget;
-  function tryCatcher() {
-    try {
-      return tryCatchTarget.apply(this, arguments);
-    } catch (e) {
-      errorObject_1.errorObject.e = e;
-      return errorObject_1.errorObject;
-    }
-  }
-  function tryCatch(fn) {
-    tryCatchTarget = fn;
-    return tryCatcher;
-  }
-  exports.tryCatch = tryCatch;
-  ;
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/errorObject.js", [], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-  // typeof any so that it we don't have to cast when comparing a result to the error object
-
-  var global = this || self,
-      GLOBAL = global;
-  exports.errorObject = { e: {} };
-  
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/UnsubscriptionError.js", [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    var __extends = this && this.__extends || function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-    /**
-     * An error thrown when one or more errors have occurred during the
-     * `unsubscribe` of a {@link Subscription}.
-     */
-    var UnsubscriptionError = function (_super) {
-        __extends(UnsubscriptionError, _super);
-        function UnsubscriptionError(errors) {
-            _super.call(this);
-            this.errors = errors;
-            var err = Error.call(this, errors ? errors.length + " errors occurred during unsubscription:\n  " + errors.map(function (err, i) {
-                return i + 1 + ") " + err.toString();
-            }).join('\n  ') : '');
-            this.name = err.name = 'UnsubscriptionError';
-            this.stack = err.stack;
-            this.message = err.message;
-        }
-        return UnsubscriptionError;
-    }(Error);
-    exports.UnsubscriptionError = UnsubscriptionError;
-    
-});
-System.registerDynamic('npm:process@0.11.9/browser.js', [], true, function ($__require, exports, module) {
-    var global = this || self,
-        GLOBAL = global;
-    // shim for using process in browser
-    var process = module.exports = {};
-
-    // cached from whatever global is present so that test runners that stub it
-    // don't break things.  But we need to wrap it in a try catch in case it is
-    // wrapped in strict mode code which doesn't define any globals.  It's inside a
-    // function because try/catches deoptimize in certain engines.
-
-    var cachedSetTimeout;
-    var cachedClearTimeout;
-
-    function defaultSetTimout() {
-        throw new Error('setTimeout has not been defined');
-    }
-    function defaultClearTimeout() {
-        throw new Error('clearTimeout has not been defined');
-    }
-    (function () {
-        try {
-            if (typeof setTimeout === 'function') {
-                cachedSetTimeout = setTimeout;
-            } else {
-                cachedSetTimeout = defaultSetTimout;
-            }
-        } catch (e) {
-            cachedSetTimeout = defaultSetTimout;
-        }
-        try {
-            if (typeof clearTimeout === 'function') {
-                cachedClearTimeout = clearTimeout;
-            } else {
-                cachedClearTimeout = defaultClearTimeout;
-            }
-        } catch (e) {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    })();
-    function runTimeout(fun) {
-        if (cachedSetTimeout === setTimeout) {
-            //normal enviroments in sane situations
-            return setTimeout(fun, 0);
-        }
-        // if setTimeout wasn't available but was latter defined
-        if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-            cachedSetTimeout = setTimeout;
-            return setTimeout(fun, 0);
-        }
-        try {
-            // when when somebody has screwed with setTimeout but no I.E. maddness
-            return cachedSetTimeout(fun, 0);
-        } catch (e) {
-            try {
-                // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-                return cachedSetTimeout.call(null, fun, 0);
-            } catch (e) {
-                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-                return cachedSetTimeout.call(this, fun, 0);
-            }
-        }
-    }
-    function runClearTimeout(marker) {
-        if (cachedClearTimeout === clearTimeout) {
-            //normal enviroments in sane situations
-            return clearTimeout(marker);
-        }
-        // if clearTimeout wasn't available but was latter defined
-        if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-            cachedClearTimeout = clearTimeout;
-            return clearTimeout(marker);
-        }
-        try {
-            // when when somebody has screwed with setTimeout but no I.E. maddness
-            return cachedClearTimeout(marker);
-        } catch (e) {
-            try {
-                // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-                return cachedClearTimeout.call(null, marker);
-            } catch (e) {
-                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-                // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-                return cachedClearTimeout.call(this, marker);
-            }
-        }
-    }
-    var queue = [];
-    var draining = false;
-    var currentQueue;
-    var queueIndex = -1;
-
-    function cleanUpNextTick() {
-        if (!draining || !currentQueue) {
-            return;
-        }
-        draining = false;
-        if (currentQueue.length) {
-            queue = currentQueue.concat(queue);
-        } else {
-            queueIndex = -1;
-        }
-        if (queue.length) {
-            drainQueue();
-        }
-    }
-
-    function drainQueue() {
-        if (draining) {
-            return;
-        }
-        var timeout = runTimeout(cleanUpNextTick);
-        draining = true;
-
-        var len = queue.length;
-        while (len) {
-            currentQueue = queue;
-            queue = [];
-            while (++queueIndex < len) {
-                if (currentQueue) {
-                    currentQueue[queueIndex].run();
-                }
-            }
-            queueIndex = -1;
-            len = queue.length;
-        }
-        currentQueue = null;
-        draining = false;
-        runClearTimeout(timeout);
-    }
-
-    process.nextTick = function (fun) {
-        var args = new Array(arguments.length - 1);
-        if (arguments.length > 1) {
-            for (var i = 1; i < arguments.length; i++) {
-                args[i - 1] = arguments[i];
-            }
-        }
-        queue.push(new Item(fun, args));
-        if (queue.length === 1 && !draining) {
-            runTimeout(drainQueue);
-        }
-    };
-
-    // v8 likes predictible objects
-    function Item(fun, array) {
-        this.fun = fun;
-        this.array = array;
-    }
-    Item.prototype.run = function () {
-        this.fun.apply(null, this.array);
-    };
-    process.title = 'browser';
-    process.browser = true;
-    process.env = {};
-    process.argv = [];
-    process.version = ''; // empty string to avoid regexp issues
-    process.versions = {};
-
-    function noop() {}
-
-    process.on = noop;
-    process.addListener = noop;
-    process.once = noop;
-    process.off = noop;
-    process.removeListener = noop;
-    process.removeAllListeners = noop;
-    process.emit = noop;
-
-    process.binding = function (name) {
-        throw new Error('process.binding is not supported');
-    };
-
-    process.cwd = function () {
-        return '/';
-    };
-    process.chdir = function (dir) {
-        throw new Error('process.chdir is not supported');
-    };
-    process.umask = function () {
-        return 0;
-    };
-});
-System.registerDynamic("npm:process@0.11.9.js", ["npm:process@0.11.9/browser.js"], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("npm:process@0.11.9/browser.js");
-});
-System.registerDynamic('github:jspm/nodelibs-process@0.1.2/index.js', ['npm:process@0.11.9.js'], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  module.exports = System._nodeRequire ? process : $__require('npm:process@0.11.9.js');
-});
-System.registerDynamic("github:jspm/nodelibs-process@0.1.2.js", ["github:jspm/nodelibs-process@0.1.2/index.js"], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  module.exports = $__require("github:jspm/nodelibs-process@0.1.2/index.js");
-});
-System.registerDynamic('npm:rxjs@5.2.0/Subscription.js', ['npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/util/isObject.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/util/UnsubscriptionError.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
-  var global = this || self,
-      GLOBAL = global;
-  /* */
-  (function (process) {
-    "use strict";
-
-    var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
-    var isObject_1 = $__require('npm:rxjs@5.2.0/util/isObject.js');
-    var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
-    var tryCatch_1 = $__require('npm:rxjs@5.2.0/util/tryCatch.js');
-    var errorObject_1 = $__require('npm:rxjs@5.2.0/util/errorObject.js');
-    var UnsubscriptionError_1 = $__require('npm:rxjs@5.2.0/util/UnsubscriptionError.js');
-    var Subscription = function () {
-      function Subscription(unsubscribe) {
-        this.closed = false;
-        this._parent = null;
-        this._parents = null;
-        this._subscriptions = null;
-        if (unsubscribe) {
-          this._unsubscribe = unsubscribe;
-        }
-      }
-      Subscription.prototype.unsubscribe = function () {
-        var hasErrors = false;
-        var errors;
-        if (this.closed) {
-          return;
-        }
-        var _a = this,
-            _parent = _a._parent,
-            _parents = _a._parents,
-            _unsubscribe = _a._unsubscribe,
-            _subscriptions = _a._subscriptions;
-        this.closed = true;
-        this._parent = null;
-        this._parents = null;
-        this._subscriptions = null;
-        var index = -1;
-        var len = _parents ? _parents.length : 0;
-        while (_parent) {
-          _parent.remove(this);
-          _parent = ++index < len && _parents[index] || null;
-        }
-        if (isFunction_1.isFunction(_unsubscribe)) {
-          var trial = tryCatch_1.tryCatch(_unsubscribe).call(this);
-          if (trial === errorObject_1.errorObject) {
-            hasErrors = true;
-            errors = errors || (errorObject_1.errorObject.e instanceof UnsubscriptionError_1.UnsubscriptionError ? flattenUnsubscriptionErrors(errorObject_1.errorObject.e.errors) : [errorObject_1.errorObject.e]);
-          }
-        }
-        if (isArray_1.isArray(_subscriptions)) {
-          index = -1;
-          len = _subscriptions.length;
-          while (++index < len) {
-            var sub = _subscriptions[index];
-            if (isObject_1.isObject(sub)) {
-              var trial = tryCatch_1.tryCatch(sub.unsubscribe).call(sub);
-              if (trial === errorObject_1.errorObject) {
-                hasErrors = true;
-                errors = errors || [];
-                var err = errorObject_1.errorObject.e;
-                if (err instanceof UnsubscriptionError_1.UnsubscriptionError) {
-                  errors = errors.concat(flattenUnsubscriptionErrors(err.errors));
-                } else {
-                  errors.push(err);
-                }
-              }
-            }
-          }
-        }
-        if (hasErrors) {
-          throw new UnsubscriptionError_1.UnsubscriptionError(errors);
-        }
-      };
-      Subscription.prototype.add = function (teardown) {
-        if (!teardown || teardown === Subscription.EMPTY) {
-          return Subscription.EMPTY;
-        }
-        if (teardown === this) {
-          return this;
-        }
-        var subscription = teardown;
-        switch (typeof teardown) {
-          case 'function':
-            subscription = new Subscription(teardown);
-          case 'object':
-            if (subscription.closed || typeof subscription.unsubscribe !== 'function') {
-              return subscription;
-            } else if (this.closed) {
-              subscription.unsubscribe();
-              return subscription;
-            } else if (typeof subscription._addParent !== 'function') {
-              var tmp = subscription;
-              subscription = new Subscription();
-              subscription._subscriptions = [tmp];
-            }
-            break;
-          default:
-            throw new Error('unrecognized teardown ' + teardown + ' added to Subscription.');
-        }
-        var subscriptions = this._subscriptions || (this._subscriptions = []);
-        subscriptions.push(subscription);
-        subscription._addParent(this);
-        return subscription;
-      };
-      Subscription.prototype.remove = function (subscription) {
-        var subscriptions = this._subscriptions;
-        if (subscriptions) {
-          var subscriptionIndex = subscriptions.indexOf(subscription);
-          if (subscriptionIndex !== -1) {
-            subscriptions.splice(subscriptionIndex, 1);
-          }
-        }
-      };
-      Subscription.prototype._addParent = function (parent) {
-        var _a = this,
-            _parent = _a._parent,
-            _parents = _a._parents;
-        if (!_parent || _parent === parent) {
-          this._parent = parent;
-        } else if (!_parents) {
-          this._parents = [parent];
-        } else if (_parents.indexOf(parent) === -1) {
-          _parents.push(parent);
-        }
-      };
-      Subscription.EMPTY = function (empty) {
-        empty.closed = true;
-        return empty;
-      }(new Subscription());
-      return Subscription;
-    }();
-    exports.Subscription = Subscription;
-    function flattenUnsubscriptionErrors(errors) {
-      return errors.reduce(function (errs, err) {
-        return errs.concat(err instanceof UnsubscriptionError_1.UnsubscriptionError ? err.errors : err);
-      }, []);
-    }
-  })($__require('github:jspm/nodelibs-process@0.1.2.js'));
-});
-System.registerDynamic("npm:rxjs@5.2.0/Observer.js", [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    exports.empty = {
-        closed: true,
-        next: function (value) {},
-        error: function (err) {
-            throw err;
-        },
-        complete: function () {}
-    };
-    
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/root.js', [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-    /**
-     * window: browser in DOM main thread
-     * self: browser in WebWorker
-     * global: Node.js/other
-     */
-
-    var global = this || self,
-        GLOBAL = global;
-    exports.root = typeof window == 'object' && window.window === window && window || typeof self == 'object' && self.self === self && self || typeof global == 'object' && global.global === global && global;
-    if (!exports.root) {
-        throw new Error('RxJS could not find any global context (window, self, global)');
-    }
-    
-});
-System.registerDynamic('npm:rxjs@5.2.0/symbol/rxSubscriber.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  var Symbol = root_1.root.Symbol;
-  exports.$$rxSubscriber = typeof Symbol === 'function' && typeof Symbol.for === 'function' ? Symbol.for('rxSubscriber') : '@@rxSubscriber';
-});
-System.registerDynamic('npm:rxjs@5.2.0/Subscriber.js', ['npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/Observer.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
-  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
-  var Observer_1 = $__require('npm:rxjs@5.2.0/Observer.js');
-  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
-  var Subscriber = function (_super) {
-    __extends(Subscriber, _super);
-    function Subscriber(destinationOrNext, error, complete) {
-      _super.call(this);
-      this.syncErrorValue = null;
-      this.syncErrorThrown = false;
-      this.syncErrorThrowable = false;
-      this.isStopped = false;
-      switch (arguments.length) {
-        case 0:
-          this.destination = Observer_1.empty;
-          break;
-        case 1:
-          if (!destinationOrNext) {
-            this.destination = Observer_1.empty;
-            break;
-          }
-          if (typeof destinationOrNext === 'object') {
-            if (destinationOrNext instanceof Subscriber) {
-              this.destination = destinationOrNext;
-              this.destination.add(this);
-            } else {
-              this.syncErrorThrowable = true;
-              this.destination = new SafeSubscriber(this, destinationOrNext);
-            }
-            break;
-          }
-        default:
-          this.syncErrorThrowable = true;
-          this.destination = new SafeSubscriber(this, destinationOrNext, error, complete);
-          break;
-      }
-    }
-    Subscriber.prototype[rxSubscriber_1.$$rxSubscriber] = function () {
-      return this;
-    };
-    Subscriber.create = function (next, error, complete) {
-      var subscriber = new Subscriber(next, error, complete);
-      subscriber.syncErrorThrowable = false;
-      return subscriber;
-    };
-    Subscriber.prototype.next = function (value) {
-      if (!this.isStopped) {
-        this._next(value);
-      }
-    };
-    Subscriber.prototype.error = function (err) {
-      if (!this.isStopped) {
-        this.isStopped = true;
-        this._error(err);
-      }
-    };
-    Subscriber.prototype.complete = function () {
-      if (!this.isStopped) {
-        this.isStopped = true;
-        this._complete();
-      }
-    };
-    Subscriber.prototype.unsubscribe = function () {
-      if (this.closed) {
-        return;
-      }
-      this.isStopped = true;
-      _super.prototype.unsubscribe.call(this);
-    };
-    Subscriber.prototype._next = function (value) {
-      this.destination.next(value);
-    };
-    Subscriber.prototype._error = function (err) {
-      this.destination.error(err);
-      this.unsubscribe();
-    };
-    Subscriber.prototype._complete = function () {
-      this.destination.complete();
-      this.unsubscribe();
-    };
-    Subscriber.prototype._unsubscribeAndRecycle = function () {
-      var _a = this,
-          _parent = _a._parent,
-          _parents = _a._parents;
-      this._parent = null;
-      this._parents = null;
-      this.unsubscribe();
-      this.closed = false;
-      this.isStopped = false;
-      this._parent = _parent;
-      this._parents = _parents;
-      return this;
-    };
-    return Subscriber;
-  }(Subscription_1.Subscription);
-  exports.Subscriber = Subscriber;
-  var SafeSubscriber = function (_super) {
-    __extends(SafeSubscriber, _super);
-    function SafeSubscriber(_parentSubscriber, observerOrNext, error, complete) {
-      _super.call(this);
-      this._parentSubscriber = _parentSubscriber;
-      var next;
-      var context = this;
-      if (isFunction_1.isFunction(observerOrNext)) {
-        next = observerOrNext;
-      } else if (observerOrNext) {
-        context = observerOrNext;
-        next = observerOrNext.next;
-        error = observerOrNext.error;
-        complete = observerOrNext.complete;
-        if (isFunction_1.isFunction(context.unsubscribe)) {
-          this.add(context.unsubscribe.bind(context));
-        }
-        context.unsubscribe = this.unsubscribe.bind(this);
-      }
-      this._context = context;
-      this._next = next;
-      this._error = error;
-      this._complete = complete;
-    }
-    SafeSubscriber.prototype.next = function (value) {
-      if (!this.isStopped && this._next) {
-        var _parentSubscriber = this._parentSubscriber;
-        if (!_parentSubscriber.syncErrorThrowable) {
-          this.__tryOrUnsub(this._next, value);
-        } else if (this.__tryOrSetError(_parentSubscriber, this._next, value)) {
-          this.unsubscribe();
-        }
-      }
-    };
-    SafeSubscriber.prototype.error = function (err) {
-      if (!this.isStopped) {
-        var _parentSubscriber = this._parentSubscriber;
-        if (this._error) {
-          if (!_parentSubscriber.syncErrorThrowable) {
-            this.__tryOrUnsub(this._error, err);
-            this.unsubscribe();
-          } else {
-            this.__tryOrSetError(_parentSubscriber, this._error, err);
-            this.unsubscribe();
-          }
-        } else if (!_parentSubscriber.syncErrorThrowable) {
-          this.unsubscribe();
-          throw err;
-        } else {
-          _parentSubscriber.syncErrorValue = err;
-          _parentSubscriber.syncErrorThrown = true;
-          this.unsubscribe();
-        }
-      }
-    };
-    SafeSubscriber.prototype.complete = function () {
-      if (!this.isStopped) {
-        var _parentSubscriber = this._parentSubscriber;
-        if (this._complete) {
-          if (!_parentSubscriber.syncErrorThrowable) {
-            this.__tryOrUnsub(this._complete);
-            this.unsubscribe();
-          } else {
-            this.__tryOrSetError(_parentSubscriber, this._complete);
-            this.unsubscribe();
-          }
-        } else {
-          this.unsubscribe();
-        }
-      }
-    };
-    SafeSubscriber.prototype.__tryOrUnsub = function (fn, value) {
-      try {
-        fn.call(this._context, value);
-      } catch (err) {
-        this.unsubscribe();
-        throw err;
-      }
-    };
-    SafeSubscriber.prototype.__tryOrSetError = function (parent, fn, value) {
-      try {
-        fn.call(this._context, value);
-      } catch (err) {
-        parent.syncErrorValue = err;
-        parent.syncErrorThrown = true;
-        return true;
-      }
-      return false;
-    };
-    SafeSubscriber.prototype._unsubscribe = function () {
-      var _parentSubscriber = this._parentSubscriber;
-      this._context = null;
-      this._parentSubscriber = null;
-      _parentSubscriber.unsubscribe();
-    };
-    return SafeSubscriber;
-  }(Subscriber);
-});
-System.registerDynamic('npm:rxjs@5.2.0/operator/map.js', ['npm:rxjs@5.2.0/Subscriber.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  function map(project, thisArg) {
-    if (typeof project !== 'function') {
-      throw new TypeError('argument is not a function. Are you looking for `mapTo()`?');
-    }
-    return this.lift(new MapOperator(project, thisArg));
-  }
-  exports.map = map;
-  var MapOperator = function () {
-    function MapOperator(project, thisArg) {
-      this.project = project;
-      this.thisArg = thisArg;
-    }
-    MapOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new MapSubscriber(subscriber, this.project, this.thisArg));
-    };
-    return MapOperator;
-  }();
-  exports.MapOperator = MapOperator;
-  var MapSubscriber = function (_super) {
-    __extends(MapSubscriber, _super);
-    function MapSubscriber(destination, project, thisArg) {
-      _super.call(this, destination);
-      this.project = project;
-      this.count = 0;
-      this.thisArg = thisArg || this;
-    }
-    MapSubscriber.prototype._next = function (value) {
-      var result;
-      try {
-        result = this.project.call(this.thisArg, value, this.count++);
-      } catch (err) {
-        this.destination.error(err);
-        return;
-      }
-      this.destination.next(result);
-    };
-    return MapSubscriber;
-  }(Subscriber_1.Subscriber);
-});
-System.registerDynamic('npm:rxjs@5.2.0/operator/pluck.js', ['npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
-  function pluck() {
-    var properties = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      properties[_i - 0] = arguments[_i];
-    }
-    var length = properties.length;
-    if (length === 0) {
-      throw new Error('list of properties cannot be empty.');
-    }
-    return map_1.map.call(this, plucker(properties, length));
-  }
-  exports.pluck = pluck;
-  function plucker(props, length) {
-    var mapper = function (x) {
-      var currentProp = x;
-      for (var i = 0; i < length; i++) {
-        var p = currentProp[props[i]];
-        if (typeof p !== 'undefined') {
-          currentProp = p;
-        } else {
-          return undefined;
-        }
-      }
-      return currentProp;
-    };
-    return mapper;
-  }
 });
 System.registerDynamic('npm:immutable@3.8.1/dist/immutable.js', [], true, function ($__require, exports, module) {
   /* */
@@ -10088,6 +9138,1351 @@ System.registerDynamic("npm:immutable@3.8.1.js", ["npm:immutable@3.8.1/dist/immu
       GLOBAL = global;
   module.exports = $__require("npm:immutable@3.8.1/dist/immutable.js");
 });
+System.registerDynamic('npm:rxjs@5.2.0/operator/pluck.js', ['npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
+  function pluck() {
+    var properties = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      properties[_i - 0] = arguments[_i];
+    }
+    var length = properties.length;
+    if (length === 0) {
+      throw new Error('list of properties cannot be empty.');
+    }
+    return map_1.map.call(this, plucker(properties, length));
+  }
+  exports.pluck = pluck;
+  function plucker(props, length) {
+    var mapper = function (x) {
+      var currentProp = x;
+      for (var i = 0; i < length; i++) {
+        var p = currentProp[props[i]];
+        if (typeof p !== 'undefined') {
+          currentProp = p;
+        } else {
+          return undefined;
+        }
+      }
+      return currentProp;
+    };
+    return mapper;
+  }
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/pluck.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/pluck.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var pluck_1 = $__require('npm:rxjs@5.2.0/operator/pluck.js');
+  Observable_1.Observable.prototype.pluck = pluck_1.pluck;
+});
+System.registerDynamic('npm:rxjs@5.2.0/observable/FromEventObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/Subscription.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  /* */
+  (function (process) {
+    "use strict";
+
+    var __extends = this && this.__extends || function (d, b) {
+      for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+      function __() {
+        this.constructor = d;
+      }
+      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+    var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+    var tryCatch_1 = $__require('npm:rxjs@5.2.0/util/tryCatch.js');
+    var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
+    var errorObject_1 = $__require('npm:rxjs@5.2.0/util/errorObject.js');
+    var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+    var toString = Object.prototype.toString;
+    function isNodeStyleEventEmitter(sourceObj) {
+      return !!sourceObj && typeof sourceObj.addListener === 'function' && typeof sourceObj.removeListener === 'function';
+    }
+    function isJQueryStyleEventEmitter(sourceObj) {
+      return !!sourceObj && typeof sourceObj.on === 'function' && typeof sourceObj.off === 'function';
+    }
+    function isNodeList(sourceObj) {
+      return !!sourceObj && toString.call(sourceObj) === '[object NodeList]';
+    }
+    function isHTMLCollection(sourceObj) {
+      return !!sourceObj && toString.call(sourceObj) === '[object HTMLCollection]';
+    }
+    function isEventTarget(sourceObj) {
+      return !!sourceObj && typeof sourceObj.addEventListener === 'function' && typeof sourceObj.removeEventListener === 'function';
+    }
+    var FromEventObservable = function (_super) {
+      __extends(FromEventObservable, _super);
+      function FromEventObservable(sourceObj, eventName, selector, options) {
+        _super.call(this);
+        this.sourceObj = sourceObj;
+        this.eventName = eventName;
+        this.selector = selector;
+        this.options = options;
+      }
+      FromEventObservable.create = function (target, eventName, options, selector) {
+        if (isFunction_1.isFunction(options)) {
+          selector = options;
+          options = undefined;
+        }
+        return new FromEventObservable(target, eventName, selector, options);
+      };
+      FromEventObservable.setupSubscription = function (sourceObj, eventName, handler, subscriber, options) {
+        var unsubscribe;
+        if (isNodeList(sourceObj) || isHTMLCollection(sourceObj)) {
+          for (var i = 0, len = sourceObj.length; i < len; i++) {
+            FromEventObservable.setupSubscription(sourceObj[i], eventName, handler, subscriber, options);
+          }
+        } else if (isEventTarget(sourceObj)) {
+          var source_1 = sourceObj;
+          sourceObj.addEventListener(eventName, handler, options);
+          unsubscribe = function () {
+            return source_1.removeEventListener(eventName, handler);
+          };
+        } else if (isJQueryStyleEventEmitter(sourceObj)) {
+          var source_2 = sourceObj;
+          sourceObj.on(eventName, handler);
+          unsubscribe = function () {
+            return source_2.off(eventName, handler);
+          };
+        } else if (isNodeStyleEventEmitter(sourceObj)) {
+          var source_3 = sourceObj;
+          sourceObj.addListener(eventName, handler);
+          unsubscribe = function () {
+            return source_3.removeListener(eventName, handler);
+          };
+        } else {
+          throw new TypeError('Invalid event target');
+        }
+        subscriber.add(new Subscription_1.Subscription(unsubscribe));
+      };
+      FromEventObservable.prototype._subscribe = function (subscriber) {
+        var sourceObj = this.sourceObj;
+        var eventName = this.eventName;
+        var options = this.options;
+        var selector = this.selector;
+        var handler = selector ? function () {
+          var args = [];
+          for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i - 0] = arguments[_i];
+          }
+          var result = tryCatch_1.tryCatch(selector).apply(void 0, args);
+          if (result === errorObject_1.errorObject) {
+            subscriber.error(errorObject_1.errorObject.e);
+          } else {
+            subscriber.next(result);
+          }
+        } : function (e) {
+          return subscriber.next(e);
+        };
+        FromEventObservable.setupSubscription(sourceObj, eventName, handler, subscriber, options);
+      };
+      return FromEventObservable;
+    }(Observable_1.Observable);
+    exports.FromEventObservable = FromEventObservable;
+  })($__require('github:jspm/nodelibs-process@0.1.2.js'));
+});
+System.registerDynamic("npm:rxjs@5.2.0/observable/fromEvent.js", ["npm:rxjs@5.2.0/observable/FromEventObservable.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var FromEventObservable_1 = $__require("npm:rxjs@5.2.0/observable/FromEventObservable.js");
+  exports.fromEvent = FromEventObservable_1.FromEventObservable.create;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/observable/fromEvent.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/fromEvent.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var fromEvent_1 = $__require('npm:rxjs@5.2.0/observable/fromEvent.js');
+  Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/map.js', ['npm:rxjs@5.2.0/Subscriber.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  function map(project, thisArg) {
+    if (typeof project !== 'function') {
+      throw new TypeError('argument is not a function. Are you looking for `mapTo()`?');
+    }
+    return this.lift(new MapOperator(project, thisArg));
+  }
+  exports.map = map;
+  var MapOperator = function () {
+    function MapOperator(project, thisArg) {
+      this.project = project;
+      this.thisArg = thisArg;
+    }
+    MapOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new MapSubscriber(subscriber, this.project, this.thisArg));
+    };
+    return MapOperator;
+  }();
+  exports.MapOperator = MapOperator;
+  var MapSubscriber = function (_super) {
+    __extends(MapSubscriber, _super);
+    function MapSubscriber(destination, project, thisArg) {
+      _super.call(this, destination);
+      this.project = project;
+      this.count = 0;
+      this.thisArg = thisArg || this;
+    }
+    MapSubscriber.prototype._next = function (value) {
+      var result;
+      try {
+        result = this.project.call(this.thisArg, value, this.count++);
+      } catch (err) {
+        this.destination.error(err);
+        return;
+      }
+      this.destination.next(result);
+    };
+    return MapSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/map.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
+  Observable_1.Observable.prototype.map = map_1.map;
+});
+System.registerDynamic("npm:rxjs@5.2.0/OuterSubscriber.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
+  var OuterSubscriber = function (_super) {
+    __extends(OuterSubscriber, _super);
+    function OuterSubscriber() {
+      _super.apply(this, arguments);
+    }
+    OuterSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
+      this.destination.next(innerValue);
+    };
+    OuterSubscriber.prototype.notifyError = function (error, innerSub) {
+      this.destination.error(error);
+    };
+    OuterSubscriber.prototype.notifyComplete = function (innerSub) {
+      this.destination.complete();
+    };
+    return OuterSubscriber;
+  }(Subscriber_1.Subscriber);
+  exports.OuterSubscriber = OuterSubscriber;
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/isArrayLike.js", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  exports.isArrayLike = function (x) {
+    return x && typeof x.length === 'number';
+  };
+  
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/isPromise.js', [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    function isPromise(value) {
+        return value && typeof value.subscribe !== 'function' && typeof value.then === 'function';
+    }
+    exports.isPromise = isPromise;
+    
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/toSubscriber.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js', 'npm:rxjs@5.2.0/Observer.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
+  var Observer_1 = $__require('npm:rxjs@5.2.0/Observer.js');
+  function toSubscriber(nextOrObserver, error, complete) {
+    if (nextOrObserver) {
+      if (nextOrObserver instanceof Subscriber_1.Subscriber) {
+        return nextOrObserver;
+      }
+      if (nextOrObserver[rxSubscriber_1.$$rxSubscriber]) {
+        return nextOrObserver[rxSubscriber_1.$$rxSubscriber]();
+      }
+    }
+    if (!nextOrObserver && !error && !complete) {
+      return new Subscriber_1.Subscriber(Observer_1.empty);
+    }
+    return new Subscriber_1.Subscriber(nextOrObserver, error, complete);
+  }
+  exports.toSubscriber = toSubscriber;
+});
+System.registerDynamic('npm:rxjs@5.2.0/Observable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/util/toSubscriber.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  var toSubscriber_1 = $__require('npm:rxjs@5.2.0/util/toSubscriber.js');
+  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
+  var Observable = function () {
+    function Observable(subscribe) {
+      this._isScalar = false;
+      if (subscribe) {
+        this._subscribe = subscribe;
+      }
+    }
+    Observable.prototype.lift = function (operator) {
+      var observable = new Observable();
+      observable.source = this;
+      observable.operator = operator;
+      return observable;
+    };
+    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
+      var operator = this.operator;
+      var sink = toSubscriber_1.toSubscriber(observerOrNext, error, complete);
+      if (operator) {
+        operator.call(sink, this.source);
+      } else {
+        sink.add(this._trySubscribe(sink));
+      }
+      if (sink.syncErrorThrowable) {
+        sink.syncErrorThrowable = false;
+        if (sink.syncErrorThrown) {
+          throw sink.syncErrorValue;
+        }
+      }
+      return sink;
+    };
+    Observable.prototype._trySubscribe = function (sink) {
+      try {
+        return this._subscribe(sink);
+      } catch (err) {
+        sink.syncErrorThrown = true;
+        sink.syncErrorValue = err;
+        sink.error(err);
+      }
+    };
+    Observable.prototype.forEach = function (next, PromiseCtor) {
+      var _this = this;
+      if (!PromiseCtor) {
+        if (root_1.root.Rx && root_1.root.Rx.config && root_1.root.Rx.config.Promise) {
+          PromiseCtor = root_1.root.Rx.config.Promise;
+        } else if (root_1.root.Promise) {
+          PromiseCtor = root_1.root.Promise;
+        }
+      }
+      if (!PromiseCtor) {
+        throw new Error('no Promise impl found');
+      }
+      return new PromiseCtor(function (resolve, reject) {
+        var subscription = _this.subscribe(function (value) {
+          if (subscription) {
+            try {
+              next(value);
+            } catch (err) {
+              reject(err);
+              subscription.unsubscribe();
+            }
+          } else {
+            next(value);
+          }
+        }, reject, resolve);
+      });
+    };
+    Observable.prototype._subscribe = function (subscriber) {
+      return this.source.subscribe(subscriber);
+    };
+    Observable.prototype[observable_1.$$observable] = function () {
+      return this;
+    };
+    Observable.create = function (subscribe) {
+      return new Observable(subscribe);
+    };
+    return Observable;
+  }();
+  exports.Observable = Observable;
+});
+System.registerDynamic('npm:rxjs@5.2.0/symbol/iterator.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  function symbolIteratorPonyfill(root) {
+    var Symbol = root.Symbol;
+    if (typeof Symbol === 'function') {
+      if (!Symbol.iterator) {
+        Symbol.iterator = Symbol('iterator polyfill');
+      }
+      return Symbol.iterator;
+    } else {
+      var Set_1 = root.Set;
+      if (Set_1 && typeof new Set_1()['@@iterator'] === 'function') {
+        return '@@iterator';
+      }
+      var Map_1 = root.Map;
+      if (Map_1) {
+        var keys = Object.getOwnPropertyNames(Map_1.prototype);
+        for (var i = 0; i < keys.length; ++i) {
+          var key = keys[i];
+          if (key !== 'entries' && key !== 'size' && Map_1.prototype[key] === Map_1.prototype['entries']) {
+            return key;
+          }
+        }
+      }
+      return '@@iterator';
+    }
+  }
+  exports.symbolIteratorPonyfill = symbolIteratorPonyfill;
+  exports.$$iterator = symbolIteratorPonyfill(root_1.root);
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/isArray.js", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  exports.isArray = Array.isArray || function (x) {
+    return x && typeof x.length === 'number';
+  };
+  
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/isObject.js", [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    function isObject(x) {
+        return x != null && typeof x === 'object';
+    }
+    exports.isObject = isObject;
+    
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/isFunction.js", [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    function isFunction(x) {
+        return typeof x === 'function';
+    }
+    exports.isFunction = isFunction;
+    
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/tryCatch.js", ["npm:rxjs@5.2.0/util/errorObject.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var errorObject_1 = $__require("npm:rxjs@5.2.0/util/errorObject.js");
+  var tryCatchTarget;
+  function tryCatcher() {
+    try {
+      return tryCatchTarget.apply(this, arguments);
+    } catch (e) {
+      errorObject_1.errorObject.e = e;
+      return errorObject_1.errorObject;
+    }
+  }
+  function tryCatch(fn) {
+    tryCatchTarget = fn;
+    return tryCatcher;
+  }
+  exports.tryCatch = tryCatch;
+  ;
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/errorObject.js", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+  // typeof any so that it we don't have to cast when comparing a result to the error object
+
+  var global = this || self,
+      GLOBAL = global;
+  exports.errorObject = { e: {} };
+  
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/UnsubscriptionError.js", [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    var __extends = this && this.__extends || function (d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+    /**
+     * An error thrown when one or more errors have occurred during the
+     * `unsubscribe` of a {@link Subscription}.
+     */
+    var UnsubscriptionError = function (_super) {
+        __extends(UnsubscriptionError, _super);
+        function UnsubscriptionError(errors) {
+            _super.call(this);
+            this.errors = errors;
+            var err = Error.call(this, errors ? errors.length + " errors occurred during unsubscription:\n  " + errors.map(function (err, i) {
+                return i + 1 + ") " + err.toString();
+            }).join('\n  ') : '');
+            this.name = err.name = 'UnsubscriptionError';
+            this.stack = err.stack;
+            this.message = err.message;
+        }
+        return UnsubscriptionError;
+    }(Error);
+    exports.UnsubscriptionError = UnsubscriptionError;
+    
+});
+System.registerDynamic('npm:process@0.11.9/browser.js', [], true, function ($__require, exports, module) {
+    var global = this || self,
+        GLOBAL = global;
+    // shim for using process in browser
+    var process = module.exports = {};
+
+    // cached from whatever global is present so that test runners that stub it
+    // don't break things.  But we need to wrap it in a try catch in case it is
+    // wrapped in strict mode code which doesn't define any globals.  It's inside a
+    // function because try/catches deoptimize in certain engines.
+
+    var cachedSetTimeout;
+    var cachedClearTimeout;
+
+    function defaultSetTimout() {
+        throw new Error('setTimeout has not been defined');
+    }
+    function defaultClearTimeout() {
+        throw new Error('clearTimeout has not been defined');
+    }
+    (function () {
+        try {
+            if (typeof setTimeout === 'function') {
+                cachedSetTimeout = setTimeout;
+            } else {
+                cachedSetTimeout = defaultSetTimout;
+            }
+        } catch (e) {
+            cachedSetTimeout = defaultSetTimout;
+        }
+        try {
+            if (typeof clearTimeout === 'function') {
+                cachedClearTimeout = clearTimeout;
+            } else {
+                cachedClearTimeout = defaultClearTimeout;
+            }
+        } catch (e) {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    })();
+    function runTimeout(fun) {
+        if (cachedSetTimeout === setTimeout) {
+            //normal enviroments in sane situations
+            return setTimeout(fun, 0);
+        }
+        // if setTimeout wasn't available but was latter defined
+        if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+            cachedSetTimeout = setTimeout;
+            return setTimeout(fun, 0);
+        }
+        try {
+            // when when somebody has screwed with setTimeout but no I.E. maddness
+            return cachedSetTimeout(fun, 0);
+        } catch (e) {
+            try {
+                // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+                return cachedSetTimeout.call(null, fun, 0);
+            } catch (e) {
+                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+                return cachedSetTimeout.call(this, fun, 0);
+            }
+        }
+    }
+    function runClearTimeout(marker) {
+        if (cachedClearTimeout === clearTimeout) {
+            //normal enviroments in sane situations
+            return clearTimeout(marker);
+        }
+        // if clearTimeout wasn't available but was latter defined
+        if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+            cachedClearTimeout = clearTimeout;
+            return clearTimeout(marker);
+        }
+        try {
+            // when when somebody has screwed with setTimeout but no I.E. maddness
+            return cachedClearTimeout(marker);
+        } catch (e) {
+            try {
+                // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+                return cachedClearTimeout.call(null, marker);
+            } catch (e) {
+                // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+                // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+                return cachedClearTimeout.call(this, marker);
+            }
+        }
+    }
+    var queue = [];
+    var draining = false;
+    var currentQueue;
+    var queueIndex = -1;
+
+    function cleanUpNextTick() {
+        if (!draining || !currentQueue) {
+            return;
+        }
+        draining = false;
+        if (currentQueue.length) {
+            queue = currentQueue.concat(queue);
+        } else {
+            queueIndex = -1;
+        }
+        if (queue.length) {
+            drainQueue();
+        }
+    }
+
+    function drainQueue() {
+        if (draining) {
+            return;
+        }
+        var timeout = runTimeout(cleanUpNextTick);
+        draining = true;
+
+        var len = queue.length;
+        while (len) {
+            currentQueue = queue;
+            queue = [];
+            while (++queueIndex < len) {
+                if (currentQueue) {
+                    currentQueue[queueIndex].run();
+                }
+            }
+            queueIndex = -1;
+            len = queue.length;
+        }
+        currentQueue = null;
+        draining = false;
+        runClearTimeout(timeout);
+    }
+
+    process.nextTick = function (fun) {
+        var args = new Array(arguments.length - 1);
+        if (arguments.length > 1) {
+            for (var i = 1; i < arguments.length; i++) {
+                args[i - 1] = arguments[i];
+            }
+        }
+        queue.push(new Item(fun, args));
+        if (queue.length === 1 && !draining) {
+            runTimeout(drainQueue);
+        }
+    };
+
+    // v8 likes predictible objects
+    function Item(fun, array) {
+        this.fun = fun;
+        this.array = array;
+    }
+    Item.prototype.run = function () {
+        this.fun.apply(null, this.array);
+    };
+    process.title = 'browser';
+    process.browser = true;
+    process.env = {};
+    process.argv = [];
+    process.version = ''; // empty string to avoid regexp issues
+    process.versions = {};
+
+    function noop() {}
+
+    process.on = noop;
+    process.addListener = noop;
+    process.once = noop;
+    process.off = noop;
+    process.removeListener = noop;
+    process.removeAllListeners = noop;
+    process.emit = noop;
+
+    process.binding = function (name) {
+        throw new Error('process.binding is not supported');
+    };
+
+    process.cwd = function () {
+        return '/';
+    };
+    process.chdir = function (dir) {
+        throw new Error('process.chdir is not supported');
+    };
+    process.umask = function () {
+        return 0;
+    };
+});
+System.registerDynamic("npm:process@0.11.9.js", ["npm:process@0.11.9/browser.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("npm:process@0.11.9/browser.js");
+});
+System.registerDynamic('github:jspm/nodelibs-process@0.1.2/index.js', ['npm:process@0.11.9.js'], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = System._nodeRequire ? process : $__require('npm:process@0.11.9.js');
+});
+System.registerDynamic("github:jspm/nodelibs-process@0.1.2.js", ["github:jspm/nodelibs-process@0.1.2/index.js"], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  module.exports = $__require("github:jspm/nodelibs-process@0.1.2/index.js");
+});
+System.registerDynamic('npm:rxjs@5.2.0/Subscription.js', ['npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/util/isObject.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/util/UnsubscriptionError.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
+  var global = this || self,
+      GLOBAL = global;
+  /* */
+  (function (process) {
+    "use strict";
+
+    var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
+    var isObject_1 = $__require('npm:rxjs@5.2.0/util/isObject.js');
+    var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
+    var tryCatch_1 = $__require('npm:rxjs@5.2.0/util/tryCatch.js');
+    var errorObject_1 = $__require('npm:rxjs@5.2.0/util/errorObject.js');
+    var UnsubscriptionError_1 = $__require('npm:rxjs@5.2.0/util/UnsubscriptionError.js');
+    var Subscription = function () {
+      function Subscription(unsubscribe) {
+        this.closed = false;
+        this._parent = null;
+        this._parents = null;
+        this._subscriptions = null;
+        if (unsubscribe) {
+          this._unsubscribe = unsubscribe;
+        }
+      }
+      Subscription.prototype.unsubscribe = function () {
+        var hasErrors = false;
+        var errors;
+        if (this.closed) {
+          return;
+        }
+        var _a = this,
+            _parent = _a._parent,
+            _parents = _a._parents,
+            _unsubscribe = _a._unsubscribe,
+            _subscriptions = _a._subscriptions;
+        this.closed = true;
+        this._parent = null;
+        this._parents = null;
+        this._subscriptions = null;
+        var index = -1;
+        var len = _parents ? _parents.length : 0;
+        while (_parent) {
+          _parent.remove(this);
+          _parent = ++index < len && _parents[index] || null;
+        }
+        if (isFunction_1.isFunction(_unsubscribe)) {
+          var trial = tryCatch_1.tryCatch(_unsubscribe).call(this);
+          if (trial === errorObject_1.errorObject) {
+            hasErrors = true;
+            errors = errors || (errorObject_1.errorObject.e instanceof UnsubscriptionError_1.UnsubscriptionError ? flattenUnsubscriptionErrors(errorObject_1.errorObject.e.errors) : [errorObject_1.errorObject.e]);
+          }
+        }
+        if (isArray_1.isArray(_subscriptions)) {
+          index = -1;
+          len = _subscriptions.length;
+          while (++index < len) {
+            var sub = _subscriptions[index];
+            if (isObject_1.isObject(sub)) {
+              var trial = tryCatch_1.tryCatch(sub.unsubscribe).call(sub);
+              if (trial === errorObject_1.errorObject) {
+                hasErrors = true;
+                errors = errors || [];
+                var err = errorObject_1.errorObject.e;
+                if (err instanceof UnsubscriptionError_1.UnsubscriptionError) {
+                  errors = errors.concat(flattenUnsubscriptionErrors(err.errors));
+                } else {
+                  errors.push(err);
+                }
+              }
+            }
+          }
+        }
+        if (hasErrors) {
+          throw new UnsubscriptionError_1.UnsubscriptionError(errors);
+        }
+      };
+      Subscription.prototype.add = function (teardown) {
+        if (!teardown || teardown === Subscription.EMPTY) {
+          return Subscription.EMPTY;
+        }
+        if (teardown === this) {
+          return this;
+        }
+        var subscription = teardown;
+        switch (typeof teardown) {
+          case 'function':
+            subscription = new Subscription(teardown);
+          case 'object':
+            if (subscription.closed || typeof subscription.unsubscribe !== 'function') {
+              return subscription;
+            } else if (this.closed) {
+              subscription.unsubscribe();
+              return subscription;
+            } else if (typeof subscription._addParent !== 'function') {
+              var tmp = subscription;
+              subscription = new Subscription();
+              subscription._subscriptions = [tmp];
+            }
+            break;
+          default:
+            throw new Error('unrecognized teardown ' + teardown + ' added to Subscription.');
+        }
+        var subscriptions = this._subscriptions || (this._subscriptions = []);
+        subscriptions.push(subscription);
+        subscription._addParent(this);
+        return subscription;
+      };
+      Subscription.prototype.remove = function (subscription) {
+        var subscriptions = this._subscriptions;
+        if (subscriptions) {
+          var subscriptionIndex = subscriptions.indexOf(subscription);
+          if (subscriptionIndex !== -1) {
+            subscriptions.splice(subscriptionIndex, 1);
+          }
+        }
+      };
+      Subscription.prototype._addParent = function (parent) {
+        var _a = this,
+            _parent = _a._parent,
+            _parents = _a._parents;
+        if (!_parent || _parent === parent) {
+          this._parent = parent;
+        } else if (!_parents) {
+          this._parents = [parent];
+        } else if (_parents.indexOf(parent) === -1) {
+          _parents.push(parent);
+        }
+      };
+      Subscription.EMPTY = function (empty) {
+        empty.closed = true;
+        return empty;
+      }(new Subscription());
+      return Subscription;
+    }();
+    exports.Subscription = Subscription;
+    function flattenUnsubscriptionErrors(errors) {
+      return errors.reduce(function (errs, err) {
+        return errs.concat(err instanceof UnsubscriptionError_1.UnsubscriptionError ? err.errors : err);
+      }, []);
+    }
+  })($__require('github:jspm/nodelibs-process@0.1.2.js'));
+});
+System.registerDynamic("npm:rxjs@5.2.0/Observer.js", [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    exports.empty = {
+        closed: true,
+        next: function (value) {},
+        error: function (err) {
+            throw err;
+        },
+        complete: function () {}
+    };
+    
+});
+System.registerDynamic('npm:rxjs@5.2.0/symbol/rxSubscriber.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  var Symbol = root_1.root.Symbol;
+  exports.$$rxSubscriber = typeof Symbol === 'function' && typeof Symbol.for === 'function' ? Symbol.for('rxSubscriber') : '@@rxSubscriber';
+});
+System.registerDynamic('npm:rxjs@5.2.0/Subscriber.js', ['npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/Observer.js', 'npm:rxjs@5.2.0/symbol/rxSubscriber.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var isFunction_1 = $__require('npm:rxjs@5.2.0/util/isFunction.js');
+  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+  var Observer_1 = $__require('npm:rxjs@5.2.0/Observer.js');
+  var rxSubscriber_1 = $__require('npm:rxjs@5.2.0/symbol/rxSubscriber.js');
+  var Subscriber = function (_super) {
+    __extends(Subscriber, _super);
+    function Subscriber(destinationOrNext, error, complete) {
+      _super.call(this);
+      this.syncErrorValue = null;
+      this.syncErrorThrown = false;
+      this.syncErrorThrowable = false;
+      this.isStopped = false;
+      switch (arguments.length) {
+        case 0:
+          this.destination = Observer_1.empty;
+          break;
+        case 1:
+          if (!destinationOrNext) {
+            this.destination = Observer_1.empty;
+            break;
+          }
+          if (typeof destinationOrNext === 'object') {
+            if (destinationOrNext instanceof Subscriber) {
+              this.destination = destinationOrNext;
+              this.destination.add(this);
+            } else {
+              this.syncErrorThrowable = true;
+              this.destination = new SafeSubscriber(this, destinationOrNext);
+            }
+            break;
+          }
+        default:
+          this.syncErrorThrowable = true;
+          this.destination = new SafeSubscriber(this, destinationOrNext, error, complete);
+          break;
+      }
+    }
+    Subscriber.prototype[rxSubscriber_1.$$rxSubscriber] = function () {
+      return this;
+    };
+    Subscriber.create = function (next, error, complete) {
+      var subscriber = new Subscriber(next, error, complete);
+      subscriber.syncErrorThrowable = false;
+      return subscriber;
+    };
+    Subscriber.prototype.next = function (value) {
+      if (!this.isStopped) {
+        this._next(value);
+      }
+    };
+    Subscriber.prototype.error = function (err) {
+      if (!this.isStopped) {
+        this.isStopped = true;
+        this._error(err);
+      }
+    };
+    Subscriber.prototype.complete = function () {
+      if (!this.isStopped) {
+        this.isStopped = true;
+        this._complete();
+      }
+    };
+    Subscriber.prototype.unsubscribe = function () {
+      if (this.closed) {
+        return;
+      }
+      this.isStopped = true;
+      _super.prototype.unsubscribe.call(this);
+    };
+    Subscriber.prototype._next = function (value) {
+      this.destination.next(value);
+    };
+    Subscriber.prototype._error = function (err) {
+      this.destination.error(err);
+      this.unsubscribe();
+    };
+    Subscriber.prototype._complete = function () {
+      this.destination.complete();
+      this.unsubscribe();
+    };
+    Subscriber.prototype._unsubscribeAndRecycle = function () {
+      var _a = this,
+          _parent = _a._parent,
+          _parents = _a._parents;
+      this._parent = null;
+      this._parents = null;
+      this.unsubscribe();
+      this.closed = false;
+      this.isStopped = false;
+      this._parent = _parent;
+      this._parents = _parents;
+      return this;
+    };
+    return Subscriber;
+  }(Subscription_1.Subscription);
+  exports.Subscriber = Subscriber;
+  var SafeSubscriber = function (_super) {
+    __extends(SafeSubscriber, _super);
+    function SafeSubscriber(_parentSubscriber, observerOrNext, error, complete) {
+      _super.call(this);
+      this._parentSubscriber = _parentSubscriber;
+      var next;
+      var context = this;
+      if (isFunction_1.isFunction(observerOrNext)) {
+        next = observerOrNext;
+      } else if (observerOrNext) {
+        context = observerOrNext;
+        next = observerOrNext.next;
+        error = observerOrNext.error;
+        complete = observerOrNext.complete;
+        if (isFunction_1.isFunction(context.unsubscribe)) {
+          this.add(context.unsubscribe.bind(context));
+        }
+        context.unsubscribe = this.unsubscribe.bind(this);
+      }
+      this._context = context;
+      this._next = next;
+      this._error = error;
+      this._complete = complete;
+    }
+    SafeSubscriber.prototype.next = function (value) {
+      if (!this.isStopped && this._next) {
+        var _parentSubscriber = this._parentSubscriber;
+        if (!_parentSubscriber.syncErrorThrowable) {
+          this.__tryOrUnsub(this._next, value);
+        } else if (this.__tryOrSetError(_parentSubscriber, this._next, value)) {
+          this.unsubscribe();
+        }
+      }
+    };
+    SafeSubscriber.prototype.error = function (err) {
+      if (!this.isStopped) {
+        var _parentSubscriber = this._parentSubscriber;
+        if (this._error) {
+          if (!_parentSubscriber.syncErrorThrowable) {
+            this.__tryOrUnsub(this._error, err);
+            this.unsubscribe();
+          } else {
+            this.__tryOrSetError(_parentSubscriber, this._error, err);
+            this.unsubscribe();
+          }
+        } else if (!_parentSubscriber.syncErrorThrowable) {
+          this.unsubscribe();
+          throw err;
+        } else {
+          _parentSubscriber.syncErrorValue = err;
+          _parentSubscriber.syncErrorThrown = true;
+          this.unsubscribe();
+        }
+      }
+    };
+    SafeSubscriber.prototype.complete = function () {
+      if (!this.isStopped) {
+        var _parentSubscriber = this._parentSubscriber;
+        if (this._complete) {
+          if (!_parentSubscriber.syncErrorThrowable) {
+            this.__tryOrUnsub(this._complete);
+            this.unsubscribe();
+          } else {
+            this.__tryOrSetError(_parentSubscriber, this._complete);
+            this.unsubscribe();
+          }
+        } else {
+          this.unsubscribe();
+        }
+      }
+    };
+    SafeSubscriber.prototype.__tryOrUnsub = function (fn, value) {
+      try {
+        fn.call(this._context, value);
+      } catch (err) {
+        this.unsubscribe();
+        throw err;
+      }
+    };
+    SafeSubscriber.prototype.__tryOrSetError = function (parent, fn, value) {
+      try {
+        fn.call(this._context, value);
+      } catch (err) {
+        parent.syncErrorValue = err;
+        parent.syncErrorThrown = true;
+        return true;
+      }
+      return false;
+    };
+    SafeSubscriber.prototype._unsubscribe = function () {
+      var _parentSubscriber = this._parentSubscriber;
+      this._context = null;
+      this._parentSubscriber = null;
+      _parentSubscriber.unsubscribe();
+    };
+    return SafeSubscriber;
+  }(Subscriber);
+});
+System.registerDynamic("npm:rxjs@5.2.0/InnerSubscriber.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
+  var InnerSubscriber = function (_super) {
+    __extends(InnerSubscriber, _super);
+    function InnerSubscriber(parent, outerValue, outerIndex) {
+      _super.call(this);
+      this.parent = parent;
+      this.outerValue = outerValue;
+      this.outerIndex = outerIndex;
+      this.index = 0;
+    }
+    InnerSubscriber.prototype._next = function (value) {
+      this.parent.notifyNext(this.outerValue, value, this.outerIndex, this.index++, this);
+    };
+    InnerSubscriber.prototype._error = function (error) {
+      this.parent.notifyError(error, this);
+      this.unsubscribe();
+    };
+    InnerSubscriber.prototype._complete = function () {
+      this.parent.notifyComplete(this);
+      this.unsubscribe();
+    };
+    return InnerSubscriber;
+  }(Subscriber_1.Subscriber);
+  exports.InnerSubscriber = InnerSubscriber;
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/root.js', [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+    /**
+     * window: browser in DOM main thread
+     * self: browser in WebWorker
+     * global: Node.js/other
+     */
+
+    var global = this || self,
+        GLOBAL = global;
+    exports.root = typeof window == 'object' && window.window === window && window || typeof self == 'object' && self.self === self && self || typeof global == 'object' && global.global === global && global;
+    if (!exports.root) {
+        throw new Error('RxJS could not find any global context (window, self, global)');
+    }
+    
+});
+System.registerDynamic('npm:rxjs@5.2.0/symbol/observable.js', ['npm:rxjs@5.2.0/util/root.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  function getSymbolObservable(context) {
+    var $$observable;
+    var Symbol = context.Symbol;
+    if (typeof Symbol === 'function') {
+      if (Symbol.observable) {
+        $$observable = Symbol.observable;
+      } else {
+        $$observable = Symbol('observable');
+        Symbol.observable = $$observable;
+      }
+    } else {
+      $$observable = '@@observable';
+    }
+    return $$observable;
+  }
+  exports.getSymbolObservable = getSymbolObservable;
+  exports.$$observable = getSymbolObservable(root_1.root);
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/subscribeToResult.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/util/isArrayLike.js', 'npm:rxjs@5.2.0/util/isPromise.js', 'npm:rxjs@5.2.0/util/isObject.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/symbol/iterator.js', 'npm:rxjs@5.2.0/InnerSubscriber.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  var isArrayLike_1 = $__require('npm:rxjs@5.2.0/util/isArrayLike.js');
+  var isPromise_1 = $__require('npm:rxjs@5.2.0/util/isPromise.js');
+  var isObject_1 = $__require('npm:rxjs@5.2.0/util/isObject.js');
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
+  var InnerSubscriber_1 = $__require('npm:rxjs@5.2.0/InnerSubscriber.js');
+  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
+  function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
+    var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
+    if (destination.closed) {
+      return null;
+    }
+    if (result instanceof Observable_1.Observable) {
+      if (result._isScalar) {
+        destination.next(result.value);
+        destination.complete();
+        return null;
+      } else {
+        return result.subscribe(destination);
+      }
+    } else if (isArrayLike_1.isArrayLike(result)) {
+      for (var i = 0, len = result.length; i < len && !destination.closed; i++) {
+        destination.next(result[i]);
+      }
+      if (!destination.closed) {
+        destination.complete();
+      }
+    } else if (isPromise_1.isPromise(result)) {
+      result.then(function (value) {
+        if (!destination.closed) {
+          destination.next(value);
+          destination.complete();
+        }
+      }, function (err) {
+        return destination.error(err);
+      }).then(null, function (err) {
+        root_1.root.setTimeout(function () {
+          throw err;
+        });
+      });
+      return destination;
+    } else if (result && typeof result[iterator_1.$$iterator] === 'function') {
+      var iterator = result[iterator_1.$$iterator]();
+      do {
+        var item = iterator.next();
+        if (item.done) {
+          destination.complete();
+          break;
+        }
+        destination.next(item.value);
+        if (destination.closed) {
+          break;
+        }
+      } while (true);
+    } else if (result && typeof result[observable_1.$$observable] === 'function') {
+      var obs = result[observable_1.$$observable]();
+      if (typeof obs.subscribe !== 'function') {
+        destination.error(new TypeError('Provided object does not correctly implement Symbol.observable'));
+      } else {
+        return obs.subscribe(new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex));
+      }
+    } else {
+      var value = isObject_1.isObject(result) ? 'an invalid object' : "'" + result + "'";
+      var msg = "You provided " + value + " where a stream was expected." + ' You can provide an Observable, Promise, Array, or Iterable.';
+      destination.error(new TypeError(msg));
+    }
+    return null;
+  }
+  exports.subscribeToResult = subscribeToResult;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/mergeAll.js', ['npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
+  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
+  function mergeAll(concurrent) {
+    if (concurrent === void 0) {
+      concurrent = Number.POSITIVE_INFINITY;
+    }
+    return this.lift(new MergeAllOperator(concurrent));
+  }
+  exports.mergeAll = mergeAll;
+  var MergeAllOperator = function () {
+    function MergeAllOperator(concurrent) {
+      this.concurrent = concurrent;
+    }
+    MergeAllOperator.prototype.call = function (observer, source) {
+      return source.subscribe(new MergeAllSubscriber(observer, this.concurrent));
+    };
+    return MergeAllOperator;
+  }();
+  exports.MergeAllOperator = MergeAllOperator;
+  var MergeAllSubscriber = function (_super) {
+    __extends(MergeAllSubscriber, _super);
+    function MergeAllSubscriber(destination, concurrent) {
+      _super.call(this, destination);
+      this.concurrent = concurrent;
+      this.hasCompleted = false;
+      this.buffer = [];
+      this.active = 0;
+    }
+    MergeAllSubscriber.prototype._next = function (observable) {
+      if (this.active < this.concurrent) {
+        this.active++;
+        this.add(subscribeToResult_1.subscribeToResult(this, observable));
+      } else {
+        this.buffer.push(observable);
+      }
+    };
+    MergeAllSubscriber.prototype._complete = function () {
+      this.hasCompleted = true;
+      if (this.active === 0 && this.buffer.length === 0) {
+        this.destination.complete();
+      }
+    };
+    MergeAllSubscriber.prototype.notifyComplete = function (innerSub) {
+      var buffer = this.buffer;
+      this.remove(innerSub);
+      this.active--;
+      if (buffer.length > 0) {
+        this._next(buffer.shift());
+      } else if (this.active === 0 && this.hasCompleted) {
+        this.destination.complete();
+      }
+    };
+    return MergeAllSubscriber;
+  }(OuterSubscriber_1.OuterSubscriber);
+  exports.MergeAllSubscriber = MergeAllSubscriber;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/mergeAll.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mergeAll.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var mergeAll_1 = $__require('npm:rxjs@5.2.0/operator/mergeAll.js');
+  Observable_1.Observable.prototype.mergeAll = mergeAll_1.mergeAll;
+});
 System.registerDynamic("src-reactive/app/helper.js", [], true, function ($__require, exports, module) {
     "use strict";
 
@@ -10112,15 +10507,18 @@ System.registerDynamic("src-reactive/app/helper.js", [], true, function ($__requ
     }
     exports.inputForTest = inputForTest;
 });
-System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/operator/pluck.js", "npm:immutable@3.8.1.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     var Observable_1 = $__require("npm:rxjs@5.2.0/Observable.js");
-    $__require("npm:rxjs@5.2.0/operator/pluck.js");
     var immutable_1 = $__require("npm:immutable@3.8.1.js");
+    $__require("npm:rxjs@5.2.0/add/operator/pluck.js");
+    $__require("npm:rxjs@5.2.0/add/observable/fromEvent.js");
+    $__require("npm:rxjs@5.2.0/add/operator/map.js");
+    $__require("npm:rxjs@5.2.0/add/operator/mergeAll.js");
     var helper_1 = $__require("src-reactive/app/helper.js");
     function pluckAndZip() {
         var contacts = Observable_1.Observable.from([{
@@ -10175,7 +10573,7 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
         });
         // let state = increase.scan((state, changeFn) => changeFn(state), { count: 0 });
         // We merge the three state change producing observables
-        var stateObservable = Observable_1.Observable.merge(increase, decrease, input).scan(function (state, changeFn) {
+        var stateObservable = Observable_1.Observable.merge([increase, decrease, input]).mergeAll().scan(function (state, changeFn) {
             return changeFn(state);
         }, {
             count: 0,
@@ -10257,7 +10655,7 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
     }
     exports.immutableStore = immutableStore;
 });
-System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-reactive/app/creating.js", "src-reactive/app/converting.js", "src-reactive/app/operator.js", "src-reactive/app/learnrx.js", "src-reactive/app/playground.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-reactive/app/creating.js", "src-reactive/app/subject.js", "src-reactive/app/converting.js", "src-reactive/app/operator.js", "src-reactive/app/learnrx.js", "src-reactive/app/playground.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -10267,11 +10665,12 @@ System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "np
     $__require("npm:screenlog@0.2.2.js");
     var testbutton_1 = $__require("libs/testbutton.js");
     var creating = $__require("src-reactive/app/creating.js");
+    var subject = $__require("src-reactive/app/subject.js");
     var converting = $__require("src-reactive/app/converting.js");
     var operator = $__require("src-reactive/app/operator.js");
     var learnrx = $__require("src-reactive/app/learnrx.js");
     var playground = $__require("src-reactive/app/playground.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Subject - 1', action: creating.testSubject1 }, { text: 'creating:   Subject - 2', action: creating.testSubject2 }, { text: 'creating:   Subject - 3', action: creating.testSubject3 }, { text: 'creating:   ReplaySubject - 1', action: creating.testReplaySubject1 }, { text: 'creating:   ReplaySubject - 2', action: creating.testReplaySubject2 }, { text: 'creating:   ReplaySubject - 3', action: creating.testReplaySubject3 }, { text: 'creating:   ReplaySubject - 4', action: creating.testReplaySubject4 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }];
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

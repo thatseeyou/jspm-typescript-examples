@@ -3,6 +3,7 @@ import 'screenlog';
 import { TestItem, makeTestButtons } from '../../libs/testbutton';
 
 import * as creating from './creating';
+import * as subject from './subject';
 import * as converting from './converting';
 import * as operator from './operator';
 import * as learnrx from './learnrx';
@@ -14,16 +15,19 @@ const tests:TestItem[] = [
     {text: 'converting: add/observable/from', action: converting.testFrom},
     {text: 'creating:   add/observable/create - 1', action: creating.testCreate1},
     {text: 'creating:   add/observable/create - 2', action: creating.testCreate2},
-    {text: 'creating:   Subject - 1', action: creating.testSubject1},
-    {text: 'creating:   Subject - 2', action: creating.testSubject2},
-    {text: 'creating:   Subject - 3', action: creating.testSubject3},
-    {text: 'creating:   ReplaySubject - 1', action: creating.testReplaySubject1},
-    {text: 'creating:   ReplaySubject - 2', action: creating.testReplaySubject2},
-    {text: 'creating:   ReplaySubject - 3', action: creating.testReplaySubject3},
-    {text: 'creating:   ReplaySubject - 4', action: creating.testReplaySubject4},
     {text: 'creating:   Merge', action: creating.testMerge},
     {text: 'creating:   add/observable/range', action: creating.testRange},
     {text: 'creating:   add/observable/zip', action: creating.testZip},
+
+    {text: 'subject:   Subject - 1', action: subject.testSubject1},
+    {text: 'subject:   Subject - 2', action: subject.testSubject2},
+    {text: 'subject:   Subject - 3', action: subject.testSubject3},
+    {text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1},
+    {text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2},
+    {text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3},
+    {text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4},
+    {text: 'subject:   multicast Observable', action: subject.testMulticast},
+
     {text: 'operator:   add/operator/pluck', action: operator.testPluck},
     {text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap},
     {text: 'operator:   add/operator/concatMap', action: operator.testConcatMap},
