@@ -557,8 +557,8 @@ export function ex24() {
     });
 }
 
-export function ex29() {
-    let button = buttonForTest('for ex29: click this');
+export function ex29(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('for ex29: click this', placeholder);
 
 	var buttonClicks = Observable.fromEvent<MouseEvent>(button, 'click');
 
@@ -572,8 +572,8 @@ export function ex29() {
         });
 }
 
-export function ex30() {
-    let button = buttonForTest('for ex30: click this');
+export function ex30(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('for ex30: click this', placeholder);
 
     var buttonClicks = Observable.fromEvent<MouseEvent>(button, 'click');
 
@@ -586,8 +586,8 @@ export function ex30() {
         });
 }
 
-export function ex33() {
-    let sprite = buttonForTest('for ex33: drag this');
+export function ex33(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let sprite = buttonForTest('for ex33: drag this', placeholder);
     sprite.style.position = 'absolute';
     let spriteContainer = document.body;
 
@@ -621,8 +621,8 @@ export function ex33() {
 	});
 }
 
-export function ex38() {
-    let button = buttonForTest('for ex38: click this');
+export function ex38(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('for ex38: click this', placeholder);
     let buttonClicks = Observable.fromEvent<MouseEvent>(button, 'click');
 
 	let clicks = buttonClicks.throttleTime(1000);
@@ -632,8 +632,8 @@ export function ex38() {
     });
 }
 
-export function ex40() {
-    let input = inputForTest('for ex40');
+export function ex40(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let input = inputForTest('for ex40', placeholder);
     let keyPresses = Observable.fromEvent<KeyboardEvent>(input, 'keypress');
 
 	let strings = keyPresses

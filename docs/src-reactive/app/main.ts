@@ -27,11 +27,18 @@ const tests:TestItem[] = [
     {text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3},
     {text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4},
     {text: 'subject:   multicast Observable', action: subject.testMulticast},
+    {text: 'subject:   refCount()',           action: subject.testMulticast3},
 
     {text: 'operator:   add/operator/pluck', action: operator.testPluck},
     {text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap},
     {text: 'operator:   add/operator/concatMap', action: operator.testConcatMap},
+    {text: 'operator:   add/operator/expand', action: operator.testExpand},
     {text: 'operator:   add/operator/merge', action: operator.testMerge},
+    {text: 'operator:   add/operator/buffer', action: operator.testBuffer},
+    {text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen},
+    {text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle},
+    {text: 'operator:   add/operator/pairwise', action: operator.testPairwise},
+    {text: 'operator:   add/operator/partition', action: operator.testPartition},
 
     {text: 'learnrx: ex5 - map', action: learnrx.ex5},
     {text: 'learnrx: ex8 - filter', action: learnrx.ex8},

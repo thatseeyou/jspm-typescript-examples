@@ -213,9 +213,9 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
     function makeTestButtons(items) {
         var container = document.getElementById('test-buttons');
         items.forEach(function (item) {
-            makeTestButton(container, item.text, function (targetButton) {
+            makeTestButton(container, item.text, function (targetButton, placeholder) {
                 console.log(">>> START of " + item.text);
-                item.action(targetButton);
+                item.action(targetButton, placeholder);
                 console.log("<<< END of " + item.text);
                 console.log();
             });
@@ -227,9 +227,11 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         var button = document.createElement('button');
         button.innerText = text;
         button.style.display = 'block';
+        var placeholder = document.createElement('div');
         parent.appendChild(button);
+        parent.appendChild(placeholder);
         button.addEventListener('click', function (event) {
-            action(_this);
+            action(_this, placeholder);
         });
     }
 });

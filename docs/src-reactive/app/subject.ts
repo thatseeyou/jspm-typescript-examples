@@ -13,19 +13,19 @@ import 'rxjs/add/operator/timestamp';
 
 import { buttonForTest, inputForTest } from './helper';
 
-export function testSubject1() {
+export function testSubject1(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new Subject();
     myObservable.subscribe(value => console.log(value));
     myObservable.next('after subscribe');
 }
 
-export function testSubject2() {
+export function testSubject2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new Subject();
     myObservable.next('before subscribe');
     myObservable.subscribe(value => console.log(value));
 }
 
-export function testSubject3() {
+export function testSubject3(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new Subject();
     myObservable.subscribe(value => console.log(`1: ${value}`));
     myObservable.subscribe(value => console.log(`2: ${value}`));
@@ -33,13 +33,13 @@ export function testSubject3() {
     myObservable.next('multiple subscribe');
 }
 
-export function testReplaySubject1() {
+export function testReplaySubject1(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new ReplaySubject();
     myObservable.next('before subscribe');
     myObservable.subscribe(value => console.log(value));
 }
 
-export function testReplaySubject2() {
+export function testReplaySubject2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new ReplaySubject();
     myObservable.subscribe(value => console.log(`1: ${value}`));
     myObservable.next('multiple subscribe');
@@ -47,7 +47,7 @@ export function testReplaySubject2() {
     myObservable.subscribe(value => console.log(`3: ${value}`));
 }
 
-export function testReplaySubject3() {
+export function testReplaySubject3(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new ReplaySubject();
     myObservable.subscribe(value => console.log(`1: ${value}`));
     myObservable.next('multiple subscribe');
@@ -56,7 +56,7 @@ export function testReplaySubject3() {
     myObservable.subscribe(value => console.log(`3: ${value}`));
 }
 
-export function testReplaySubject4() {
+export function testReplaySubject4(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new ReplaySubject(2);
     myObservable.subscribe(value => console.log(`1: ${value}`));
     myObservable.next('multiple subscribe 1');
@@ -66,9 +66,9 @@ export function testReplaySubject4() {
     myObservable.subscribe(value => console.log(`3: ${value}`));
 }
 
-export function testMulticast() {
+export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     (() => {
-        let button = buttonForTest('Observable(num of handler = 2')
+        let button = buttonForTest('Observable(num of handler = 2)', placeholder)
         let buttonObservable = Observable.fromEvent(button, 'click').map((value) => {
             console.log('map Called');
             return value;
@@ -79,7 +79,7 @@ export function testMulticast() {
     })();
 
     (() => {
-        let button = buttonForTest('ConnectableObservable(num of handler = 1')
+        let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
         let buttonObservable = Observable.fromEvent(button, 'click').map((value) => {
             console.log('map Called');
             return value;
@@ -92,3 +92,47 @@ export function testMulticast() {
         buttonObservable.connect();
     })();
 }
+
+export function testMulticast2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
+    let buttonObservable = Observable.fromEvent<MouseEvent>(button, 'click')
+        .map((ev) => {
+            console.log('map Called');
+            return ev;
+        })
+        .multicast<MouseEvent>(new Subject());
+
+    buttonObservable
+        .map((ev) => {
+            return (<HTMLButtonElement>ev.target).innerText;
+        })
+        .subscribe((value) => console.log(`[1] click from ${value}`));
+
+    buttonObservable
+        .map((ev) => (<HTMLButtonElement>ev.target).innerText)
+        .subscribe((value) => console.log(`[2] click from ${value}`));
+
+    buttonObservable.connect();
+}
+
+export function testMulticast3(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
+    let buttonObservable = Observable.fromEvent<MouseEvent>(button, 'click')
+        .map((ev) => {
+            console.log('map Called');
+            return ev;
+        })
+        .multicast<MouseEvent>(new Subject())
+        .refCount();;
+
+    buttonObservable
+        .map((ev) => {
+            return (<HTMLButtonElement>ev.target).innerText;
+        })
+        .subscribe((value) => console.log(`[1] click from ${value}`));
+
+    buttonObservable
+        .map((ev) => (<HTMLButtonElement>ev.target).innerText)
+        .subscribe((value) => console.log(`[2] click from ${value}`));
+}
+

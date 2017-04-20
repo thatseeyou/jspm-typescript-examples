@@ -145,18 +145,13 @@ export function testRange() {
     .subscribe(number => console.log(`${number}`));
 }
 
-export function testZip() {
+export function testZip(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     // 1. make left, right button
     let [leftClickObservable, rightClickObservable] = ['left', 'right']
     .map(function(text) {
-        let buttonElement = document.createElement('button');
-        buttonElement.innerText = text;
-        buttonElement.style.height = '50px';
-        
-        // side effect
-        document.body.appendChild(buttonElement);
+        let button = buttonForTest(text, placeholder);
 
-        return Observable.fromEvent<MouseEvent>(buttonElement, 'click');
+        return Observable.fromEvent<MouseEvent>(button, 'click');
     });
 
     let zippedObservable = Observable.zip(leftClickObservable, rightClickObservable, function(leftClick, rightClick):[number, number] {
@@ -187,16 +182,16 @@ export function testZip() {
     });
 }
 
-export function testMerge() {
-    let key1Button = buttonForTest('1');
+export function testMerge(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let key1Button = buttonForTest('1', placeholder);
     let key1 = Observable.fromEvent<MouseEvent>(key1Button, 'click')
         .map(() => 1);
 
-    let key2Button = buttonForTest('2');
+    let key2Button = buttonForTest('2', placeholder);
     let key2 = Observable.fromEvent<MouseEvent>(key2Button, 'click')
         .map(() => 2);
 
-    let key3Button = buttonForTest('3');
+    let key3Button = buttonForTest('3', placeholder);
     let key3 = Observable.fromEvent<MouseEvent>(key3Button, 'click')
         .map(() => 3);
 

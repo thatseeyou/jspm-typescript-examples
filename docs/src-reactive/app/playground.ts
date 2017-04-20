@@ -42,7 +42,7 @@ export function pluckAndZip() {
 }
 
 // excerpt from http://reactivex.io/rxjs/manual/tutorial.html
-export function stateStore() {
+export function stateStore(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     interface State {
         count:number;
         inputValue: string;
@@ -50,17 +50,17 @@ export function stateStore() {
         //[key:string]: any;
     }
     
-    let increaseButton = buttonForTest('increase');
+    let increaseButton = buttonForTest('increase', placeholder);
     let increase = Observable.fromEvent<MouseEvent>(increaseButton, 'click')
         // We map to a function that will change our state
         .map(() => (state: State) => Object.assign({}, state, { count: state.count + 1 }));
 
-    let decreaseButton = buttonForTest('decrease');
+    let decreaseButton = buttonForTest('decrease', placeholder);
     let decrease = Observable.fromEvent<MouseEvent>(decreaseButton, 'click')
         // We map to a function that will change our state
         .map(() => (state: State) => Object.assign({}, state, { count: state.count - 1 }));
 
-    let inputElement = inputForTest('input');
+    let inputElement = inputForTest('input', placeholder);
     let input = Observable.fromEvent<KeyboardEvent>(inputElement, 'keyup')
         // Let us also map the keypress events to produce an inputValue state
         .map(event => {
@@ -96,7 +96,7 @@ export function stateStore() {
     });
 }
 
-export function immutableStore() {
+export function immutableStore(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     type State = Map<string, any>;
 
     // interface State {
@@ -106,17 +106,17 @@ export function immutableStore() {
     //     //[key:string]: any;
     // }
     
-    let increaseButton = buttonForTest('increase');
+    let increaseButton = buttonForTest('increase', placeholder);
     let increase = Observable.fromEvent<MouseEvent>(increaseButton, 'click')
         // We map to a function that will change our state
         .map(event => (state: State) => state.update('count', value => value + 1));
 
-    let decreaseButton = buttonForTest('decrease');
+    let decreaseButton = buttonForTest('decrease', placeholder);
     let decrease = Observable.fromEvent<MouseEvent>(decreaseButton, 'click')
         // We map to a function that will change our state
         .map(event => (state: State) => state.update('count', value => value - 1));
 
-    let inputElement = inputForTest('input');
+    let inputElement = inputForTest('input', placeholder);
     let input = Observable.fromEvent<KeyboardEvent>(inputElement, 'keyup')
         // Let us also map the keypress events to produce an inputValue state
         .map(event => (state: State) => state.update('inputValue', () => (event.target as HTMLInputElement).value));
