@@ -1,3 +1,5 @@
+import { Observer } from 'rxjs/Observer';
+
 export function buttonForTest(text: string, parent?:HTMLElement) {
     let button = document.createElement('button');
     button.innerText = text;
@@ -19,4 +21,12 @@ export function inputForTest(label: string, parent?:HTMLElement) {
     p.appendChild(labelEl);
 
     return inputEl;
+}
+
+export function simpleObserver<T>(prefix: string):Observer<T> {
+    return {
+        next: (value) => console.log(`${prefix}: ${value}`),
+        error: (err) => console.log(`${prefix}: ERROR: ${err}`),
+        complete: () => console.log(`${prefix}: Completed`)
+    }
 }

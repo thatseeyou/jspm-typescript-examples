@@ -9,8 +9,12 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/observable/range';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/interval';
 
-import { buttonForTest, inputForTest } from './helper';
+import 'rxjs/add/operator/take';
+
+import { buttonForTest, inputForTest, simpleObserver } from './helper';
 
 export function testCreate1() {
     /* Using a function */
@@ -197,6 +201,15 @@ export function testMerge(testButton:HTMLButtonElement, placeholder:HTMLElement)
 
     Observable.merge(key1, key2, key3)
         .scan((sum, current) => sum * 10 + current, 0)
-        .subscribe((value) => console.log(`Digit: ${value}`));
+        .subscribe(simpleObserver('Digit'));
 }
 
+export function testDefer(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let defered = Observable.defer(() => {
+        console.log('defer called');
+        return Observable.interval(500).take(5);
+    });
+
+    defered.subscribe(simpleObserver('1'));
+    defered.subscribe(simpleObserver('2'));
+}

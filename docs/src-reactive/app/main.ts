@@ -8,6 +8,8 @@ import * as converting from './converting';
 import * as operator from './operator';
 import * as learnrx from './learnrx';
 import * as playground from './playground';
+import * as asscan from './asscan';
+import * as notification from './notification';
 
 const tests:TestItem[] = [
     {text: '---- clear log ----', action: screenLog.clear},
@@ -18,6 +20,7 @@ const tests:TestItem[] = [
     {text: 'creating:   Merge', action: creating.testMerge},
     {text: 'creating:   add/observable/range', action: creating.testRange},
     {text: 'creating:   add/observable/zip', action: creating.testZip},
+    {text: 'creating:   add/observable/defer', action: creating.testDefer},
 
     {text: 'subject:   Subject - 1', action: subject.testSubject1},
     {text: 'subject:   Subject - 2', action: subject.testSubject2},
@@ -39,6 +42,21 @@ const tests:TestItem[] = [
     {text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle},
     {text: 'operator:   add/operator/pairwise', action: operator.testPairwise},
     {text: 'operator:   add/operator/partition', action: operator.testPartition},
+    {text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest},
+    {text: 'operator:   add/operator/testWithLatestFrom', action: operator.testWithLatestFrom},
+    {text: 'operator:   add/operator/testDebouce', action: operator.testDebounce},
+    {text: 'operator:   add/operator/testDelayWhen', action: operator.testDelayWhen},
+    {text: 'operator:   add/operator/testDistinct', action: operator.testDistinct},
+
+    {text: 'as scan:   map as scan', action: asscan.mapAsScan},
+    {text: 'as scan:   buffer as scan', action: asscan.bufferAsScan1},
+    {text: 'as scan:   buffer as scan', action: asscan.bufferAsScan2},
+    {text: 'as scan:   audit as scan', action: asscan.auditAsScan},
+    {text: 'as scan:   count as scan', action: asscan.countAsScan},
+    {text: 'as scan:   filter as scan', action: asscan.filterAsScan},
+    {text: 'as scan:   distinct as scan', action: asscan.distinctAsScan},
+
+    {text: 'notification:   observe vs. toObservable', action: notification.testNotification1},
 
     {text: 'learnrx: ex5 - map', action: learnrx.ex5},
     {text: 'learnrx: ex8 - filter', action: learnrx.ex8},

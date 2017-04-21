@@ -10,6 +10,7 @@ import { Subject } from 'rxjs/Subject';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/multicast';
 import 'rxjs/add/operator/timestamp';
+import 'rxjs/add/operator/do';
 
 import { buttonForTest, inputForTest } from './helper';
 
@@ -69,10 +70,10 @@ export function testReplaySubject4(testButton:HTMLButtonElement, placeholder:HTM
 export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     (() => {
         let button = buttonForTest('Observable(num of handler = 2)', placeholder)
-        let buttonObservable = Observable.fromEvent(button, 'click').map((value) => {
-            console.log('map Called');
-            return value;
-        });
+        let buttonObservable = Observable.fromEvent(button, 'click')
+            .do((value) => {
+                console.log('do Called');
+            });
 
         buttonObservable.subscribe((ev) => console.log(`click from Observable - 1`));
         buttonObservable.subscribe((ev) => console.log(`click from Observable - 2`));
@@ -80,10 +81,10 @@ export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElem
 
     (() => {
         let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
-        let buttonObservable = Observable.fromEvent(button, 'click').map((value) => {
-            console.log('map Called');
-            return value;
-        })
+        let buttonObservable = Observable.fromEvent(button, 'click')
+            .do((value) => {
+                console.log('do Called');
+            })
             .multicast(new Subject());
 
         buttonObservable.subscribe((ev) => console.log(`click from ConnectableObservable - 1`));
@@ -96,9 +97,8 @@ export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElem
 export function testMulticast2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
     let buttonObservable = Observable.fromEvent<MouseEvent>(button, 'click')
-        .map((ev) => {
-            console.log('map Called');
-            return ev;
+        .do((ev) => {
+            console.log('do Called');
         })
         .multicast<MouseEvent>(new Subject());
 
@@ -118,9 +118,8 @@ export function testMulticast2(testButton:HTMLButtonElement, placeholder:HTMLEle
 export function testMulticast3(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
     let buttonObservable = Observable.fromEvent<MouseEvent>(button, 'click')
-        .map((ev) => {
-            console.log('map Called');
-            return ev;
+        .do((ev) => {
+            console.log('do Called');
         })
         .multicast<MouseEvent>(new Subject())
         .refCount();;

@@ -235,6 +235,69 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
+System.registerDynamic("src-immutable/app/gettingstarted.js", ["npm:immutable@3.8.1.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var immutable_1 = $__require("npm:immutable@3.8.1.js");
+    function test1() {
+        var map1 = immutable_1.Map({ a: 1, b: 2, c: 3 });
+        var map2 = map1.set('b', 50);
+        console.log("" + map1.get('b')); // 2
+        console.log("" + map2.get('b')); // 50
+    }
+    exports.test1 = test1;
+    function test2() {
+        var map1 = immutable_1.Map({ a: 1, b: 2, c: 3, d: 4 });
+        var map2 = immutable_1.Map({ c: 10, a: 20, t: 30 });
+        var obj = { d: 100, o: 200, g: 300 };
+        var map3 = map1.merge(map2, obj);
+        console.log("" + map3); // 50
+    }
+    exports.test2 = test2;
+    function test3() {
+        var list1 = immutable_1.List([1, 2]);
+        var list2 = list1.push(3, 4, 5);
+        var list3 = list2.unshift(0);
+        var list4 = list1.concat(list2, list3);
+        console.log(list1);
+        console.log(list2);
+        console.log(list3);
+        console.log(list4);
+    }
+    exports.test3 = test3;
+    function test4() {
+        var deep = immutable_1.Map({ a: 1, b: 2, c: immutable_1.List([3, 4, 5]) });
+        console.log(deep.toObject()); // { a: 1, b: 2, c: List [ 3, 4, 5 ] }
+        console.log(deep.toArray()); // [ 1, 2, List [ 3, 4, 5 ] ]
+        console.log(deep.toJS()); // { a: 1, b: 2, c: [ 3, 4, 5 ] }
+        console.log(JSON.stringify(deep)); // '{"a":1,"b":2,"c":[3,4,5]}'
+    }
+    exports.test4 = test4;
+    function test5() {
+        var nested = immutable_1.fromJS({ a: { b: { c: [3, 4, 5] } } });
+        //const nested = Map({ a: { b: { c: [3, 4, 5] } } })
+        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ] } } }
+        var nested2 = nested.mergeDeep({ a: { b: { d: 6 } } });
+        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ], d: 6 } } }
+        nested2.getIn(['a', 'b', 'd']); // 6
+        var nested3 = nested2.updateIn(['a', 'b', 'd'], function (value) {
+            return value + 1;
+        });
+        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ], d: 7 } } }
+        var nested4 = nested3.updateIn(['a', 'b', 'c'], function (list) {
+            return list.push(6);
+        });
+        // Map { a: Map { b: Map { c: List [ 3, 4, 5, 6 ], d: 7 } } }
+        console.log(nested);
+        console.log(nested2);
+        console.log(nested3);
+        console.log(nested4);
+    }
+    exports.test5 = test5;
+});
 System.registerDynamic('npm:immutable@3.8.1/dist/immutable.js', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
@@ -5052,70 +5115,47 @@ System.registerDynamic("npm:immutable@3.8.1.js", ["npm:immutable@3.8.1/dist/immu
       GLOBAL = global;
   module.exports = $__require("npm:immutable@3.8.1/dist/immutable.js");
 });
-System.registerDynamic("src-immutable/app/gettingstarted.js", ["npm:immutable@3.8.1.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-immutable/app/set.js", ["npm:immutable@3.8.1.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     var immutable_1 = $__require("npm:immutable@3.8.1.js");
-    function test1() {
-        var map1 = immutable_1.Map({ a: 1, b: 2, c: 3 });
-        var map2 = map1.set('b', 50);
-        console.log("" + map1.get('b')); // 2
-        console.log("" + map2.get('b')); // 50
+    function testAdd1() {
+        var s1 = immutable_1.Set([1, 2, 3]);
+        var s2 = s1.add(4);
+        var s3 = s2.add(1);
+        console.log(s1);
+        console.log(s2);
+        console.log(s3);
     }
-    exports.test1 = test1;
-    function test2() {
-        var map1 = immutable_1.Map({ a: 1, b: 2, c: 3, d: 4 });
-        var map2 = immutable_1.Map({ c: 10, a: 20, t: 30 });
-        var obj = { d: 100, o: 200, g: 300 };
-        var map3 = map1.merge(map2, obj);
-        console.log("" + map3); // 50
+    exports.testAdd1 = testAdd1;
+    function testAdd2() {
+        var s1 = immutable_1.Set();
+        var s2 = s1.add(4);
+        var s3 = s2.add(1);
+        console.log(s1);
+        console.log(s2);
+        console.log(s3);
     }
-    exports.test2 = test2;
-    function test3() {
-        var list1 = immutable_1.List([1, 2]);
-        var list2 = list1.push(3, 4, 5);
-        var list3 = list2.unshift(0);
-        var list4 = list1.concat(list2, list3);
-        console.log(list1);
-        console.log(list2);
-        console.log(list3);
-        console.log(list4);
+    exports.testAdd2 = testAdd2;
+    function testHas() {
+        var s1 = immutable_1.Set([1, 2, 3]);
+        console.log("1 exists ? " + s1.has(1));
+        console.log("4 exists ? " + s1.has(4));
+        var s2 = immutable_1.Set([{ key: 1 }, { key: 2 }, { key: 3 }]);
+        console.log(s2);
+        console.log("{key:1} exists ? " + s2.has({ key: 1 }));
+        console.log("{key:4} exists ? " + s2.has({ key: 4 }));
+        var s3 = immutable_1.Set([immutable_1.Map({ key: 1 }), immutable_1.Map({ key: 2 }), immutable_1.Map({ key: 3 })]);
+        console.log(s3);
+        console.log("Map({key:1}) exists ? " + s3.has(immutable_1.Map({ key: 1 })));
+        console.log("Map({key:4}) exists ? " + s3.has(immutable_1.Map({ key: 4 })));
     }
-    exports.test3 = test3;
-    function test4() {
-        var deep = immutable_1.Map({ a: 1, b: 2, c: immutable_1.List([3, 4, 5]) });
-        console.log(deep.toObject()); // { a: 1, b: 2, c: List [ 3, 4, 5 ] }
-        console.log(deep.toArray()); // [ 1, 2, List [ 3, 4, 5 ] ]
-        console.log(deep.toJS()); // { a: 1, b: 2, c: [ 3, 4, 5 ] }
-        console.log(JSON.stringify(deep)); // '{"a":1,"b":2,"c":[3,4,5]}'
-    }
-    exports.test4 = test4;
-    function test5() {
-        var nested = immutable_1.fromJS({ a: { b: { c: [3, 4, 5] } } });
-        //const nested = Map({ a: { b: { c: [3, 4, 5] } } })
-        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ] } } }
-        var nested2 = nested.mergeDeep({ a: { b: { d: 6 } } });
-        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ], d: 6 } } }
-        nested2.getIn(['a', 'b', 'd']); // 6
-        var nested3 = nested2.updateIn(['a', 'b', 'd'], function (value) {
-            return value + 1;
-        });
-        // Map { a: Map { b: Map { c: List [ 3, 4, 5 ], d: 7 } } }
-        var nested4 = nested3.updateIn(['a', 'b', 'c'], function (list) {
-            return list.push(6);
-        });
-        // Map { a: Map { b: Map { c: List [ 3, 4, 5, 6 ], d: 7 } } }
-        console.log(nested);
-        console.log(nested2);
-        console.log(nested3);
-        console.log(nested4);
-    }
-    exports.test5 = test5;
+    exports.testHas = testHas;
 });
-System.registerDynamic("src-immutable/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-immutable/app/gettingstarted.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-immutable/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-immutable/app/gettingstarted.js", "src-immutable/app/set.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -5125,7 +5165,8 @@ System.registerDynamic("src-immutable/app/main.js", ["npm:domready@1.0.8.js", "n
     $__require("npm:screenlog@0.2.2.js");
     var testbutton_1 = $__require("libs/testbutton.js");
     var started = $__require("src-immutable/app/gettingstarted.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'gettingstarted: Map', action: started.test1 }, { text: 'gettingstarted: Map.merge', action: started.test2 }, { text: 'gettingstarted: List', action: started.test3 }, { text: 'gettingstarted: back to raw', action: started.test4 }, { text: 'gettingstarted: nested', action: started.test5 }];
+    var set = $__require("src-immutable/app/set.js");
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'gettingstarted: Map', action: started.test1 }, { text: 'gettingstarted: Map.merge', action: started.test2 }, { text: 'gettingstarted: List', action: started.test3 }, { text: 'gettingstarted: back to raw', action: started.test4 }, { text: 'gettingstarted: nested', action: started.test5 }, { text: 'set: add', action: set.testAdd1 }, { text: 'set: add', action: set.testAdd2 }, { text: 'set: has', action: set.testHas }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

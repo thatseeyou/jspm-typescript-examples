@@ -3,6 +3,8 @@ import { Observer, PartialObserver } from 'rxjs/Observer';
 
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
+import 'rxjs/add/observable/timer';
+import 'rxjs/add/observable/empty';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/delay';
@@ -19,9 +21,14 @@ import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/partition'; 
 import 'rxjs/add/operator/mapTo'; 
 import 'rxjs/add/operator/expand'; 
-// import 'rxjs/add/observable/return';
+import 'rxjs/add/operator/combineLatest'; 
+import 'rxjs/add/operator/withLatestFrom'; 
+import 'rxjs/add/operator/audit'; 
+import 'rxjs/add/operator/debounce'; 
+import 'rxjs/add/operator/delayWhen';
+import 'rxjs/add/operator/distinct';
 
-import { buttonForTest, inputForTest } from './helper';
+import { buttonForTest, inputForTest, simpleObserver } from './helper';
 
 export function testPluck(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     Observable.from([
@@ -30,7 +37,7 @@ export function testPluck(testButton:HTMLButtonElement, placeholder:HTMLElement)
         { name: { first: 'sangjeong', last: 'shim' }},
     ])
         .pluck('name', 'first')
-        .subscribe(value => console.log(`${value}`));
+        .subscribe(simpleObserver('pluck'));
 }
 
 export function testMergeMap(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -98,7 +105,7 @@ export function testMerge(testButton:HTMLButtonElement, placeholder:HTMLElement)
 
     key1.merge(key2, key3)
         .scan((sum, current) => sum * 10 + current, 0)
-        .subscribe((value) => console.log(`Digit: ${value}`));
+        .subscribe(simpleObserver('merge'));
 }
 
 export function testBuffer(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -107,7 +114,7 @@ export function testBuffer(testButton:HTMLButtonElement, placeholder:HTMLElement
 
     Observable.interval(200)
         .buffer(down)
-        .subscribe((value) => console.log(value));
+        .subscribe(simpleObserver('buffer'));
 }
 
 export function testBufferWhen(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -116,7 +123,7 @@ export function testBufferWhen(testButton:HTMLButtonElement, placeholder:HTMLEle
 
     Observable.interval(200)
         .bufferWhen(() => down)
-        .subscribe((value) => console.log(value));
+        .subscribe(simpleObserver('bufferWhen'));
 }
 
 export function testBufferToggle(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -126,7 +133,7 @@ export function testBufferToggle(testButton:HTMLButtonElement, placeholder:HTMLE
 
     Observable.interval(200)
         .bufferToggle(down, () => up)
-        .subscribe((value) => console.log(value));
+        .subscribe(simpleObserver('bufferToggle'));
 }
 
 export function testPairwise(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -150,6 +157,72 @@ export function testPartition(testButton:HTMLButtonElement, placeholder:HTMLElem
         .take(10)
         .partition((value) => value % 2 == 0 ? true : false);
 
-    even.subscribe((value) => console.log(`even: ${value}`));
-    odd.subscribe((value) => console.log(`odd: ${value}`));
+    even.subscribe(simpleObserver('even'));
+    odd.subscribe(simpleObserver('odd'));
+}
+
+export function testCombineLatest(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let input1 = inputForTest('left trigger', placeholder);
+    let input2 = inputForTest('right trigger', placeholder);
+
+    let inputOb1 = Observable.fromEvent<Event>(input1, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+    let inputOb2 = Observable.fromEvent<Event>(input2, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+
+    inputOb1.combineLatest(inputOb2, (left, right) => `${left} + ${right}`)
+        .subscribe(simpleObserver('combineLates'));
+}
+
+export function testWithLatestFrom(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let input1 = inputForTest('left only trigger', placeholder);
+    let input2 = inputForTest('right', placeholder);
+
+    let inputOb1 = Observable.fromEvent<Event>(input1, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+    let inputOb2 = Observable.fromEvent<Event>(input2, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+
+    inputOb1.withLatestFrom(inputOb2, (left, right) => `${left} + ${right}`)
+        .subscribe((value) => console.log(value));
+}
+
+export function testDebounce(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('emit when down', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown');
+
+    Observable.interval(200)
+        .debounce(() => down)
+        .subscribe(simpleObserver('debounce'));
+
+    Observable.interval(200)
+        .audit(() => down)
+        .subscribe(simpleObserver('audit'));
+
+    Observable.interval(200)
+        .buffer(down)
+        .concatMap((numbers) => {
+            return numbers.length > 0 ? Observable.of(numbers[numbers.length - 1]) : Observable.empty();
+        })
+        .subscribe(simpleObserver('buffer and last'));
+}
+
+export function testDelayWhen(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('emit when down', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown');
+
+    let delayedClicks = down
+        .delayWhen(event => {
+            console.log('duration selector called');
+            //return Observable.interval(1000); // first event only is used
+            return Observable.timer(1000);  
+        });
+
+    delayedClicks.subscribe(simpleObserver('delayWhen'));
+}
+
+export function testDistinct(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    Observable.of(1,2,1,2,1,2)
+    .distinct()
+    .subscribe(simpleObserver('distinct'));
 }
