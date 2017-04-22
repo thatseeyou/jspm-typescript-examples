@@ -1,10 +1,15 @@
 import { Observable } from 'rxjs/Observable';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
+import { Subject } from 'rxjs/Subject';
 import { Observer, PartialObserver } from 'rxjs/Observer';
 
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/timer';
 import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/throw';
+import 'rxjs/add/observable/concat';
+import 'rxjs/add/observable/defer';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/delay';
@@ -25,8 +30,20 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/withLatestFrom'; 
 import 'rxjs/add/operator/audit'; 
 import 'rxjs/add/operator/debounce'; 
+import 'rxjs/add/operator/sample'; 
 import 'rxjs/add/operator/delayWhen';
 import 'rxjs/add/operator/distinct';
+import 'rxjs/add/operator/repeat';
+import 'rxjs/add/operator/repeatWhen';
+import 'rxjs/add/operator/multicast';
+import 'rxjs/add/operator/window';
+import 'rxjs/add/operator/windowCount';
+import 'rxjs/add/operator/windowWhen';
+import 'rxjs/add/operator/groupBy';
+import 'rxjs/add/operator/isEmpty';
+import 'rxjs/add/operator/ignoreElements';
+import 'rxjs/add/operator/single';
+import 'rxjs/add/operator/race';
 
 import { buttonForTest, inputForTest, simpleObserver } from './helper';
 
@@ -187,19 +204,37 @@ export function testWithLatestFrom(testButton:HTMLButtonElement, placeholder:HTM
         .subscribe((value) => console.log(value));
 }
 
-export function testDebounce(testButton:HTMLButtonElement, placeholder:HTMLElement) {
-    let button = buttonForTest('emit when down', placeholder);
-    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown');
+export function testRace(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let input1 = inputForTest('left trigger', placeholder);
+    let input2 = inputForTest('right trigger', placeholder);
 
-    Observable.interval(200)
+    let inputOb1 = Observable.fromEvent<Event>(input1, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+    let inputOb2 = Observable.fromEvent<Event>(input2, 'input')
+        .map((ev) => (ev.target as HTMLInputElement).value);
+
+    inputOb1.race(inputOb2)
+        .subscribe(simpleObserver('combineLates'));
+}
+
+export function testDebounce(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('emit last value', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown'); //.take(3);
+
+    Observable.interval(1000)
         .debounce(() => down)
         .subscribe(simpleObserver('debounce'));
 
-    Observable.interval(200)
+    Observable.interval(1000)
         .audit(() => down)
         .subscribe(simpleObserver('audit'));
 
-    Observable.interval(200)
+    Observable.interval(1000)
+        .sample(down)
+        .subscribe(simpleObserver('sample'));
+
+    // main time line completed by down completition
+    Observable.interval(1000)
         .buffer(down)
         .concatMap((numbers) => {
             return numbers.length > 0 ? Observable.of(numbers[numbers.length - 1]) : Observable.empty();
@@ -225,4 +260,159 @@ export function testDistinct(testButton:HTMLButtonElement, placeholder:HTMLEleme
     Observable.of(1,2,1,2,1,2)
     .distinct()
     .subscribe(simpleObserver('distinct'));
+}
+
+export function testRepeat(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.defer(() => {
+        let delay = Math.floor(Math.random() * 400 + 100);
+        console.log(`defer called: delay = ${delay}`);
+        return Observable.interval(delay).take(3);
+    });
+    
+    source
+        .repeat(3)
+        .subscribe(simpleObserver('repeat'));
+}
+
+export function testRepeatWhen1(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('resubscribe after source completed', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown').take(3);
+
+    let source = Observable.defer(() => {
+        let delay = Math.floor(Math.random() * 400 + 100);
+        console.log(`defer called: delay = ${delay}`);
+        return Observable.interval(delay).take(3);
+    });
+    
+    source
+        .repeatWhen((notification) => {
+            console.log('notification:');
+            console.log(notification);
+            return down;
+        })
+        .subscribe(simpleObserver('repeatWhen'));
+}
+
+export function testRepeatWhen2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('resubscribe after source completed', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown').take(3);
+
+    let source = Observable.concat(
+        Observable.interval(500).take(3),
+        Observable.throw('throw')
+    );
+    
+    source
+        .repeatWhen((notification) => {
+            console.log('notification:');
+            console.log(notification);
+            return down;
+        })
+        .subscribe(simpleObserver('repeatWhen'));
+}
+
+export function testWindow(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('new window', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown').take(3);
+
+    let source = Observable.interval(300);
+
+    let windowed = source
+        .window(down)
+        .mergeMap((value) => {
+            console.log('new Window');
+            return value;
+        });
+        // .mergeAll();
+
+    windowed.subscribe(simpleObserver('window'));
+}
+
+export function testWindowWhen(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('new window', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button, 'mousedown').take(3);
+
+    let source = Observable.interval(300);
+
+    let windowed = source
+        .windowWhen(() => {
+            console.log('when close?');
+            return down.take(1);
+            // return down
+        })
+        .mergeMap((value) => {
+            console.log('new window');
+            return value;
+        });
+        // .mergeAll();
+
+    windowed.subscribe(simpleObserver('window'));
+}
+
+
+export function testWindowCount1(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(300).take(10);
+
+    let windowed = source
+        .windowCount(5, 3)
+        .do((value) => console.log('new window'))
+        .mergeAll();
+        // .mergeAll();
+
+    windowed.subscribe(simpleObserver('window'));
+}
+
+export function testWindowCount2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(300).take(10);
+
+    let windowed = source
+        .windowCount(3, 5)
+        .do((value) => console.log('new window'))
+        .mergeAll();
+        // .mergeAll();
+
+    windowed.subscribe(simpleObserver('window'));
+}
+
+export function testGroupBy(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(300).take(10);
+
+    let grouped = source
+        .groupBy((value) => value % 3)
+        .map((value) => {
+            console.log(`new grourp key = ${value.key}`)
+            return value.map((innerValue) => {
+                return `${value.key} / ${innerValue}`;
+            });
+        })
+        .mergeAll();
+        // .mergeAll();
+
+    grouped.subscribe(simpleObserver('groupBy'));
+}
+
+
+export function testIgnoreElements(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(300).take(3);
+
+    let end = source
+        .do((value) => console.log(`interval[${value}]`))
+        .ignoreElements()
+        .isEmpty();
+
+    end.subscribe(simpleObserver('isEmpty'));
+}
+
+export function testSingle(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button1 = buttonForTest('source', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button1, 'mousedown');
+
+    let button2 = buttonForTest('complete', placeholder);
+    let complete = Observable.fromEvent<MouseEvent>(button2, 'mousedown');
+
+    let single = down
+        .takeUntil(complete)
+        .single()
+
+    single.subscribe(simpleObserver('single'));
 }

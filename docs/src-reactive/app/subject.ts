@@ -11,8 +11,9 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 import 'rxjs/add/operator/multicast';
 import 'rxjs/add/operator/timestamp';
 import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/publish';
 
-import { buttonForTest, inputForTest } from './helper';
+import { buttonForTest, inputForTest, simpleObserver } from './helper';
 
 export function testSubject1(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     var myObservable = new Subject();
@@ -75,8 +76,8 @@ export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElem
                 console.log('do Called');
             });
 
-        buttonObservable.subscribe((ev) => console.log(`click from Observable - 1`));
-        buttonObservable.subscribe((ev) => console.log(`click from Observable - 2`));
+        buttonObservable.subscribe(simpleObserver('click from Observable - 1'));
+        buttonObservable.subscribe(simpleObserver('click from Observable - 2'));
     })();
 
     (() => {
@@ -87,8 +88,8 @@ export function testMulticast(testButton:HTMLButtonElement, placeholder:HTMLElem
             })
             .multicast(new Subject());
 
-        buttonObservable.subscribe((ev) => console.log(`click from ConnectableObservable - 1`));
-        buttonObservable.subscribe((ev) => console.log(`click from ConnectableObservable - 2`));
+        buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 1'));
+        buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 2'));
 
         buttonObservable.connect();
     })();
@@ -135,3 +136,15 @@ export function testMulticast3(testButton:HTMLButtonElement, placeholder:HTMLEle
         .subscribe((value) => console.log(`[2] click from ${value}`));
 }
 
+export function testPublish(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button = buttonForTest('ConnectableObservable(num of handler = 1)', placeholder)
+    let buttonObservable = Observable.fromEvent(button, 'click').take(2)
+        .do((value) => {
+            console.log('do Called');
+        })
+        .publish()
+        .refCount();;
+
+    buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 1'));
+    buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 2'));
+}

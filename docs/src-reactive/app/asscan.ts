@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { Notification } from 'rxjs/Notification';
 
 import 'rxjs/add/observable/range';
 import 'rxjs/add/observable/interval';
@@ -13,8 +14,12 @@ import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/audit';
 import 'rxjs/add/operator/count';
 import 'rxjs/add/operator/materialize';
+import 'rxjs/add/operator/dematerialize';
 import 'rxjs/add/operator/mergeScan';
 import 'rxjs/add/operator/multicast';
+import 'rxjs/add/operator/find';
+import 'rxjs/add/operator/concat';
+import 'rxjs/add/operator/every';
 
 import { Set, fromJS } from 'immutable';
 
@@ -235,4 +240,42 @@ export function distinctAsScan(testButton:HTMLButtonElement, placeholder:HTMLEle
 
     asDistinct.subscribe(simpleObserver('distinct'));
     asScan.subscribe(simpleObserver('scan'));
+}
+
+export function findAsScan(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let generator = Observable.interval(200);
+
+    let asFind = generator.find((value) => value > 5 ? true : false);
+
+    let asScan = generator
+        .mergeScan((ignore, value) => {
+            // let complete = Notification.createComplete();
+            // return Observable.merge(Observable.of(value), Observable.of(complete).dematerialize())
+
+
+            return value > 5 ? Observable.of(value) : Observable.empty();
+        }, null)
+        .do((value) => console.log('do called'))
+        // .take(1)
+
+    asFind.subscribe(simpleObserver('find'));
+    asScan.subscribe(simpleObserver('scan'));
+
+}
+
+export function isEmptyAsScan(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let generator = Observable
+        .interval(200)
+        .do((value) => console.log(`interval[${value}]`))
+        .take(3)
+        .ignoreElements();
+
+    let asIsEmpty = generator.isEmpty();
+
+    let asScan = generator
+        .scan((isEmpty, value) => false, true)
+        .every((isEmpty) => isEmpty);
+
+    asIsEmpty.subscribe(simpleObserver('isEmpty'));
+    asScan.subscribe(simpleObserver('reduce'));
 }
