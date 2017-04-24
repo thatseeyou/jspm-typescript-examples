@@ -1224,7 +1224,6 @@ System.registerDynamic("src-reactive/app/subject.js", ["npm:rxjs@5.2.0/Observabl
         var buttonObservable = Observable_1.Observable.fromEvent(button, 'click').do(function (ev) {
             console.log('do Called');
         }).multicast(new Subject_1.Subject()).refCount();
-        ;
         buttonObservable.map(function (ev) {
             return ev.target.innerText;
         }).subscribe(function (value) {
@@ -6531,9 +6530,7 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
     exports.testExpand = testExpand;
     function testMerge(testButton, placeholder) {
         var key1Button = helper_1.buttonForTest('1', placeholder);
-        var key1 = Observable_1.Observable.fromEvent(key1Button, 'click').map(function () {
-            return 1;
-        });
+        var key1 = Observable_1.Observable.fromEvent(key1Button, 'click').mapTo(1);
         var key2Button = helper_1.buttonForTest('2', placeholder);
         var key2 = Observable_1.Observable.fromEvent(key2Button, 'click').map(function () {
             return 2;
@@ -6542,6 +6539,7 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
         var key3 = Observable_1.Observable.fromEvent(key3Button, 'click').map(function () {
             return 3;
         });
+        // key1.merge<number, number>([key2, key3])
         key1.merge(key2, key3).scan(function (sum, current) {
             return sum * 10 + current;
         }, 0).subscribe(helper_1.simpleObserver('merge'));
@@ -6636,10 +6634,12 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
     function testDebounce(testButton, placeholder) {
         var button = helper_1.buttonForTest('emit last value', placeholder);
         var down = Observable_1.Observable.fromEvent(button, 'mousedown'); //.take(3);
-        Observable_1.Observable.interval(1000).debounce(function () {
+        Observable_1.Observable.interval(1000).debounce(function (value) {
+            console.log('debounce called');
             return down;
         }).subscribe(helper_1.simpleObserver('debounce'));
-        Observable_1.Observable.interval(1000).audit(function () {
+        Observable_1.Observable.interval(1000).audit(function (value) {
+            console.log('new audit called');
             return down;
         }).subscribe(helper_1.simpleObserver('audit'));
         Observable_1.Observable.interval(1000).sample(down).subscribe(helper_1.simpleObserver('sample'));
@@ -6751,7 +6751,7 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
             return value % 3;
         }).map(function (value) {
             console.log("new grourp key = " + value.key);
-            return value.map(function (innerValue) {
+            return value.take(2).map(function (innerValue) {
                 return value.key + " / " + innerValue;
             });
         }).mergeAll();

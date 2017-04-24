@@ -110,16 +110,17 @@ export function testExpand(testButton:HTMLButtonElement, placeholder:HTMLElement
 export function testMerge(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     let key1Button = buttonForTest('1', placeholder);
     let key1 = Observable.fromEvent<MouseEvent>(key1Button, 'click')
-        .map(() => 1);
+        .mapTo(1);
 
     let key2Button = buttonForTest('2', placeholder);
     let key2 = Observable.fromEvent<MouseEvent>(key2Button, 'click')
-        .map(() => 2);
+        .mapTo(2);
 
     let key3Button = buttonForTest('3', placeholder);
     let key3 = Observable.fromEvent<MouseEvent>(key3Button, 'click')
-        .map(() => 3);
+        .mapTo(3);
 
+    // key1.merge<number, number>([key2, key3])
     key1.merge(key2, key3)
         .scan((sum, current) => sum * 10 + current, 0)
         .subscribe(simpleObserver('merge'));
@@ -222,11 +223,17 @@ export function testDebounce(testButton:HTMLButtonElement, placeholder:HTMLEleme
     let down = Observable.fromEvent<MouseEvent>(button, 'mousedown'); //.take(3);
 
     Observable.interval(1000)
-        .debounce(() => down)
+        .debounce((value) => {
+            console.log('debounce called');
+            return down
+        })
         .subscribe(simpleObserver('debounce'));
 
     Observable.interval(1000)
-        .audit(() => down)
+        .audit((value) => {
+            console.log('new audit called');
+            return down;
+        })
         .subscribe(simpleObserver('audit'));
 
     Observable.interval(1000)
@@ -381,7 +388,7 @@ export function testGroupBy(testButton:HTMLButtonElement, placeholder:HTMLElemen
         .groupBy((value) => value % 3)
         .map((value) => {
             console.log(`new grourp key = ${value.key}`)
-            return value.map((innerValue) => {
+            return value.take(2).map((innerValue) => {
                 return `${value.key} / ${innerValue}`;
             });
         })

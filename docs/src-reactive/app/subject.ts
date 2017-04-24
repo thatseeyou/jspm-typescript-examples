@@ -123,7 +123,7 @@ export function testMulticast3(testButton:HTMLButtonElement, placeholder:HTMLEle
             console.log('do Called');
         })
         .multicast<MouseEvent>(new Subject())
-        .refCount();;
+        .refCount();
 
     buttonObservable
         .map((ev) => {
