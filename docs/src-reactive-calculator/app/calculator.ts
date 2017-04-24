@@ -8,6 +8,7 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/zip';
 
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mapTo';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/do';
@@ -132,13 +133,9 @@ export class Calculator {
         let descs = Observable.from(keyDescriptions);
 
         this.keyObservable = Observable
-            .zip(buttons, descs, (button, desc) => {
+            .zip(buttons, descs, (button, [keyType, keyValue, _]) => {
                 return Observable.fromEvent<MouseEvent>(button, 'click')
-                    .map((ev) => {
-                        let keyType = desc[0];
-                        let keyValue = desc[1];
-                        return [keyType, keyValue];
-                    });
+                    .mapTo([keyType, keyValue]);
             })
             .mergeAll();
     }
