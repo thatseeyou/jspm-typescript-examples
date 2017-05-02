@@ -88,6 +88,7 @@ const tests:TestItem[] = [
     {text: 'playground: pluck and zip', action: playground.pluckAndZip},
     {text: 'playground: stateStore', action: playground.stateStore},
     {text: 'playground: immutableStore', action: playground.immutableStore},
+    {text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath},
 ];
 
 domready(() => {

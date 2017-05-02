@@ -1,10 +1,10 @@
 import domready = require('domready');
-import 'screenlog';
+// import 'screenlog';
 
 import { Calculator } from './calculator';
 
 domready(() => {
-    screenLog.init({ autoScroll: true });
+    // screenLog.init({ autoScroll: true });
 
     let container = document.createElement('div');
     document.body.appendChild(container);

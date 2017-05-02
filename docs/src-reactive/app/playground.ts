@@ -1,11 +1,19 @@
 import { Observable } from 'rxjs/Observable';
 import { Map, fromJS } from 'immutable';
-import 'rxjs/add/operator/pluck';
+
 import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/observable/zip';
+
+import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/share';
 
-import { buttonForTest, inputForTest } from './helper';
+import { simpleObserver, buttonForTest, inputForTest } from './helper';
 
 export function pluckAndZip() {
     let contacts = Observable.from([
@@ -157,4 +165,23 @@ export function immutableStore(testButton:HTMLButtonElement, placeholder:HTMLEle
             });
         }
     });
+}
+
+export function zipUnbalancedMultipath(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let generator = Observable.interval(500).take(5).share();
+
+    let path1 = generator
+        .do(() => { console.log('path1: before map'); })
+        .map((value) => value + 100)
+
+    let path2 = generator
+        .do(() => { console.log('path2: before delay'); })
+        .delay(1000)
+        .do(() => { console.log('path2: after delay'); })
+
+    Observable
+        .zip(path1, path2, (value1, value2) => {
+            return `${value1} - ${value2}`;
+        })
+        .subscribe(simpleObserver('zipped'));
 }

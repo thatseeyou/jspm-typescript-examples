@@ -26,6 +26,7 @@
             "rxjs" : ["jspm_packages/npm/rxjs@5.2.0"],
             "rxjs/*" : ["jspm_packages/npm/rxjs@5.2.0/*"],
             "immutable" : ["jspm_packages/npm/immutable@3.8.1/dist"],
+            "decimal.js" : ["types/decimal.js/index.d.ts"],
             "*": [
                 "node_modules/@types/*",
                 "types/*"   // custom declarations

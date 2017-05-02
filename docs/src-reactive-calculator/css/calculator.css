@@ -9,17 +9,18 @@
     min-height: 65px;
     margin-bottom: 4px;
     border: 1px solid darkred;
-}
-.calc-display {
     flex: 100%;
 }
-.calc-result {
+.calc-active-display {
+    border: 2px solid darkred !important;
+}
+.calc-first {
     flex: 1;
 }
 .calc-operator {
     flex: 10%;
 }
-.calc-operand {
+.calc-second {
     flex: 90%;
 }
 .calc-first, .calc-second, .calc-operator {

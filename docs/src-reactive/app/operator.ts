@@ -210,12 +210,14 @@ export function testRace(testButton:HTMLButtonElement, placeholder:HTMLElement) 
     let input2 = inputForTest('right trigger', placeholder);
 
     let inputOb1 = Observable.fromEvent<Event>(input1, 'input')
+        .do((ev) => { console.log('input1 to map'); })
         .map((ev) => (ev.target as HTMLInputElement).value);
     let inputOb2 = Observable.fromEvent<Event>(input2, 'input')
+        .do((ev) => { console.log('input2 to map'); })
         .map((ev) => (ev.target as HTMLInputElement).value);
 
     inputOb1.race(inputOb2)
-        .subscribe(simpleObserver('combineLates'));
+        .subscribe(simpleObserver('winner takes all'));
 }
 
 export function testDebounce(testButton:HTMLButtonElement, placeholder:HTMLElement) {

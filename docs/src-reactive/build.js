@@ -235,260 +235,6 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic('npm:rxjs@5.2.0/operator/zip.js', ['npm:rxjs@5.2.0/observable/ArrayObservable.js', 'npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js', 'npm:rxjs@5.2.0/symbol/iterator.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var ArrayObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayObservable.js');
-  var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
-  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
-  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
-  function zipProto() {
-    var observables = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      observables[_i - 0] = arguments[_i];
-    }
-    return this.lift.call(zipStatic.apply(void 0, [this].concat(observables)));
-  }
-  exports.zipProto = zipProto;
-  function zipStatic() {
-    var observables = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      observables[_i - 0] = arguments[_i];
-    }
-    var project = observables[observables.length - 1];
-    if (typeof project === 'function') {
-      observables.pop();
-    }
-    return new ArrayObservable_1.ArrayObservable(observables).lift(new ZipOperator(project));
-  }
-  exports.zipStatic = zipStatic;
-  var ZipOperator = function () {
-    function ZipOperator(project) {
-      this.project = project;
-    }
-    ZipOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new ZipSubscriber(subscriber, this.project));
-    };
-    return ZipOperator;
-  }();
-  exports.ZipOperator = ZipOperator;
-  var ZipSubscriber = function (_super) {
-    __extends(ZipSubscriber, _super);
-    function ZipSubscriber(destination, project, values) {
-      if (values === void 0) {
-        values = Object.create(null);
-      }
-      _super.call(this, destination);
-      this.iterators = [];
-      this.active = 0;
-      this.project = typeof project === 'function' ? project : null;
-      this.values = values;
-    }
-    ZipSubscriber.prototype._next = function (value) {
-      var iterators = this.iterators;
-      if (isArray_1.isArray(value)) {
-        iterators.push(new StaticArrayIterator(value));
-      } else if (typeof value[iterator_1.$$iterator] === 'function') {
-        iterators.push(new StaticIterator(value[iterator_1.$$iterator]()));
-      } else {
-        iterators.push(new ZipBufferIterator(this.destination, this, value));
-      }
-    };
-    ZipSubscriber.prototype._complete = function () {
-      var iterators = this.iterators;
-      var len = iterators.length;
-      this.active = len;
-      for (var i = 0; i < len; i++) {
-        var iterator = iterators[i];
-        if (iterator.stillUnsubscribed) {
-          this.add(iterator.subscribe(iterator, i));
-        } else {
-          this.active--;
-        }
-      }
-    };
-    ZipSubscriber.prototype.notifyInactive = function () {
-      this.active--;
-      if (this.active === 0) {
-        this.destination.complete();
-      }
-    };
-    ZipSubscriber.prototype.checkIterators = function () {
-      var iterators = this.iterators;
-      var len = iterators.length;
-      var destination = this.destination;
-      for (var i = 0; i < len; i++) {
-        var iterator = iterators[i];
-        if (typeof iterator.hasValue === 'function' && !iterator.hasValue()) {
-          return;
-        }
-      }
-      var shouldComplete = false;
-      var args = [];
-      for (var i = 0; i < len; i++) {
-        var iterator = iterators[i];
-        var result = iterator.next();
-        if (iterator.hasCompleted()) {
-          shouldComplete = true;
-        }
-        if (result.done) {
-          destination.complete();
-          return;
-        }
-        args.push(result.value);
-      }
-      if (this.project) {
-        this._tryProject(args);
-      } else {
-        destination.next(args);
-      }
-      if (shouldComplete) {
-        destination.complete();
-      }
-    };
-    ZipSubscriber.prototype._tryProject = function (args) {
-      var result;
-      try {
-        result = this.project.apply(this, args);
-      } catch (err) {
-        this.destination.error(err);
-        return;
-      }
-      this.destination.next(result);
-    };
-    return ZipSubscriber;
-  }(Subscriber_1.Subscriber);
-  exports.ZipSubscriber = ZipSubscriber;
-  var StaticIterator = function () {
-    function StaticIterator(iterator) {
-      this.iterator = iterator;
-      this.nextResult = iterator.next();
-    }
-    StaticIterator.prototype.hasValue = function () {
-      return true;
-    };
-    StaticIterator.prototype.next = function () {
-      var result = this.nextResult;
-      this.nextResult = this.iterator.next();
-      return result;
-    };
-    StaticIterator.prototype.hasCompleted = function () {
-      var nextResult = this.nextResult;
-      return nextResult && nextResult.done;
-    };
-    return StaticIterator;
-  }();
-  var StaticArrayIterator = function () {
-    function StaticArrayIterator(array) {
-      this.array = array;
-      this.index = 0;
-      this.length = 0;
-      this.length = array.length;
-    }
-    StaticArrayIterator.prototype[iterator_1.$$iterator] = function () {
-      return this;
-    };
-    StaticArrayIterator.prototype.next = function (value) {
-      var i = this.index++;
-      var array = this.array;
-      return i < this.length ? {
-        value: array[i],
-        done: false
-      } : {
-        value: null,
-        done: true
-      };
-    };
-    StaticArrayIterator.prototype.hasValue = function () {
-      return this.array.length > this.index;
-    };
-    StaticArrayIterator.prototype.hasCompleted = function () {
-      return this.array.length === this.index;
-    };
-    return StaticArrayIterator;
-  }();
-  var ZipBufferIterator = function (_super) {
-    __extends(ZipBufferIterator, _super);
-    function ZipBufferIterator(destination, parent, observable) {
-      _super.call(this, destination);
-      this.parent = parent;
-      this.observable = observable;
-      this.stillUnsubscribed = true;
-      this.buffer = [];
-      this.isComplete = false;
-    }
-    ZipBufferIterator.prototype[iterator_1.$$iterator] = function () {
-      return this;
-    };
-    ZipBufferIterator.prototype.next = function () {
-      var buffer = this.buffer;
-      if (buffer.length === 0 && this.isComplete) {
-        return {
-          value: null,
-          done: true
-        };
-      } else {
-        return {
-          value: buffer.shift(),
-          done: false
-        };
-      }
-    };
-    ZipBufferIterator.prototype.hasValue = function () {
-      return this.buffer.length > 0;
-    };
-    ZipBufferIterator.prototype.hasCompleted = function () {
-      return this.buffer.length === 0 && this.isComplete;
-    };
-    ZipBufferIterator.prototype.notifyComplete = function () {
-      if (this.buffer.length > 0) {
-        this.isComplete = true;
-        this.parent.notifyInactive();
-      } else {
-        this.destination.complete();
-      }
-    };
-    ZipBufferIterator.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
-      this.buffer.push(innerValue);
-      this.parent.checkIterators();
-    };
-    ZipBufferIterator.prototype.subscribe = function (value, index) {
-      return subscribeToResult_1.subscribeToResult(this, this.observable, this, index);
-    };
-    return ZipBufferIterator;
-  }(OuterSubscriber_1.OuterSubscriber);
-});
-System.registerDynamic("npm:rxjs@5.2.0/observable/zip.js", ["npm:rxjs@5.2.0/operator/zip.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var zip_1 = $__require("npm:rxjs@5.2.0/operator/zip.js");
-  exports.zip = zip_1.zipStatic;
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/observable/zip.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/zip.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var zip_1 = $__require('npm:rxjs@5.2.0/observable/zip.js');
-  Observable_1.Observable.zip = zip_1.zip;
-});
 System.registerDynamic("src-reactive/app/creating.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/Subject.js", "npm:rxjs@5.2.0/ReplaySubject.js", "npm:rxjs@5.2.0/add/observable/range.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/observable/merge.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/operator/take.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
     // alternative import method
     // import * as Rx from 'rxjs';
@@ -978,85 +724,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/timestamp.js', ['npm:rxjs@5.
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var timestamp_1 = $__require('npm:rxjs@5.2.0/operator/timestamp.js');
   Observable_1.Observable.prototype.timestamp = timestamp_1.timestamp;
-});
-System.registerDynamic("npm:rxjs@5.2.0/operator/do.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
-  function _do(nextOrObserver, error, complete) {
-    return this.lift(new DoOperator(nextOrObserver, error, complete));
-  }
-  exports._do = _do;
-  var DoOperator = function () {
-    function DoOperator(nextOrObserver, error, complete) {
-      this.nextOrObserver = nextOrObserver;
-      this.error = error;
-      this.complete = complete;
-    }
-    DoOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
-    };
-    return DoOperator;
-  }();
-  var DoSubscriber = function (_super) {
-    __extends(DoSubscriber, _super);
-    function DoSubscriber(destination, nextOrObserver, error, complete) {
-      _super.call(this, destination);
-      var safeSubscriber = new Subscriber_1.Subscriber(nextOrObserver, error, complete);
-      safeSubscriber.syncErrorThrowable = true;
-      this.add(safeSubscriber);
-      this.safeSubscriber = safeSubscriber;
-    }
-    DoSubscriber.prototype._next = function (value) {
-      var safeSubscriber = this.safeSubscriber;
-      safeSubscriber.next(value);
-      if (safeSubscriber.syncErrorThrown) {
-        this.destination.error(safeSubscriber.syncErrorValue);
-      } else {
-        this.destination.next(value);
-      }
-    };
-    DoSubscriber.prototype._error = function (err) {
-      var safeSubscriber = this.safeSubscriber;
-      safeSubscriber.error(err);
-      if (safeSubscriber.syncErrorThrown) {
-        this.destination.error(safeSubscriber.syncErrorValue);
-      } else {
-        this.destination.error(err);
-      }
-    };
-    DoSubscriber.prototype._complete = function () {
-      var safeSubscriber = this.safeSubscriber;
-      safeSubscriber.complete();
-      if (safeSubscriber.syncErrorThrown) {
-        this.destination.error(safeSubscriber.syncErrorValue);
-      } else {
-        this.destination.complete();
-      }
-    };
-    return DoSubscriber;
-  }(Subscriber_1.Subscriber);
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/do.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/do.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var do_1 = $__require('npm:rxjs@5.2.0/operator/do.js');
-  Observable_1.Observable.prototype.do = do_1._do;
-  Observable_1.Observable.prototype._do = do_1._do;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/publish.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/operator/multicast.js'], true, function ($__require, exports, module) {
   /* */
@@ -2071,129 +1738,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/defer.js', ['npm:rxjs@5.2.
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var defer_1 = $__require('npm:rxjs@5.2.0/observable/defer.js');
   Observable_1.Observable.defer = defer_1.defer;
-});
-System.registerDynamic("npm:rxjs@5.2.0/util/isDate.js", [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    function isDate(value) {
-        return value instanceof Date && !isNaN(+value);
-    }
-    exports.isDate = isDate;
-    
-});
-System.registerDynamic('npm:rxjs@5.2.0/operator/delay.js', ['npm:rxjs@5.2.0/scheduler/async.js', 'npm:rxjs@5.2.0/util/isDate.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Notification.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var async_1 = $__require('npm:rxjs@5.2.0/scheduler/async.js');
-  var isDate_1 = $__require('npm:rxjs@5.2.0/util/isDate.js');
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var Notification_1 = $__require('npm:rxjs@5.2.0/Notification.js');
-  function delay(delay, scheduler) {
-    if (scheduler === void 0) {
-      scheduler = async_1.async;
-    }
-    var absoluteDelay = isDate_1.isDate(delay);
-    var delayFor = absoluteDelay ? +delay - scheduler.now() : Math.abs(delay);
-    return this.lift(new DelayOperator(delayFor, scheduler));
-  }
-  exports.delay = delay;
-  var DelayOperator = function () {
-    function DelayOperator(delay, scheduler) {
-      this.delay = delay;
-      this.scheduler = scheduler;
-    }
-    DelayOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new DelaySubscriber(subscriber, this.delay, this.scheduler));
-    };
-    return DelayOperator;
-  }();
-  var DelaySubscriber = function (_super) {
-    __extends(DelaySubscriber, _super);
-    function DelaySubscriber(destination, delay, scheduler) {
-      _super.call(this, destination);
-      this.delay = delay;
-      this.scheduler = scheduler;
-      this.queue = [];
-      this.active = false;
-      this.errored = false;
-    }
-    DelaySubscriber.dispatch = function (state) {
-      var source = state.source;
-      var queue = source.queue;
-      var scheduler = state.scheduler;
-      var destination = state.destination;
-      while (queue.length > 0 && queue[0].time - scheduler.now() <= 0) {
-        queue.shift().notification.observe(destination);
-      }
-      if (queue.length > 0) {
-        var delay_1 = Math.max(0, queue[0].time - scheduler.now());
-        this.schedule(state, delay_1);
-      } else {
-        source.active = false;
-      }
-    };
-    DelaySubscriber.prototype._schedule = function (scheduler) {
-      this.active = true;
-      this.add(scheduler.schedule(DelaySubscriber.dispatch, this.delay, {
-        source: this,
-        destination: this.destination,
-        scheduler: scheduler
-      }));
-    };
-    DelaySubscriber.prototype.scheduleNotification = function (notification) {
-      if (this.errored === true) {
-        return;
-      }
-      var scheduler = this.scheduler;
-      var message = new DelayMessage(scheduler.now() + this.delay, notification);
-      this.queue.push(message);
-      if (this.active === false) {
-        this._schedule(scheduler);
-      }
-    };
-    DelaySubscriber.prototype._next = function (value) {
-      this.scheduleNotification(Notification_1.Notification.createNext(value));
-    };
-    DelaySubscriber.prototype._error = function (err) {
-      this.errored = true;
-      this.queue = [];
-      this.destination.error(err);
-    };
-    DelaySubscriber.prototype._complete = function () {
-      this.scheduleNotification(Notification_1.Notification.createComplete());
-    };
-    return DelaySubscriber;
-  }(Subscriber_1.Subscriber);
-  var DelayMessage = function () {
-    function DelayMessage(time, notification) {
-      this.time = time;
-      this.notification = notification;
-    }
-    return DelayMessage;
-  }();
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/delay.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/delay.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var delay_1 = $__require('npm:rxjs@5.2.0/operator/delay.js');
-  Observable_1.Observable.prototype.delay = delay_1.delay;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/timeInterval.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/scheduler/async.js'], true, function ($__require, exports, module) {
   /* */
@@ -6532,13 +6076,9 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
         var key1Button = helper_1.buttonForTest('1', placeholder);
         var key1 = Observable_1.Observable.fromEvent(key1Button, 'click').mapTo(1);
         var key2Button = helper_1.buttonForTest('2', placeholder);
-        var key2 = Observable_1.Observable.fromEvent(key2Button, 'click').map(function () {
-            return 2;
-        });
+        var key2 = Observable_1.Observable.fromEvent(key2Button, 'click').mapTo(2);
         var key3Button = helper_1.buttonForTest('3', placeholder);
-        var key3 = Observable_1.Observable.fromEvent(key3Button, 'click').map(function () {
-            return 3;
-        });
+        var key3 = Observable_1.Observable.fromEvent(key3Button, 'click').mapTo(3);
         // key1.merge<number, number>([key2, key3])
         key1.merge(key2, key3).scan(function (sum, current) {
             return sum * 10 + current;
@@ -6622,13 +6162,17 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
     function testRace(testButton, placeholder) {
         var input1 = helper_1.inputForTest('left trigger', placeholder);
         var input2 = helper_1.inputForTest('right trigger', placeholder);
-        var inputOb1 = Observable_1.Observable.fromEvent(input1, 'input').map(function (ev) {
+        var inputOb1 = Observable_1.Observable.fromEvent(input1, 'input').do(function (ev) {
+            console.log('input1 to map');
+        }).map(function (ev) {
             return ev.target.value;
         });
-        var inputOb2 = Observable_1.Observable.fromEvent(input2, 'input').map(function (ev) {
+        var inputOb2 = Observable_1.Observable.fromEvent(input2, 'input').do(function (ev) {
+            console.log('input2 to map');
+        }).map(function (ev) {
             return ev.target.value;
         });
-        inputOb1.race(inputOb2).subscribe(helper_1.simpleObserver('combineLates'));
+        inputOb1.race(inputOb2).subscribe(helper_1.simpleObserver('winner takes all'));
     }
     exports.testRace = testRace;
     function testDebounce(testButton, placeholder) {
@@ -6970,109 +6514,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/reduce.js', ['npm:rxjs@5.2.0
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var reduce_1 = $__require('npm:rxjs@5.2.0/operator/reduce.js');
   Observable_1.Observable.prototype.reduce = reduce_1.reduce;
-});
-System.registerDynamic('npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js', [], true, function ($__require, exports, module) {
-    /* */
-    "use strict";
-
-    var global = this || self,
-        GLOBAL = global;
-    var __extends = this && this.__extends || function (d, b) {
-        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-        function __() {
-            this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-    /**
-     * An error thrown when an element was queried at a certain index of an
-     * Observable, but no such index or position exists in that sequence.
-     *
-     * @see {@link elementAt}
-     * @see {@link take}
-     * @see {@link takeLast}
-     *
-     * @class ArgumentOutOfRangeError
-     */
-    var ArgumentOutOfRangeError = function (_super) {
-        __extends(ArgumentOutOfRangeError, _super);
-        function ArgumentOutOfRangeError() {
-            var err = _super.call(this, 'argument out of range');
-            this.name = err.name = 'ArgumentOutOfRangeError';
-            this.stack = err.stack;
-            this.message = err.message;
-        }
-        return ArgumentOutOfRangeError;
-    }(Error);
-    exports.ArgumentOutOfRangeError = ArgumentOutOfRangeError;
-    
-});
-System.registerDynamic('npm:rxjs@5.2.0/operator/take.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js', 'npm:rxjs@5.2.0/observable/EmptyObservable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var ArgumentOutOfRangeError_1 = $__require('npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js');
-  var EmptyObservable_1 = $__require('npm:rxjs@5.2.0/observable/EmptyObservable.js');
-  function take(count) {
-    if (count === 0) {
-      return new EmptyObservable_1.EmptyObservable();
-    } else {
-      return this.lift(new TakeOperator(count));
-    }
-  }
-  exports.take = take;
-  var TakeOperator = function () {
-    function TakeOperator(total) {
-      this.total = total;
-      if (this.total < 0) {
-        throw new ArgumentOutOfRangeError_1.ArgumentOutOfRangeError();
-      }
-    }
-    TakeOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new TakeSubscriber(subscriber, this.total));
-    };
-    return TakeOperator;
-  }();
-  var TakeSubscriber = function (_super) {
-    __extends(TakeSubscriber, _super);
-    function TakeSubscriber(destination, total) {
-      _super.call(this, destination);
-      this.total = total;
-      this.count = 0;
-    }
-    TakeSubscriber.prototype._next = function (value) {
-      var total = this.total;
-      var count = ++this.count;
-      if (count <= total) {
-        this.destination.next(value);
-        if (count === total) {
-          this.destination.complete();
-          this.unsubscribe();
-        }
-      }
-    };
-    return TakeSubscriber;
-  }(Subscriber_1.Subscriber);
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/take.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/take.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var take_1 = $__require('npm:rxjs@5.2.0/operator/take.js');
-  Observable_1.Observable.prototype.take = take_1.take;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/takeUntil.js', ['npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
   /* */
@@ -7752,51 +7193,6 @@ System.registerDynamic("src-reactive/app/learnrx.js", ["npm:rxjs@5.2.0/Observabl
     }
     exports.ex40 = ex40;
 });
-System.registerDynamic('npm:rxjs@5.2.0/operator/pluck.js', ['npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
-  function pluck() {
-    var properties = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      properties[_i - 0] = arguments[_i];
-    }
-    var length = properties.length;
-    if (length === 0) {
-      throw new Error('list of properties cannot be empty.');
-    }
-    return map_1.map.call(this, plucker(properties, length));
-  }
-  exports.pluck = pluck;
-  function plucker(props, length) {
-    var mapper = function (x) {
-      var currentProp = x;
-      for (var i = 0; i < length; i++) {
-        var p = currentProp[props[i]];
-        if (typeof p !== 'undefined') {
-          currentProp = p;
-        } else {
-          return undefined;
-        }
-      }
-      return currentProp;
-    };
-    return mapper;
-  }
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/pluck.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/pluck.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var pluck_1 = $__require('npm:rxjs@5.2.0/operator/pluck.js');
-  Observable_1.Observable.prototype.pluck = pluck_1.pluck;
-});
 System.registerDynamic('npm:rxjs@5.2.0/observable/FromEventObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/Subscription.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
@@ -7922,6 +7318,305 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/fromEvent.js', ['npm:rxjs@
   var fromEvent_1 = $__require('npm:rxjs@5.2.0/observable/fromEvent.js');
   Observable_1.Observable.fromEvent = fromEvent_1.fromEvent;
 });
+System.registerDynamic('npm:rxjs@5.2.0/operator/zip.js', ['npm:rxjs@5.2.0/observable/ArrayObservable.js', 'npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js', 'npm:rxjs@5.2.0/symbol/iterator.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var ArrayObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayObservable.js');
+  var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
+  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
+  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
+  function zipProto() {
+    var observables = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      observables[_i - 0] = arguments[_i];
+    }
+    return this.lift.call(zipStatic.apply(void 0, [this].concat(observables)));
+  }
+  exports.zipProto = zipProto;
+  function zipStatic() {
+    var observables = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      observables[_i - 0] = arguments[_i];
+    }
+    var project = observables[observables.length - 1];
+    if (typeof project === 'function') {
+      observables.pop();
+    }
+    return new ArrayObservable_1.ArrayObservable(observables).lift(new ZipOperator(project));
+  }
+  exports.zipStatic = zipStatic;
+  var ZipOperator = function () {
+    function ZipOperator(project) {
+      this.project = project;
+    }
+    ZipOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new ZipSubscriber(subscriber, this.project));
+    };
+    return ZipOperator;
+  }();
+  exports.ZipOperator = ZipOperator;
+  var ZipSubscriber = function (_super) {
+    __extends(ZipSubscriber, _super);
+    function ZipSubscriber(destination, project, values) {
+      if (values === void 0) {
+        values = Object.create(null);
+      }
+      _super.call(this, destination);
+      this.iterators = [];
+      this.active = 0;
+      this.project = typeof project === 'function' ? project : null;
+      this.values = values;
+    }
+    ZipSubscriber.prototype._next = function (value) {
+      var iterators = this.iterators;
+      if (isArray_1.isArray(value)) {
+        iterators.push(new StaticArrayIterator(value));
+      } else if (typeof value[iterator_1.$$iterator] === 'function') {
+        iterators.push(new StaticIterator(value[iterator_1.$$iterator]()));
+      } else {
+        iterators.push(new ZipBufferIterator(this.destination, this, value));
+      }
+    };
+    ZipSubscriber.prototype._complete = function () {
+      var iterators = this.iterators;
+      var len = iterators.length;
+      this.active = len;
+      for (var i = 0; i < len; i++) {
+        var iterator = iterators[i];
+        if (iterator.stillUnsubscribed) {
+          this.add(iterator.subscribe(iterator, i));
+        } else {
+          this.active--;
+        }
+      }
+    };
+    ZipSubscriber.prototype.notifyInactive = function () {
+      this.active--;
+      if (this.active === 0) {
+        this.destination.complete();
+      }
+    };
+    ZipSubscriber.prototype.checkIterators = function () {
+      var iterators = this.iterators;
+      var len = iterators.length;
+      var destination = this.destination;
+      for (var i = 0; i < len; i++) {
+        var iterator = iterators[i];
+        if (typeof iterator.hasValue === 'function' && !iterator.hasValue()) {
+          return;
+        }
+      }
+      var shouldComplete = false;
+      var args = [];
+      for (var i = 0; i < len; i++) {
+        var iterator = iterators[i];
+        var result = iterator.next();
+        if (iterator.hasCompleted()) {
+          shouldComplete = true;
+        }
+        if (result.done) {
+          destination.complete();
+          return;
+        }
+        args.push(result.value);
+      }
+      if (this.project) {
+        this._tryProject(args);
+      } else {
+        destination.next(args);
+      }
+      if (shouldComplete) {
+        destination.complete();
+      }
+    };
+    ZipSubscriber.prototype._tryProject = function (args) {
+      var result;
+      try {
+        result = this.project.apply(this, args);
+      } catch (err) {
+        this.destination.error(err);
+        return;
+      }
+      this.destination.next(result);
+    };
+    return ZipSubscriber;
+  }(Subscriber_1.Subscriber);
+  exports.ZipSubscriber = ZipSubscriber;
+  var StaticIterator = function () {
+    function StaticIterator(iterator) {
+      this.iterator = iterator;
+      this.nextResult = iterator.next();
+    }
+    StaticIterator.prototype.hasValue = function () {
+      return true;
+    };
+    StaticIterator.prototype.next = function () {
+      var result = this.nextResult;
+      this.nextResult = this.iterator.next();
+      return result;
+    };
+    StaticIterator.prototype.hasCompleted = function () {
+      var nextResult = this.nextResult;
+      return nextResult && nextResult.done;
+    };
+    return StaticIterator;
+  }();
+  var StaticArrayIterator = function () {
+    function StaticArrayIterator(array) {
+      this.array = array;
+      this.index = 0;
+      this.length = 0;
+      this.length = array.length;
+    }
+    StaticArrayIterator.prototype[iterator_1.$$iterator] = function () {
+      return this;
+    };
+    StaticArrayIterator.prototype.next = function (value) {
+      var i = this.index++;
+      var array = this.array;
+      return i < this.length ? {
+        value: array[i],
+        done: false
+      } : {
+        value: null,
+        done: true
+      };
+    };
+    StaticArrayIterator.prototype.hasValue = function () {
+      return this.array.length > this.index;
+    };
+    StaticArrayIterator.prototype.hasCompleted = function () {
+      return this.array.length === this.index;
+    };
+    return StaticArrayIterator;
+  }();
+  var ZipBufferIterator = function (_super) {
+    __extends(ZipBufferIterator, _super);
+    function ZipBufferIterator(destination, parent, observable) {
+      _super.call(this, destination);
+      this.parent = parent;
+      this.observable = observable;
+      this.stillUnsubscribed = true;
+      this.buffer = [];
+      this.isComplete = false;
+    }
+    ZipBufferIterator.prototype[iterator_1.$$iterator] = function () {
+      return this;
+    };
+    ZipBufferIterator.prototype.next = function () {
+      var buffer = this.buffer;
+      if (buffer.length === 0 && this.isComplete) {
+        return {
+          value: null,
+          done: true
+        };
+      } else {
+        return {
+          value: buffer.shift(),
+          done: false
+        };
+      }
+    };
+    ZipBufferIterator.prototype.hasValue = function () {
+      return this.buffer.length > 0;
+    };
+    ZipBufferIterator.prototype.hasCompleted = function () {
+      return this.buffer.length === 0 && this.isComplete;
+    };
+    ZipBufferIterator.prototype.notifyComplete = function () {
+      if (this.buffer.length > 0) {
+        this.isComplete = true;
+        this.parent.notifyInactive();
+      } else {
+        this.destination.complete();
+      }
+    };
+    ZipBufferIterator.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
+      this.buffer.push(innerValue);
+      this.parent.checkIterators();
+    };
+    ZipBufferIterator.prototype.subscribe = function (value, index) {
+      return subscribeToResult_1.subscribeToResult(this, this.observable, this, index);
+    };
+    return ZipBufferIterator;
+  }(OuterSubscriber_1.OuterSubscriber);
+});
+System.registerDynamic("npm:rxjs@5.2.0/observable/zip.js", ["npm:rxjs@5.2.0/operator/zip.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var zip_1 = $__require("npm:rxjs@5.2.0/operator/zip.js");
+  exports.zip = zip_1.zipStatic;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/observable/zip.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/zip.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var zip_1 = $__require('npm:rxjs@5.2.0/observable/zip.js');
+  Observable_1.Observable.zip = zip_1.zip;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/pluck.js', ['npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var map_1 = $__require('npm:rxjs@5.2.0/operator/map.js');
+  function pluck() {
+    var properties = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+      properties[_i - 0] = arguments[_i];
+    }
+    var length = properties.length;
+    if (length === 0) {
+      throw new Error('list of properties cannot be empty.');
+    }
+    return map_1.map.call(this, plucker(properties, length));
+  }
+  exports.pluck = pluck;
+  function plucker(props, length) {
+    var mapper = function (x) {
+      var currentProp = x;
+      for (var i = 0; i < length; i++) {
+        var p = currentProp[props[i]];
+        if (typeof p !== 'undefined') {
+          currentProp = p;
+        } else {
+          return undefined;
+        }
+      }
+      return currentProp;
+    };
+    return mapper;
+  }
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/pluck.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/pluck.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var pluck_1 = $__require('npm:rxjs@5.2.0/operator/pluck.js');
+  Observable_1.Observable.prototype.pluck = pluck_1.pluck;
+});
 System.registerDynamic('npm:rxjs@5.2.0/add/operator/mergeAll.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mergeAll.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -7932,7 +7627,339 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/mergeAll.js', ['npm:rxjs@5.2
   var mergeAll_1 = $__require('npm:rxjs@5.2.0/operator/mergeAll.js');
   Observable_1.Observable.prototype.mergeAll = mergeAll_1.mergeAll;
 });
-System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:rxjs@5.2.0/operator/do.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
+  function _do(nextOrObserver, error, complete) {
+    return this.lift(new DoOperator(nextOrObserver, error, complete));
+  }
+  exports._do = _do;
+  var DoOperator = function () {
+    function DoOperator(nextOrObserver, error, complete) {
+      this.nextOrObserver = nextOrObserver;
+      this.error = error;
+      this.complete = complete;
+    }
+    DoOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new DoSubscriber(subscriber, this.nextOrObserver, this.error, this.complete));
+    };
+    return DoOperator;
+  }();
+  var DoSubscriber = function (_super) {
+    __extends(DoSubscriber, _super);
+    function DoSubscriber(destination, nextOrObserver, error, complete) {
+      _super.call(this, destination);
+      var safeSubscriber = new Subscriber_1.Subscriber(nextOrObserver, error, complete);
+      safeSubscriber.syncErrorThrowable = true;
+      this.add(safeSubscriber);
+      this.safeSubscriber = safeSubscriber;
+    }
+    DoSubscriber.prototype._next = function (value) {
+      var safeSubscriber = this.safeSubscriber;
+      safeSubscriber.next(value);
+      if (safeSubscriber.syncErrorThrown) {
+        this.destination.error(safeSubscriber.syncErrorValue);
+      } else {
+        this.destination.next(value);
+      }
+    };
+    DoSubscriber.prototype._error = function (err) {
+      var safeSubscriber = this.safeSubscriber;
+      safeSubscriber.error(err);
+      if (safeSubscriber.syncErrorThrown) {
+        this.destination.error(safeSubscriber.syncErrorValue);
+      } else {
+        this.destination.error(err);
+      }
+    };
+    DoSubscriber.prototype._complete = function () {
+      var safeSubscriber = this.safeSubscriber;
+      safeSubscriber.complete();
+      if (safeSubscriber.syncErrorThrown) {
+        this.destination.error(safeSubscriber.syncErrorValue);
+      } else {
+        this.destination.complete();
+      }
+    };
+    return DoSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/do.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/do.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var do_1 = $__require('npm:rxjs@5.2.0/operator/do.js');
+  Observable_1.Observable.prototype.do = do_1._do;
+  Observable_1.Observable.prototype._do = do_1._do;
+});
+System.registerDynamic("npm:rxjs@5.2.0/util/isDate.js", [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    function isDate(value) {
+        return value instanceof Date && !isNaN(+value);
+    }
+    exports.isDate = isDate;
+    
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/delay.js', ['npm:rxjs@5.2.0/scheduler/async.js', 'npm:rxjs@5.2.0/util/isDate.js', 'npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Notification.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var async_1 = $__require('npm:rxjs@5.2.0/scheduler/async.js');
+  var isDate_1 = $__require('npm:rxjs@5.2.0/util/isDate.js');
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var Notification_1 = $__require('npm:rxjs@5.2.0/Notification.js');
+  function delay(delay, scheduler) {
+    if (scheduler === void 0) {
+      scheduler = async_1.async;
+    }
+    var absoluteDelay = isDate_1.isDate(delay);
+    var delayFor = absoluteDelay ? +delay - scheduler.now() : Math.abs(delay);
+    return this.lift(new DelayOperator(delayFor, scheduler));
+  }
+  exports.delay = delay;
+  var DelayOperator = function () {
+    function DelayOperator(delay, scheduler) {
+      this.delay = delay;
+      this.scheduler = scheduler;
+    }
+    DelayOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new DelaySubscriber(subscriber, this.delay, this.scheduler));
+    };
+    return DelayOperator;
+  }();
+  var DelaySubscriber = function (_super) {
+    __extends(DelaySubscriber, _super);
+    function DelaySubscriber(destination, delay, scheduler) {
+      _super.call(this, destination);
+      this.delay = delay;
+      this.scheduler = scheduler;
+      this.queue = [];
+      this.active = false;
+      this.errored = false;
+    }
+    DelaySubscriber.dispatch = function (state) {
+      var source = state.source;
+      var queue = source.queue;
+      var scheduler = state.scheduler;
+      var destination = state.destination;
+      while (queue.length > 0 && queue[0].time - scheduler.now() <= 0) {
+        queue.shift().notification.observe(destination);
+      }
+      if (queue.length > 0) {
+        var delay_1 = Math.max(0, queue[0].time - scheduler.now());
+        this.schedule(state, delay_1);
+      } else {
+        source.active = false;
+      }
+    };
+    DelaySubscriber.prototype._schedule = function (scheduler) {
+      this.active = true;
+      this.add(scheduler.schedule(DelaySubscriber.dispatch, this.delay, {
+        source: this,
+        destination: this.destination,
+        scheduler: scheduler
+      }));
+    };
+    DelaySubscriber.prototype.scheduleNotification = function (notification) {
+      if (this.errored === true) {
+        return;
+      }
+      var scheduler = this.scheduler;
+      var message = new DelayMessage(scheduler.now() + this.delay, notification);
+      this.queue.push(message);
+      if (this.active === false) {
+        this._schedule(scheduler);
+      }
+    };
+    DelaySubscriber.prototype._next = function (value) {
+      this.scheduleNotification(Notification_1.Notification.createNext(value));
+    };
+    DelaySubscriber.prototype._error = function (err) {
+      this.errored = true;
+      this.queue = [];
+      this.destination.error(err);
+    };
+    DelaySubscriber.prototype._complete = function () {
+      this.scheduleNotification(Notification_1.Notification.createComplete());
+    };
+    return DelaySubscriber;
+  }(Subscriber_1.Subscriber);
+  var DelayMessage = function () {
+    function DelayMessage(time, notification) {
+      this.time = time;
+      this.notification = notification;
+    }
+    return DelayMessage;
+  }();
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/delay.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/delay.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var delay_1 = $__require('npm:rxjs@5.2.0/operator/delay.js');
+  Observable_1.Observable.prototype.delay = delay_1.delay;
+});
+System.registerDynamic('npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js', [], true, function ($__require, exports, module) {
+    /* */
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    var __extends = this && this.__extends || function (d, b) {
+        for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        function __() {
+            this.constructor = d;
+        }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+    /**
+     * An error thrown when an element was queried at a certain index of an
+     * Observable, but no such index or position exists in that sequence.
+     *
+     * @see {@link elementAt}
+     * @see {@link take}
+     * @see {@link takeLast}
+     *
+     * @class ArgumentOutOfRangeError
+     */
+    var ArgumentOutOfRangeError = function (_super) {
+        __extends(ArgumentOutOfRangeError, _super);
+        function ArgumentOutOfRangeError() {
+            var err = _super.call(this, 'argument out of range');
+            this.name = err.name = 'ArgumentOutOfRangeError';
+            this.stack = err.stack;
+            this.message = err.message;
+        }
+        return ArgumentOutOfRangeError;
+    }(Error);
+    exports.ArgumentOutOfRangeError = ArgumentOutOfRangeError;
+    
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/take.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js', 'npm:rxjs@5.2.0/observable/EmptyObservable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var ArgumentOutOfRangeError_1 = $__require('npm:rxjs@5.2.0/util/ArgumentOutOfRangeError.js');
+  var EmptyObservable_1 = $__require('npm:rxjs@5.2.0/observable/EmptyObservable.js');
+  function take(count) {
+    if (count === 0) {
+      return new EmptyObservable_1.EmptyObservable();
+    } else {
+      return this.lift(new TakeOperator(count));
+    }
+  }
+  exports.take = take;
+  var TakeOperator = function () {
+    function TakeOperator(total) {
+      this.total = total;
+      if (this.total < 0) {
+        throw new ArgumentOutOfRangeError_1.ArgumentOutOfRangeError();
+      }
+    }
+    TakeOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new TakeSubscriber(subscriber, this.total));
+    };
+    return TakeOperator;
+  }();
+  var TakeSubscriber = function (_super) {
+    __extends(TakeSubscriber, _super);
+    function TakeSubscriber(destination, total) {
+      _super.call(this, destination);
+      this.total = total;
+      this.count = 0;
+    }
+    TakeSubscriber.prototype._next = function (value) {
+      var total = this.total;
+      var count = ++this.count;
+      if (count <= total) {
+        this.destination.next(value);
+        if (count === total) {
+          this.destination.complete();
+          this.unsubscribe();
+        }
+      }
+    };
+    return TakeSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/take.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/take.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var take_1 = $__require('npm:rxjs@5.2.0/operator/take.js');
+  Observable_1.Observable.prototype.take = take_1.take;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/share.js', ['npm:rxjs@5.2.0/operator/multicast.js', 'npm:rxjs@5.2.0/Subject.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var multicast_1 = $__require('npm:rxjs@5.2.0/operator/multicast.js');
+  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
+  function shareSubjectFactory() {
+    return new Subject_1.Subject();
+  }
+  function share() {
+    return multicast_1.multicast.call(this, shareSubjectFactory).refCount();
+  }
+  exports.share = share;
+  ;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/share.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/share.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var share_1 = $__require('npm:rxjs@5.2.0/operator/share.js');
+  Observable_1.Observable.prototype.share = share_1.share;
+});
+System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "npm:rxjs@5.2.0/add/operator/do.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/share.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -7940,10 +7967,16 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
     Object.defineProperty(exports, "__esModule", { value: true });
     var Observable_1 = $__require("npm:rxjs@5.2.0/Observable.js");
     var immutable_1 = $__require("npm:immutable@3.8.1.js");
-    $__require("npm:rxjs@5.2.0/add/operator/pluck.js");
     $__require("npm:rxjs@5.2.0/add/observable/fromEvent.js");
+    $__require("npm:rxjs@5.2.0/add/observable/interval.js");
+    $__require("npm:rxjs@5.2.0/add/observable/zip.js");
+    $__require("npm:rxjs@5.2.0/add/operator/pluck.js");
     $__require("npm:rxjs@5.2.0/add/operator/map.js");
     $__require("npm:rxjs@5.2.0/add/operator/mergeAll.js");
+    $__require("npm:rxjs@5.2.0/add/operator/do.js");
+    $__require("npm:rxjs@5.2.0/add/operator/delay.js");
+    $__require("npm:rxjs@5.2.0/add/operator/take.js");
+    $__require("npm:rxjs@5.2.0/add/operator/share.js");
     var helper_1 = $__require("src-reactive/app/helper.js");
     function pluckAndZip() {
         var contacts = Observable_1.Observable.from([{
@@ -8079,6 +8112,23 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
         });
     }
     exports.immutableStore = immutableStore;
+    function zipUnbalancedMultipath(testButton, placeholder) {
+        var generator = Observable_1.Observable.interval(500).take(5).share();
+        var path1 = generator.do(function () {
+            console.log('path1: before map');
+        }).map(function (value) {
+            return value + 100;
+        });
+        var path2 = generator.do(function () {
+            console.log('path2: before delay');
+        }).delay(1000).do(function () {
+            console.log('path2: after delay');
+        });
+        Observable_1.Observable.zip(path1, path2, function (value1, value2) {
+            return value1 + " - " + value2;
+        }).subscribe(helper_1.simpleObserver('zipped'));
+    }
+    exports.zipUnbalancedMultipath = zipUnbalancedMultipath;
 });
 System.registerDynamic("npm:rxjs@5.2.0/observable/RangeObservable.js", ["npm:rxjs@5.2.0/Observable.js"], true, function ($__require, exports, module) {
   /* */
@@ -16393,7 +16443,7 @@ System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "np
     var playground = $__require("src-reactive/app/playground.js");
     var asscan = $__require("src-reactive/app/asscan.js");
     var notification = $__require("src-reactive/app/notification.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }];
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

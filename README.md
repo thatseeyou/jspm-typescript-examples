@@ -129,3 +129,24 @@ Using unbundled modules requires URL start with /. Github pages which start with
     $ jspm install npm:codemirror
     $ npm install --save @types/codemirror
     ```
+
+* [MikeMcl/decimal.js](https://github.com/MikeMcl/decimal.js) [[Demo](https://thatseeyou.github.io/jspm-typescript-samples/decimal.js.html)]
+
+    ```
+    $ jspm install decimal.js
+    $ npm install @types/decimal.js
+    $ cp -a node_modules/@types/decimal.js types/
+    $ npm uninstall @types/decimal.js
+    $ vi tsconfig.json
+    ...
+        "baseUrl": "..",
+        "paths": {
+            "decimal.js" : ["types/decimal.js/index.d.ts"],
+        }
+    ...
+    $ vi types/decimal.js/index.d.ts
+    ...
+    (add/change declarations)
+    ...
+    ```
+
