@@ -352,10 +352,8 @@ export class Calculator {
                 second: '0',
                 operator: KeyValue.Add
             })
-            .do(state => {
-                this.changeActiveDisplay(state.step == Step.WaitFirst || state.step == Step.ChangeFirst ? true : false)
-            })
             .subscribe((state:CalculatorState) => {
+                this.changeActiveDisplay(state.step == Step.WaitFirst || state.step == Step.ChangeFirst ? true : false)
                 this.updateFirstOperand(state.first);
                 this.updateOperator(state.operator == KeyValue.Add ? '+' : 
                     state.operator == KeyValue.Subtract ? '-' : 

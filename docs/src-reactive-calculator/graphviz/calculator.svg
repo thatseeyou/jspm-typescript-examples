@@ -9,19 +9,19 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1190.5)">
 <title>calculator</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-1190.5 758,-1190.5 758,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_buttonsObservable</title>
+<polygon fill="none" stroke="#000000" points="213,-880.5 213,-1178.5 532,-1178.5 532,-880.5 213,-880.5"/>
+<text text-anchor="middle" x="372.5" y="-1163.3" font-family="Times,serif" font-size="14.00" fill="#000000">buttonsObservable</text>
+</g>
 <g id="clust3" class="cluster">
 <title>cluster_operandObservable</title>
-<polygon fill="none" stroke="#000000" points="8,-439.25 8,-952.5 524,-952.5 524,-439.25 8,-439.25"/>
-<text text-anchor="middle" x="266" y="-937.3" font-family="Times,serif" font-size="14.00" fill="#000000">operandOpservable</text>
+<polygon fill="none" stroke="#000000" points="8,-439.25 8,-872.5 524,-872.5 524,-439.25 8,-439.25"/>
+<text text-anchor="middle" x="266" y="-857.3" font-family="Times,serif" font-size="14.00" fill="#000000">operandOpservable</text>
 </g>
 <g id="clust11" class="cluster">
 <title>cluster_subscribe</title>
 <polygon fill="none" stroke="#000000" points="532,-8 532,-491.25 746,-491.25 746,-8 532,-8"/>
-</g>
-<g id="clust1" class="cluster">
-<title>cluster_buttonsObservable</title>
-<polygon fill="none" stroke="#000000" points="213,-960.5 213,-1178.5 532,-1178.5 532,-960.5 213,-960.5"/>
-<text text-anchor="middle" x="372.5" y="-1163.3" font-family="Times,serif" font-size="14.00" fill="#000000">buttonsObservable</text>
 </g>
 <!-- buttonsObservable.buttonsOb -->
 <g id="node1" class="node">
@@ -68,15 +68,15 @@
 <!-- buttonsObservable -->
 <g id="node5" class="node">
 <title>buttonsObservable</title>
-<polygon fill="none" stroke="#000000" points="391.2558,-893.0442 391.2558,-907.9558 372.9466,-918.5 347.0534,-918.5 328.7442,-907.9558 328.7442,-893.0442 347.0534,-882.5 372.9466,-882.5 391.2558,-893.0442"/>
-<polygon fill="none" stroke="#000000" points="395.2712,-890.7363 395.2712,-910.2637 374.0238,-922.5 345.9762,-922.5 324.7288,-910.2637 324.7288,-890.7363 345.9762,-878.5 374.0238,-878.5 395.2712,-890.7363"/>
-<text text-anchor="middle" x="360" y="-896.3" font-family="Times,serif" font-size="14.00" fill="#000000">share</text>
+<polygon fill="none" stroke="#000000" points="391.2558,-903.0442 391.2558,-917.9558 372.9466,-928.5 347.0534,-928.5 328.7442,-917.9558 328.7442,-903.0442 347.0534,-892.5 372.9466,-892.5 391.2558,-903.0442"/>
+<polygon fill="none" stroke="#000000" points="395.2712,-900.7363 395.2712,-920.2637 374.0238,-932.5 345.9762,-932.5 324.7288,-920.2637 324.7288,-900.7363 345.9762,-888.5 374.0238,-888.5 395.2712,-900.7363"/>
+<text text-anchor="middle" x="360" y="-906.3" font-family="Times,serif" font-size="14.00" fill="#000000">share</text>
 </g>
 <!-- buttonsObservable.mergeAll&#45;&gt;buttonsObservable -->
 <g id="edge4" class="edge">
 <title>buttonsObservable.mergeAll&#45;&gt;buttonsObservable</title>
-<path fill="none" stroke="#000000" d="M360,-968.2616C360,-957.9652 360,-944.7954 360,-932.809"/>
-<polygon fill="#000000" stroke="#000000" points="363.5001,-932.682 360,-922.6821 356.5001,-932.6821 363.5001,-932.682"/>
+<path fill="none" stroke="#000000" d="M360,-968.4891C360,-960.791 360,-951.5629 360,-942.7561"/>
+<polygon fill="#000000" stroke="#000000" points="363.5001,-942.7282 360,-932.7282 356.5001,-942.7282 363.5001,-942.7282"/>
 </g>
 <!-- resetFnOb.filter -->
 <g id="node6" class="node">
@@ -87,8 +87,8 @@
 <!-- buttonsObservable&#45;&gt;resetFnOb.filter -->
 <g id="edge5" class="edge">
 <title>buttonsObservable&#45;&gt;resetFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M324.5653,-892.3364C280.5712,-882.0653 203.0261,-863.5192 127.8999,-842.9653"/>
-<polygon fill="#000000" stroke="#000000" points="128.369,-839.4643 117.7988,-840.1852 126.5115,-846.2134 128.369,-839.4643"/>
+<path fill="none" stroke="#000000" d="M324.4581,-906.9986C268.0446,-901.0633 160.8249,-888.1342 126,-872.5 113.5479,-866.9098 101.5324,-858.0082 91.6311,-849.3808"/>
+<polygon fill="#000000" stroke="#000000" points="93.9252,-846.7361 84.1757,-842.5891 89.2111,-851.9109 93.9252,-846.7361"/>
 </g>
 <!-- clearFnOb.filter -->
 <g id="node8" class="node">
@@ -99,8 +99,8 @@
 <!-- buttonsObservable&#45;&gt;clearFnOb.filter -->
 <g id="edge7" class="edge">
 <title>buttonsObservable&#45;&gt;clearFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M327.3665,-889.0863C297.7808,-878.5632 252.8264,-862.1396 205.957,-842.7769"/>
-<polygon fill="#000000" stroke="#000000" points="207.1388,-839.4778 196.5616,-838.8661 204.4487,-845.9403 207.1388,-839.4778"/>
+<path fill="none" stroke="#000000" d="M324.5589,-908.2532C291.4048,-904.7326 241.6349,-895.6959 205,-872.5 196.2472,-866.958 188.5523,-858.7752 182.3611,-850.7294"/>
+<polygon fill="#000000" stroke="#000000" points="185.1418,-848.6011 176.4723,-842.5109 179.4517,-852.6782 185.1418,-848.6011"/>
 </g>
 <!-- percentFnOb.filter -->
 <g id="node10" class="node">
@@ -111,8 +111,8 @@
 <!-- buttonsObservable&#45;&gt;percentFnOb.filter -->
 <g id="edge9" class="edge">
 <title>buttonsObservable&#45;&gt;percentFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M335.5441,-884.1961C319.8016,-873.701 299.0782,-859.8855 281.5329,-848.1886"/>
-<polygon fill="#000000" stroke="#000000" points="283.4728,-845.2754 273.2108,-842.6405 279.5898,-851.0997 283.4728,-845.2754"/>
+<path fill="none" stroke="#000000" d="M329.1809,-898.0634C315.2136,-891.6042 298.9639,-882.8815 286,-872.5 278.2895,-866.3255 271.0032,-858.4701 264.8149,-850.911"/>
+<polygon fill="#000000" stroke="#000000" points="267.4809,-848.6385 258.5628,-842.9184 261.9674,-852.9514 267.4809,-848.6385"/>
 </g>
 <!-- pointFnOb.filter -->
 <g id="node12" class="node">
@@ -123,8 +123,8 @@
 <!-- buttonsObservable&#45;&gt;pointFnOb.filter -->
 <g id="edge11" class="edge">
 <title>buttonsObservable&#45;&gt;pointFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M349.0989,-878.1086C345.134,-869.9645 340.6055,-860.6627 336.4462,-852.1191"/>
-<polygon fill="#000000" stroke="#000000" points="339.4809,-850.3565 331.9567,-842.8975 333.1871,-853.4206 339.4809,-850.3565"/>
+<path fill="none" stroke="#000000" d="M350.4716,-888.3529C345.6874,-877.2328 339.847,-863.6579 334.7834,-851.8884"/>
+<polygon fill="#000000" stroke="#000000" points="337.9201,-850.3229 330.7529,-842.5202 331.49,-853.0894 337.9201,-850.3229"/>
 </g>
 <!-- signFnOb.filter -->
 <g id="node14" class="node">
@@ -135,8 +135,8 @@
 <!-- buttonsObservable&#45;&gt;signFnOb.filter -->
 <g id="edge13" class="edge">
 <title>buttonsObservable&#45;&gt;signFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M371.1957,-878.1086C375.3116,-869.8769 380.0187,-860.4625 384.3281,-851.8438"/>
-<polygon fill="#000000" stroke="#000000" points="387.4596,-853.407 388.8013,-842.8975 381.1986,-850.2765 387.4596,-853.407"/>
+<path fill="none" stroke="#000000" d="M369.7859,-888.3529C374.6994,-877.2328 380.6977,-863.6579 385.8981,-851.8884"/>
+<polygon fill="#000000" stroke="#000000" points="389.1973,-853.0817 390.0376,-842.5202 382.7945,-850.2525 389.1973,-853.0817"/>
 </g>
 <!-- numberFnOb.filter -->
 <g id="node16" class="node">
@@ -147,8 +147,8 @@
 <!-- buttonsObservable&#45;&gt;numberFnOb.filter -->
 <g id="edge15" class="edge">
 <title>buttonsObservable&#45;&gt;numberFnOb.filter</title>
-<path fill="none" stroke="#000000" d="M385.0713,-884.7528C401.923,-874.1682 424.4371,-860.0271 443.419,-848.1046"/>
-<polygon fill="#000000" stroke="#000000" points="445.5286,-850.9127 452.1352,-842.63 441.8054,-844.985 445.5286,-850.9127"/>
+<path fill="none" stroke="#000000" d="M391.1111,-898.3142C405.7657,-891.8038 423.0482,-882.9669 437,-872.5 445.2346,-866.3222 453.1783,-858.4659 459.9961,-850.907"/>
+<polygon fill="#000000" stroke="#000000" points="463.0152,-852.7668 466.9127,-842.9149 457.7222,-848.186 463.0152,-852.7668"/>
 </g>
 <!-- enter.filter -->
 <g id="node22" class="node">
@@ -159,7 +159,7 @@
 <!-- buttonsObservable&#45;&gt;enter.filter -->
 <g id="edge26" class="edge">
 <title>buttonsObservable&#45;&gt;enter.filter</title>
-<path fill="none" stroke="#000000" d="M395.2845,-896.9799C432.2822,-891.4812 489.8325,-877.5414 525,-842.5 555.0728,-812.535 557,-794.9532 557,-752.5 557,-752.5 557,-752.5 557,-680.5 557,-612.8701 570.7603,-534.2788 578.9882,-493.3305"/>
+<path fill="none" stroke="#000000" d="M395.3405,-906.8772C438.9244,-901.69 509.5227,-890.7082 528,-872.5 567.0816,-833.9877 557,-807.3686 557,-752.5 557,-752.5 557,-752.5 557,-680.5 557,-612.8701 570.7603,-534.2788 578.9882,-493.3305"/>
 <polygon fill="#000000" stroke="#000000" points="582.467,-493.7887 581.0477,-483.2893 575.6098,-492.3822 582.467,-493.7887"/>
 </g>
 <!-- operator.filter -->
@@ -171,8 +171,8 @@
 <!-- buttonsObservable&#45;&gt;operator.filter -->
 <g id="edge28" class="edge">
 <title>buttonsObservable&#45;&gt;operator.filter</title>
-<path fill="none" stroke="#000000" d="M395.3885,-897.7431C469.6616,-889.8284 635,-860.123 635,-752.5 635,-752.5 635,-752.5 635,-680.5 635,-611.5334 659.6549,-533.2854 674.3389,-492.7983"/>
-<polygon fill="#000000" stroke="#000000" points="677.6482,-493.9404 677.8362,-483.3472 671.0832,-491.511 677.6482,-493.9404"/>
+<path fill="none" stroke="#000000" d="M395.1783,-907.2337C444.8138,-902.0488 532.2349,-890.6257 558,-872.5 608.6838,-836.844 629,-814.4693 629,-752.5 629,-752.5 629,-752.5 629,-680.5 629,-611.0857 656.6135,-533.0188 673.0596,-492.6792"/>
+<polygon fill="#000000" stroke="#000000" points="676.3667,-493.8417 676.9766,-483.2645 669.9037,-491.1528 676.3667,-493.8417"/>
 </g>
 <!-- resetFnOb -->
 <g id="node7" class="node">
@@ -195,26 +195,26 @@
 <!-- resetFnOb&#45;&gt;operandObservable.merge -->
 <g id="edge17" class="edge">
 <title>resetFnOb&#45;&gt;operandObservable.merge</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M107.3968,-743.1114C115.8977,-740.2674 125.3146,-737.187 134,-734.5 185.7733,-718.4832 246.0446,-701.5575 284.3466,-691.0144"/>
-<polygon fill="#000000" stroke="#000000" points="285.3501,-694.3685 294.0668,-688.346 283.497,-687.6182 285.3501,-694.3685"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M107.4218,-742.8928C115.621,-740.0999 124.6504,-737.1026 133,-734.5 184.9923,-718.2941 245.5957,-701.4139 284.1183,-690.9326"/>
+<polygon fill="#000000" stroke="#000000" points="285.1597,-694.2767 293.8948,-688.281 283.3273,-687.5208 285.1597,-694.2767"/>
 </g>
 <!-- clearFnOb -->
 <g id="node9" class="node">
 <title>clearFnOb</title>
-<polygon fill="none" stroke="#000000" points="197.1787,-770.5 142.8213,-770.5 142.8213,-734.5 197.1787,-734.5 197.1787,-770.5"/>
-<text text-anchor="middle" x="170" y="-748.3" font-family="Times,serif" font-size="14.00" fill="#000000">mapTo</text>
+<polygon fill="none" stroke="#000000" points="196.1787,-770.5 141.8213,-770.5 141.8213,-734.5 196.1787,-734.5 196.1787,-770.5"/>
+<text text-anchor="middle" x="169" y="-748.3" font-family="Times,serif" font-size="14.00" fill="#000000">mapTo</text>
 </g>
 <!-- clearFnOb.filter&#45;&gt;clearFnOb -->
 <g id="edge8" class="edge">
 <title>clearFnOb.filter&#45;&gt;clearFnOb</title>
-<path fill="none" stroke="#000000" d="M167.0094,-806.3314C167.4372,-798.631 167.9459,-789.4743 168.4213,-780.9166"/>
-<polygon fill="#000000" stroke="#000000" points="171.9169,-781.092 168.977,-770.9133 164.9276,-780.7037 171.9169,-781.092"/>
+<path fill="none" stroke="#000000" d="M166.757,-806.3314C167.0779,-798.631 167.4594,-789.4743 167.816,-780.9166"/>
+<polygon fill="#000000" stroke="#000000" points="171.3133,-781.0503 168.2328,-770.9133 164.3194,-780.7589 171.3133,-781.0503"/>
 </g>
 <!-- clearFnOb&#45;&gt;operandObservable.merge -->
 <g id="edge18" class="edge">
 <title>clearFnOb&#45;&gt;operandObservable.merge</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M197.3533,-739.6278C223.034,-727.5428 261.5285,-709.4278 289.1372,-696.4354"/>
-<polygon fill="#000000" stroke="#000000" points="290.8521,-699.4967 298.4099,-692.0718 287.8714,-693.1629 290.8521,-699.4967"/>
+<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M196.5321,-739.6278C222.3806,-727.5428 261.1267,-709.4278 288.9159,-696.4354"/>
+<polygon fill="#000000" stroke="#000000" points="290.6728,-699.4777 298.2492,-692.0718 287.708,-693.1366 290.6728,-699.4777"/>
 </g>
 <!-- percentFnOb -->
 <g id="node11" class="node">

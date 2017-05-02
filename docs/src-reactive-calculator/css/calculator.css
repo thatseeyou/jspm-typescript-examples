@@ -1,8 +1,16 @@
+#calculator {
+    float: left;
+}
+#diagram {
+    float: left;
+}
+#diagram img {
+    width: 600px;
+}
 .calc-container {
     display: flex;
     flex-flow: row wrap;
     width: 277px;
-    /*height: 500px;*/
 }
 .calc-display {
     display: flex;
