@@ -4,6 +4,8 @@ import { Map, fromJS } from 'immutable';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/zip';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/fromPromise';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/map';
@@ -184,4 +186,48 @@ export function zipUnbalancedMultipath(testButton:HTMLButtonElement, placeholder
             return `${value1} - ${value2}`;
         })
         .subscribe(simpleObserver('zipped'));
+}
+
+export function fromPromise(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    function idExists(id:string) { 
+        return id === 'exist' ? true : false;
+    }
+
+    function deleteUser(id: string) {
+        if (idExists(id)) {
+            return Observable.fromPromise(Promise.resolve('delete user'));
+        } else {
+            return Observable.of('user not exist');
+        }
+    }
+
+    deleteUser('exist').subscribe((value) => {
+        console.log(value);
+    })
+
+    deleteUser('not exist').subscribe((value) => {
+        console.log(value);
+    })
+}
+
+export function fromPromise2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+
+    function idExists(id:string) { 
+        return id === 'exist' ? true : false;
+    }
+
+    function deleteUser(id: string) {
+        Observable.defer(() => {
+            if (idExists(id)) {
+                return Observable.fromPromise(Promise.resolve('delete user'));
+            } else {
+                return Observable.of('user not exist');
+            }
+        }).subscribe((value) => {
+            console.log(value);
+        })
+    }
+
+    deleteUser('exist');
+    deleteUser('not exist');
 }

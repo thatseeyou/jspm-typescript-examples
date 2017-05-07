@@ -914,111 +914,6 @@ System.registerDynamic("src-reactive/app/subject.js", ["npm:rxjs@5.2.0/Observabl
     }
     exports.testPublish = testPublish;
 });
-System.registerDynamic('npm:rxjs@5.2.0/observable/PromiseObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var PromiseObservable = function (_super) {
-    __extends(PromiseObservable, _super);
-    function PromiseObservable(promise, scheduler) {
-      _super.call(this);
-      this.promise = promise;
-      this.scheduler = scheduler;
-    }
-    PromiseObservable.create = function (promise, scheduler) {
-      return new PromiseObservable(promise, scheduler);
-    };
-    PromiseObservable.prototype._subscribe = function (subscriber) {
-      var _this = this;
-      var promise = this.promise;
-      var scheduler = this.scheduler;
-      if (scheduler == null) {
-        if (this._isScalar) {
-          if (!subscriber.closed) {
-            subscriber.next(this.value);
-            subscriber.complete();
-          }
-        } else {
-          promise.then(function (value) {
-            _this.value = value;
-            _this._isScalar = true;
-            if (!subscriber.closed) {
-              subscriber.next(value);
-              subscriber.complete();
-            }
-          }, function (err) {
-            if (!subscriber.closed) {
-              subscriber.error(err);
-            }
-          }).then(null, function (err) {
-            root_1.root.setTimeout(function () {
-              throw err;
-            });
-          });
-        }
-      } else {
-        if (this._isScalar) {
-          if (!subscriber.closed) {
-            return scheduler.schedule(dispatchNext, 0, {
-              value: this.value,
-              subscriber: subscriber
-            });
-          }
-        } else {
-          promise.then(function (value) {
-            _this.value = value;
-            _this._isScalar = true;
-            if (!subscriber.closed) {
-              subscriber.add(scheduler.schedule(dispatchNext, 0, {
-                value: value,
-                subscriber: subscriber
-              }));
-            }
-          }, function (err) {
-            if (!subscriber.closed) {
-              subscriber.add(scheduler.schedule(dispatchError, 0, {
-                err: err,
-                subscriber: subscriber
-              }));
-            }
-          }).then(null, function (err) {
-            root_1.root.setTimeout(function () {
-              throw err;
-            });
-          });
-        }
-      }
-    };
-    return PromiseObservable;
-  }(Observable_1.Observable);
-  exports.PromiseObservable = PromiseObservable;
-  function dispatchNext(arg) {
-    var value = arg.value,
-        subscriber = arg.subscriber;
-    if (!subscriber.closed) {
-      subscriber.next(value);
-      subscriber.complete();
-    }
-  }
-  function dispatchError(arg) {
-    var err = arg.err,
-        subscriber = arg.subscriber;
-    if (!subscriber.closed) {
-      subscriber.error(err);
-    }
-  }
-});
 System.registerDynamic('npm:rxjs@5.2.0/observable/IteratorObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/symbol/iterator.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -1665,79 +1560,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/concat.js', ['npm:rxjs@5.2
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var concat_1 = $__require('npm:rxjs@5.2.0/observable/concat.js');
   Observable_1.Observable.concat = concat_1.concat;
-});
-System.registerDynamic('npm:rxjs@5.2.0/observable/DeferObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js', 'npm:rxjs@5.2.0/OuterSubscriber.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
-  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
-  var DeferObservable = function (_super) {
-    __extends(DeferObservable, _super);
-    function DeferObservable(observableFactory) {
-      _super.call(this);
-      this.observableFactory = observableFactory;
-    }
-    DeferObservable.create = function (observableFactory) {
-      return new DeferObservable(observableFactory);
-    };
-    DeferObservable.prototype._subscribe = function (subscriber) {
-      return new DeferSubscriber(subscriber, this.observableFactory);
-    };
-    return DeferObservable;
-  }(Observable_1.Observable);
-  exports.DeferObservable = DeferObservable;
-  var DeferSubscriber = function (_super) {
-    __extends(DeferSubscriber, _super);
-    function DeferSubscriber(destination, factory) {
-      _super.call(this, destination);
-      this.factory = factory;
-      this.tryDefer();
-    }
-    DeferSubscriber.prototype.tryDefer = function () {
-      try {
-        this._callFactory();
-      } catch (err) {
-        this._error(err);
-      }
-    };
-    DeferSubscriber.prototype._callFactory = function () {
-      var result = this.factory();
-      if (result) {
-        this.add(subscribeToResult_1.subscribeToResult(this, result));
-      }
-    };
-    return DeferSubscriber;
-  }(OuterSubscriber_1.OuterSubscriber);
-});
-System.registerDynamic("npm:rxjs@5.2.0/observable/defer.js", ["npm:rxjs@5.2.0/observable/DeferObservable.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var DeferObservable_1 = $__require("npm:rxjs@5.2.0/observable/DeferObservable.js");
-  exports.defer = DeferObservable_1.DeferObservable.create;
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/observable/defer.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/defer.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var defer_1 = $__require('npm:rxjs@5.2.0/observable/defer.js');
-  Observable_1.Observable.defer = defer_1.defer;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/timeInterval.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/scheduler/async.js'], true, function ($__require, exports, module) {
   /* */
@@ -7572,6 +7394,203 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/zip.js', ['npm:rxjs@5.2.0/
   var zip_1 = $__require('npm:rxjs@5.2.0/observable/zip.js');
   Observable_1.Observable.zip = zip_1.zip;
 });
+System.registerDynamic('npm:rxjs@5.2.0/observable/DeferObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js', 'npm:rxjs@5.2.0/OuterSubscriber.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
+  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
+  var DeferObservable = function (_super) {
+    __extends(DeferObservable, _super);
+    function DeferObservable(observableFactory) {
+      _super.call(this);
+      this.observableFactory = observableFactory;
+    }
+    DeferObservable.create = function (observableFactory) {
+      return new DeferObservable(observableFactory);
+    };
+    DeferObservable.prototype._subscribe = function (subscriber) {
+      return new DeferSubscriber(subscriber, this.observableFactory);
+    };
+    return DeferObservable;
+  }(Observable_1.Observable);
+  exports.DeferObservable = DeferObservable;
+  var DeferSubscriber = function (_super) {
+    __extends(DeferSubscriber, _super);
+    function DeferSubscriber(destination, factory) {
+      _super.call(this, destination);
+      this.factory = factory;
+      this.tryDefer();
+    }
+    DeferSubscriber.prototype.tryDefer = function () {
+      try {
+        this._callFactory();
+      } catch (err) {
+        this._error(err);
+      }
+    };
+    DeferSubscriber.prototype._callFactory = function () {
+      var result = this.factory();
+      if (result) {
+        this.add(subscribeToResult_1.subscribeToResult(this, result));
+      }
+    };
+    return DeferSubscriber;
+  }(OuterSubscriber_1.OuterSubscriber);
+});
+System.registerDynamic("npm:rxjs@5.2.0/observable/defer.js", ["npm:rxjs@5.2.0/observable/DeferObservable.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var DeferObservable_1 = $__require("npm:rxjs@5.2.0/observable/DeferObservable.js");
+  exports.defer = DeferObservable_1.DeferObservable.create;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/observable/defer.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/defer.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var defer_1 = $__require('npm:rxjs@5.2.0/observable/defer.js');
+  Observable_1.Observable.defer = defer_1.defer;
+});
+System.registerDynamic('npm:rxjs@5.2.0/observable/PromiseObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var PromiseObservable = function (_super) {
+    __extends(PromiseObservable, _super);
+    function PromiseObservable(promise, scheduler) {
+      _super.call(this);
+      this.promise = promise;
+      this.scheduler = scheduler;
+    }
+    PromiseObservable.create = function (promise, scheduler) {
+      return new PromiseObservable(promise, scheduler);
+    };
+    PromiseObservable.prototype._subscribe = function (subscriber) {
+      var _this = this;
+      var promise = this.promise;
+      var scheduler = this.scheduler;
+      if (scheduler == null) {
+        if (this._isScalar) {
+          if (!subscriber.closed) {
+            subscriber.next(this.value);
+            subscriber.complete();
+          }
+        } else {
+          promise.then(function (value) {
+            _this.value = value;
+            _this._isScalar = true;
+            if (!subscriber.closed) {
+              subscriber.next(value);
+              subscriber.complete();
+            }
+          }, function (err) {
+            if (!subscriber.closed) {
+              subscriber.error(err);
+            }
+          }).then(null, function (err) {
+            root_1.root.setTimeout(function () {
+              throw err;
+            });
+          });
+        }
+      } else {
+        if (this._isScalar) {
+          if (!subscriber.closed) {
+            return scheduler.schedule(dispatchNext, 0, {
+              value: this.value,
+              subscriber: subscriber
+            });
+          }
+        } else {
+          promise.then(function (value) {
+            _this.value = value;
+            _this._isScalar = true;
+            if (!subscriber.closed) {
+              subscriber.add(scheduler.schedule(dispatchNext, 0, {
+                value: value,
+                subscriber: subscriber
+              }));
+            }
+          }, function (err) {
+            if (!subscriber.closed) {
+              subscriber.add(scheduler.schedule(dispatchError, 0, {
+                err: err,
+                subscriber: subscriber
+              }));
+            }
+          }).then(null, function (err) {
+            root_1.root.setTimeout(function () {
+              throw err;
+            });
+          });
+        }
+      }
+    };
+    return PromiseObservable;
+  }(Observable_1.Observable);
+  exports.PromiseObservable = PromiseObservable;
+  function dispatchNext(arg) {
+    var value = arg.value,
+        subscriber = arg.subscriber;
+    if (!subscriber.closed) {
+      subscriber.next(value);
+      subscriber.complete();
+    }
+  }
+  function dispatchError(arg) {
+    var err = arg.err,
+        subscriber = arg.subscriber;
+    if (!subscriber.closed) {
+      subscriber.error(err);
+    }
+  }
+});
+System.registerDynamic("npm:rxjs@5.2.0/observable/fromPromise.js", ["npm:rxjs@5.2.0/observable/PromiseObservable.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var PromiseObservable_1 = $__require("npm:rxjs@5.2.0/observable/PromiseObservable.js");
+  exports.fromPromise = PromiseObservable_1.PromiseObservable.create;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/observable/fromPromise.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/fromPromise.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var fromPromise_1 = $__require('npm:rxjs@5.2.0/observable/fromPromise.js');
+  Observable_1.Observable.fromPromise = fromPromise_1.fromPromise;
+});
 System.registerDynamic('npm:rxjs@5.2.0/operator/pluck.js', ['npm:rxjs@5.2.0/operator/map.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -7959,7 +7978,7 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/share.js', ['npm:rxjs@5.2.0/
   var share_1 = $__require('npm:rxjs@5.2.0/operator/share.js');
   Observable_1.Observable.prototype.share = share_1.share;
 });
-System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "npm:rxjs@5.2.0/add/operator/do.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/share.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/observable/fromPromise.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "npm:rxjs@5.2.0/add/operator/do.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/share.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -7970,6 +7989,8 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
     $__require("npm:rxjs@5.2.0/add/observable/fromEvent.js");
     $__require("npm:rxjs@5.2.0/add/observable/interval.js");
     $__require("npm:rxjs@5.2.0/add/observable/zip.js");
+    $__require("npm:rxjs@5.2.0/add/observable/defer.js");
+    $__require("npm:rxjs@5.2.0/add/observable/fromPromise.js");
     $__require("npm:rxjs@5.2.0/add/operator/pluck.js");
     $__require("npm:rxjs@5.2.0/add/operator/map.js");
     $__require("npm:rxjs@5.2.0/add/operator/mergeAll.js");
@@ -8129,6 +8150,44 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
         }).subscribe(helper_1.simpleObserver('zipped'));
     }
     exports.zipUnbalancedMultipath = zipUnbalancedMultipath;
+    function fromPromise(testButton, placeholder) {
+        function idExists(id) {
+            return id === 'exist' ? true : false;
+        }
+        function deleteUser(id) {
+            if (idExists(id)) {
+                return Observable_1.Observable.fromPromise(Promise.resolve('delete user'));
+            } else {
+                return Observable_1.Observable.of('user not exist');
+            }
+        }
+        deleteUser('exist').subscribe(function (value) {
+            console.log(value);
+        });
+        deleteUser('not exist').subscribe(function (value) {
+            console.log(value);
+        });
+    }
+    exports.fromPromise = fromPromise;
+    function fromPromise2(testButton, placeholder) {
+        function idExists(id) {
+            return id === 'exist' ? true : false;
+        }
+        function deleteUser(id) {
+            Observable_1.Observable.defer(function () {
+                if (idExists(id)) {
+                    return Observable_1.Observable.fromPromise(Promise.resolve('delete user'));
+                } else {
+                    return Observable_1.Observable.of('user not exist');
+                }
+            }).subscribe(function (value) {
+                console.log(value);
+            });
+        }
+        deleteUser('exist');
+        deleteUser('not exist');
+    }
+    exports.fromPromise2 = fromPromise2;
 });
 System.registerDynamic("npm:rxjs@5.2.0/observable/RangeObservable.js", ["npm:rxjs@5.2.0/Observable.js"], true, function ($__require, exports, module) {
   /* */
@@ -16443,7 +16502,7 @@ System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "np
     var playground = $__require("src-reactive/app/playground.js");
     var asscan = $__require("src-reactive/app/asscan.js");
     var notification = $__require("src-reactive/app/notification.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }];
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }, { text: 'playground: fromPromise', action: playground.fromPromise }, { text: 'playground: fromPromise & defer', action: playground.fromPromise2 }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);
