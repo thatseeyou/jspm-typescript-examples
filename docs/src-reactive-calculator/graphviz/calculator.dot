@@ -70,13 +70,15 @@ digraph calculator {
         }
 
         "operandObservable.merge" [label="merge" shape="oval"]
-        "operandObservable.scan" [label="scan\n-inputMode\l-isMinus\l-valueString\l-byReset\l" shape=cylinder]
+        "operandObservable.scan" [label="scan\n-inputMode\l-isMinus\l-valueString\l-propagate\l" shape=cylinder]
+        "operandObservable.do" [label="do" shape="oval"]
         operandObservable [label="mergeMap"]
 
         {resetFnOb, clearFnOb, percentFnOb, pointFnOb, signFnOb, numberFnOb}
         -> "operandObservable.merge" [style=dashed]
         "operandObservable.merge"->"operandObservable.scan"
-        "operandObservable.scan"->operandObservable
+        "operandObservable.scan"->"operandObservable.do"
+        "operandObservable.do"->operandObservable
     }
 
     subgraph cluster_subscribe {
@@ -95,6 +97,13 @@ digraph calculator {
             buttonsObservable -> "enter.filter" -> enter
         }
 
+        subgraph clear {
+            "clear.filter" [label="filter(C)"]
+            clear [label="map"]
+
+            buttonsObservable -> "clear.filter" -> clear
+        }
+
         subgraph operator {
             "operator.filter" [label="filter(+,-,×,÷)"]
             operator [label="map"]
@@ -102,12 +111,12 @@ digraph calculator {
             buttonsObservable -> "operator.filter" -> operator
         }
 
-        "subscribe.scan" [label="scan\n-step\l-first\l-second\l-operator\l" shape="cylinder"]
+        "subscribe.scan" [label="scan\n-step\l-first\l-second\l-operator\l-skipOperand\l" shape="cylinder"]
         "subscribe.merge" [label="merge" shape="oval"]
         "subscribe.startWith" [label="startWith"]
         "subscribe.subscribe" [label="subscribe" shape="oval"]
 
-        {operand enter operator}->"subscribe.merge" [style=dashed]
+        {clear operand enter operator}->"subscribe.merge" [style=dashed]
         "subscribe.merge"->"subscribe.scan"->"subscribe.startWith"->"subscribe.subscribe"
     }
 }

@@ -70,7 +70,7 @@ const enum Step {
 
 // let keypad:[KeyType, KeyValue, string][]= [
 const buttonsConfig: [KeyType, KeyValue, string][] = [
-    [KeyType.Clear,    KeyValue.C,         'C'],
+    [KeyType.Clear,    KeyValue.C,         'AC'],
     [KeyType.Number,   KeyValue.PlusMinus, '±'],
     [KeyType.Number,   KeyValue.Percent,   '%'],
     [KeyType.Operator, KeyValue.Divide,    '÷'],
@@ -101,6 +101,7 @@ export class Calculator {
     private secondOperandEl: HTMLDivElement;
     private firstDisplayEl: HTMLDivElement;
     private secondDisplayEl: HTMLDivElement;
+    private clearButtonEl: HTMLButtonElement;
 
     private buttonsObservable: Observable<[KeyType, KeyValue]>;
     private operandObservable: Observable<string>;
@@ -143,6 +144,7 @@ export class Calculator {
         this.secondOperandEl = this.container.querySelector('.calc-second') as HTMLDivElement;
         this.firstDisplayEl = this.container.querySelectorAll('.calc-display').item(0) as HTMLDivElement;
         this.secondDisplayEl = this.container.querySelectorAll('.calc-display').item(1) as HTMLDivElement;;
+        this.clearButtonEl = this.container.querySelector('button') as HTMLButtonElement;
     }
     private initObservables() {
         this.initButtonsObservable();
@@ -173,7 +175,7 @@ export class Calculator {
             inputMode: InputMode;
             isMinus: boolean;
             valueString: string;
-            byReset: boolean;
+            propagate: boolean;
         }
 
         let resetFnOb = this.buttonsObservable
@@ -181,7 +183,7 @@ export class Calculator {
             .mapTo((state: OperandState) => {
                 state.inputMode = InputMode.Decimal;
                 state.valueString = '0';
-                state.byReset = true;
+                state.propagate = false;
                 return state;
             });
 
@@ -190,16 +192,16 @@ export class Calculator {
             .mapTo((state: OperandState) => {
                 state.inputMode = InputMode.Decimal;
                 state.valueString = '0';
-                state.byReset = false;
+                state.propagate = true;
                 return state;
-            });
+            })
 
         let percentFnOb = this.buttonsObservable
             .filter(([_, keyValue]) => (keyValue == KeyValue.Percent) ? true : false)
             .mapTo((state: OperandState):OperandState => {
                 state.inputMode = InputMode.Percent;
                 state.valueString = new Decimal(state.valueString).div(100).valueOf();
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
 
@@ -217,16 +219,16 @@ export class Calculator {
                 else {
                     // ignore
                 }
-                state.byReset = false;
+                state.propagate = true;
                 return state;
-            });
+            })
 
         let signFnOb = this.buttonsObservable
             .filter(([_, keyValue]) => (keyValue == KeyValue.PlusMinus) ? true : false)
             .mapTo((state: OperandState) => {
                 let isPlus = state.valueString[0] != '-';
                 state.valueString = isPlus ? '-' + state.valueString : state.valueString.slice(1);
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
 
@@ -249,10 +251,10 @@ export class Calculator {
                         break;
                     }
 
-                    state.byReset = false;
+                    state.propagate = true;
                     return state;
                 };
-            });
+            })
         
         this.operandObservable = Observable
             .merge(resetFnOb, percentFnOb, clearFnOb, pointFnOb, signFnOb, numberFnOb)
@@ -263,12 +265,14 @@ export class Calculator {
                 inputMode: InputMode.Decimal,
                 isMinus: false,
                 valueString: '0',
-                byReset: false
+                propagate: true
+            })
+            .do(state => {
+                this.updateClearButtonText(state.valueString == '0' || state.valueString == '-0' ? 'AC' : 'C');
             })
             .mergeMap(state => {
-                return state.byReset ? Observable.empty() : Observable.of(state.valueString);
+                return state.propagate ? Observable.of(state.valueString) : Observable.empty();
             })
-            // .publishReplay().refCount()
     }
 
     private subscribe() {
@@ -283,11 +287,16 @@ export class Calculator {
             first: string;
             second: string;
             operator: KeyValue;
+            skipOperand: boolean;
         }
 
         let operand = this.operandObservable
             .map(operand => (state:CalculatorState) => {
                 console.log(`---- operand : ${operand}`);
+                if (state.skipOperand) {
+                    state.skipOperand = false;
+                    return state;
+                }
                 switch (state.step) {
                     case Step.WaitFirst:
                         state.step = Step.ChangeFirst;
@@ -318,6 +327,20 @@ export class Calculator {
                 return state;
             })
 
+        let clear = this.buttonsObservable
+            .filter(([keyType, _]) => (keyType == KeyType.Clear) ? true : false)
+            .map(([_, keyValue]) => (state:CalculatorState) => {
+                console.log(`---- clear`);
+                if ( (state.step == Step.WaitFirst || state.step == Step.ChangeFirst) && (state.first == '0' || state.first == '-0') || 
+                     (state.step == Step.WaitSecond || state.step == Step.ChangeSecond) && (state.second == '0' || state.second == '-0')) {
+                    state.first = '0';
+                    state.second = '0'
+                    state.step = Step.WaitFirst;
+                    state.operator = KeyValue.Add;
+                    state.skipOperand = true;
+                }
+                return state;
+            })
 
         let operator = this.buttonsObservable
             .filter(([keyType, _]) => (keyType == KeyType.Operator) ? true : false)
@@ -332,7 +355,7 @@ export class Calculator {
             })
 
         Observable
-            .merge(enter, operator, operand)
+            .merge(clear, enter, operator, operand)
             .scan((state, changeFn) => {
                 console.log('\n>>>> BEFORE ');
                 console.log(state);
@@ -344,7 +367,8 @@ export class Calculator {
                 step: Step.WaitFirst,
                 first: '0',
                 second: '0',
-                operator: KeyValue.Add
+                operator: KeyValue.Add,
+                skipOperand: false
             })
             .startWith({
                 step: Step.WaitFirst,
@@ -373,6 +397,10 @@ export class Calculator {
 
     private updateSecondOperand(value: string) {
         this.secondOperandEl.innerText = numberWithCommas(value);
+    }
+
+    private updateClearButtonText(value: string) {
+        this.clearButtonEl.innerText = value;
     }
 
     private changeActiveDisplay(isFirst: boolean) {

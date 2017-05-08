@@ -236,10 +236,10 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
     }
 });
 System.registerDynamic("src-reactive/app/creating.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/Subject.js", "npm:rxjs@5.2.0/ReplaySubject.js", "npm:rxjs@5.2.0/add/observable/range.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/observable/merge.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/operator/take.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+    "use strict";
     // alternative import method
     // import * as Rx from 'rxjs';
     // Rx.Observable.from(args);
-    "use strict";
 
     var global = this || self,
         GLOBAL = global;
@@ -6541,8 +6541,8 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/distinctUntilChanged.js', ['
   Observable_1.Observable.prototype.distinctUntilChanged = distinctUntilChanged_1.distinctUntilChanged;
 });
 System.registerDynamic("src-reactive/app/learnrx.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/operator/filter.js", "npm:rxjs@5.2.0/add/operator/concatAll.js", "npm:rxjs@5.2.0/add/operator/concatMap.js", "npm:rxjs@5.2.0/add/operator/reduce.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/takeUntil.js", "npm:rxjs@5.2.0/add/operator/throttleTime.js", "npm:rxjs@5.2.0/add/operator/distinctUntilChanged.js", "npm:rxjs@5.2.0/add/operator/scan.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
-    // excerpt from http://reactivex.io/learnrx/
     "use strict";
+    // excerpt from http://reactivex.io/learnrx/
 
     var global = this || self,
         GLOBAL = global;

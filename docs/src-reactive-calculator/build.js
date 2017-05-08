@@ -6526,7 +6526,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
     $__require("npm:rxjs@5.2.0/add/operator/share.js");
     var utility_1 = $__require("src-reactive-calculator/app/utility.js");
     // let keypad:[KeyType, KeyValue, string][]= [
-    var buttonsConfig = [[2 /* Clear */, 17 /* C */, 'C'], [0 /* Number */, 11 /* PlusMinus */, '±'], [0 /* Number */, 12 /* Percent */, '%'], [1 /* Operator */, 16 /* Divide */, '÷'], [0 /* Number */, 7 /* Seven */, '7'], [0 /* Number */, 8 /* Eight */, '8'], [0 /* Number */, 9 /* Nine */, '9'], [1 /* Operator */, 15 /* Multiply */, '×'], [0 /* Number */, 4 /* Four */, '4'], [0 /* Number */, 5 /* Five */, '5'], [0 /* Number */, 6 /* Six */, '6'], [1 /* Operator */, 14 /* Subtract */, '-'], [0 /* Number */, 1 /* One */, '1'], [0 /* Number */, 2 /* Two */, '2'], [0 /* Number */, 3 /* Three */, '3'], [1 /* Operator */, 13 /* Add */, '+'], [0 /* Number */, 0 /* Zero */, '0'], [0 /* Number */, 10 /* Point */, '.'], [3 /* Enter */, 18 /* Enter */, '=']];
+    var buttonsConfig = [[2 /* Clear */, 17 /* C */, 'AC'], [0 /* Number */, 11 /* PlusMinus */, '±'], [0 /* Number */, 12 /* Percent */, '%'], [1 /* Operator */, 16 /* Divide */, '÷'], [0 /* Number */, 7 /* Seven */, '7'], [0 /* Number */, 8 /* Eight */, '8'], [0 /* Number */, 9 /* Nine */, '9'], [1 /* Operator */, 15 /* Multiply */, '×'], [0 /* Number */, 4 /* Four */, '4'], [0 /* Number */, 5 /* Five */, '5'], [0 /* Number */, 6 /* Six */, '6'], [1 /* Operator */, 14 /* Subtract */, '-'], [0 /* Number */, 1 /* One */, '1'], [0 /* Number */, 2 /* Two */, '2'], [0 /* Number */, 3 /* Three */, '3'], [1 /* Operator */, 13 /* Add */, '+'], [0 /* Number */, 0 /* Zero */, '0'], [0 /* Number */, 10 /* Point */, '.'], [3 /* Enter */, 18 /* Enter */, '=']];
     var Calculator = function () {
         function Calculator(container) {
             this.container = container;
@@ -6550,6 +6550,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             this.firstDisplayEl = this.container.querySelectorAll('.calc-display').item(0);
             this.secondDisplayEl = this.container.querySelectorAll('.calc-display').item(1);
             ;
+            this.clearButtonEl = this.container.querySelector('button');
         };
         Calculator.prototype.initObservables = function () {
             this.initButtonsObservable();
@@ -6567,6 +6568,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             }).mergeAll().share();
         };
         Calculator.prototype.initOperandObservable = function () {
+            var _this = this;
             var resetFnOb = this.buttonsObservable.filter(function (_a) {
                 var keyType = _a[0],
                     _ = _a[1];
@@ -6574,7 +6576,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             }).mapTo(function (state) {
                 state.inputMode = 0 /* Decimal */;
                 state.valueString = '0';
-                state.byReset = true;
+                state.propagate = false;
                 return state;
             });
             var clearFnOb = this.buttonsObservable.filter(function (_a) {
@@ -6584,7 +6586,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             }).mapTo(function (state) {
                 state.inputMode = 0 /* Decimal */;
                 state.valueString = '0';
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
             var percentFnOb = this.buttonsObservable.filter(function (_a) {
@@ -6594,7 +6596,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             }).mapTo(function (state) {
                 state.inputMode = 1 /* Percent */;
                 state.valueString = new Decimal(state.valueString).div(100).valueOf();
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
             var pointFnOb = this.buttonsObservable.filter(function (_a) {
@@ -6611,7 +6613,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                     } else {
                     // ignore
                 }
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
             var signFnOb = this.buttonsObservable.filter(function (_a) {
@@ -6621,7 +6623,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             }).mapTo(function (state) {
                 var isPlus = state.valueString[0] != '-';
                 state.valueString = isPlus ? '-' + state.valueString : state.valueString.slice(1);
-                state.byReset = false;
+                state.propagate = true;
                 return state;
             });
             var numberFnOb = this.buttonsObservable.filter(function (_a) {
@@ -6644,7 +6646,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                             state.inputMode = 0 /* Decimal */;
                             break;
                     }
-                    state.byReset = false;
+                    state.propagate = true;
                     return state;
                 };
             });
@@ -6655,11 +6657,12 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                 inputMode: 0 /* Decimal */
                 , isMinus: false,
                 valueString: '0',
-                byReset: false
+                propagate: true
+            }).do(function (state) {
+                _this.updateClearButtonText(state.valueString == '0' || state.valueString == '-0' ? 'AC' : 'C');
             }).mergeMap(function (state) {
-                return state.byReset ? Observable_1.Observable.empty() : Observable_1.Observable.of(state.valueString);
+                return state.propagate ? Observable_1.Observable.of(state.valueString) : Observable_1.Observable.empty();
             });
-            // .publishReplay().refCount()
         };
         Calculator.prototype.subscribe = function () {
             //                      N            +         = 
@@ -6671,6 +6674,10 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
             var operand = this.operandObservable.map(function (operand) {
                 return function (state) {
                     console.log("---- operand : " + operand);
+                    if (state.skipOperand) {
+                        state.skipOperand = false;
+                        return state;
+                    }
                     switch (state.step) {
                         case 0 /* WaitFirst */:
                             state.step = 1 /* ChangeFirst */;
@@ -6703,6 +6710,25 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                     return state;
                 };
             });
+            var clear = this.buttonsObservable.filter(function (_a) {
+                var keyType = _a[0],
+                    _ = _a[1];
+                return keyType == 2 /* Clear */ ? true : false;
+            }).map(function (_a) {
+                var _ = _a[0],
+                    keyValue = _a[1];
+                return function (state) {
+                    console.log("---- clear");
+                    if ((state.step == 0 /* WaitFirst */ || state.step == 1 /* ChangeFirst */) && (state.first == '0' || state.first == '-0') || (state.step == 2 /* WaitSecond */ || state.step == 3 /* ChangeSecond */) && (state.second == '0' || state.second == '-0')) {
+                        state.first = '0';
+                        state.second = '0';
+                        state.step = 0 /* WaitFirst */;
+                        state.operator = 13 /* Add */;
+                        state.skipOperand = true;
+                    }
+                    return state;
+                };
+            });
             var operator = this.buttonsObservable.filter(function (_a) {
                 var keyType = _a[0],
                     _ = _a[1];
@@ -6718,7 +6744,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                     return state;
                 };
             });
-            Observable_1.Observable.merge(enter, operator, operand).scan(function (state, changeFn) {
+            Observable_1.Observable.merge(clear, enter, operator, operand).scan(function (state, changeFn) {
                 console.log('\n>>>> BEFORE ');
                 console.log(state);
                 var newState = changeFn(state);
@@ -6730,6 +6756,7 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
                 , first: '0',
                 second: '0',
                 operator: 13 /* Add */
+                , skipOperand: false
             }).startWith({
                 step: 0 /* WaitFirst */
                 , first: '0',
@@ -6750,6 +6777,9 @@ System.registerDynamic("src-reactive-calculator/app/calculator.js", ["src-reacti
         };
         Calculator.prototype.updateSecondOperand = function (value) {
             this.secondOperandEl.innerText = utility_1.numberWithCommas(value);
+        };
+        Calculator.prototype.updateClearButtonText = function (value) {
+            this.clearButtonEl.innerText = value;
         };
         Calculator.prototype.changeActiveDisplay = function (isFirst) {
             if (isFirst) {
