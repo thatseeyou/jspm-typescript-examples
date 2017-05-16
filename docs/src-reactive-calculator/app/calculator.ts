@@ -2,6 +2,7 @@ import '../css/calculator.css!css';
 import * as Decimal from 'decimal.js';
 
 import { Observable } from 'rxjs/Observable';
+import { Observer } from 'rxjs/Observer';
 
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/of';
@@ -9,11 +10,13 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/zip';
+import 'rxjs/add/observable/timer';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mapTo';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/mergeMapTo';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/do';
@@ -21,8 +24,26 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/share';
+import 'rxjs/add/operator/timeoutWith';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/repeat';
+import 'rxjs/add/operator/timestamp';
 
 import { numberWithCommas } from './utility';
+
+function simpleObserver<T>(prefix: string):Observer<T> {
+    return {
+        next: (value) => {
+            console.log(`${prefix}: NEXT:`)
+            console.log(value)
+        },
+        error: (err) => {
+            console.log(`${prefix}: ERROR:`)
+            console.log(err)
+        },
+        complete: () => console.log(`${prefix}: Completed`)
+    }
+}
 
 //
 //    1 + 1   + 1   +
@@ -106,6 +127,8 @@ export class Calculator {
     private buttonsObservable: Observable<[KeyType, KeyValue]>;
     private operandObservable: Observable<string>;
 
+    private readonly timeout = 5000;
+
     constructor(private container: HTMLElement) {
         this.render();
         this.initObservables();
@@ -149,19 +172,26 @@ export class Calculator {
     private initObservables() {
         this.initButtonsObservable();
         this.initOperandObservable();
-        // this.initStepObservable();
     }
 
     private initButtonsObservable() {
-        let buttonsOb = Observable.from(this.container.querySelectorAll('.calc-button'));
-        let buttonsConfigOb = Observable.from(buttonsConfig);
+        let buttonObservables = buttonsConfig.map(([keyType, keyValue, _], index) => {
+            let button = this.container.querySelectorAll('.calc-button')[index];
+            return Observable.fromEvent<MouseEvent>(button, 'click').mapTo([keyType, keyValue]);
+        });
+        let buttonsOb = Observable.merge(buttonObservables).mergeAll();
 
-        this.buttonsObservable = Observable
-            .zip(buttonsOb, buttonsConfigOb, (button, [keyType, keyValue, _]) => {
-                return Observable.fromEvent<MouseEvent>(button, 'click')
-                    .mapTo([keyType, keyValue]);
-            })
-            .mergeAll()
+        this.buttonsObservable = buttonsOb
+            // send C button event twice when timeout
+            // .mergeMap(([keyType, keyValue]) => {
+            //     let fired = Observable.of([keyType, keyValue]);
+            //     let timeout = Observable
+            //         .timer(1000)
+            //         .takeUntil(buttonsOb)
+            //         .mergeMapTo( Observable.of([KeyType.Clear, KeyValue.C]).repeat(2) )
+
+            //     return Observable.merge(fired, timeout);
+            // })
             .share()
     }
 
@@ -258,6 +288,21 @@ export class Calculator {
         
         this.operandObservable = Observable
             .merge(resetFnOb, percentFnOb, clearFnOb, pointFnOb, signFnOb, numberFnOb)
+            .mergeMap(changeFn => {
+                let source = Observable.of(changeFn);
+                let timeout = Observable
+                    .timer(this.timeout)
+                    .mapTo((state: OperandState) => {
+                        state.inputMode = InputMode.Decimal;
+                        state.valueString = '0';
+                        state.propagate = false;
+                        return state;
+                    })
+                    .do(value => console.log('timeout => C'))
+                    .takeUntil(this.buttonsObservable);
+
+                return Observable.merge(source, timeout);
+            })
             .scan((state, changeFn) => {
                 let newState = changeFn(state);
                 return newState;
@@ -356,12 +401,29 @@ export class Calculator {
 
         Observable
             .merge(clear, enter, operator, operand)
+            .mergeMap(changeFn => {
+                let source = Observable.of(changeFn);
+                let timeout = Observable
+                    .timer(this.timeout)
+                    .mapTo((state: CalculatorState) => {
+                        state.first = '0';
+                        state.second = '0'
+                        state.step = Step.WaitFirst;
+                        state.operator = KeyValue.Add;
+                        state.skipOperand = false;
+                        return state;
+                    })
+                    .do(value => console.log('timeout => AC'))
+                    .takeUntil(this.buttonsObservable);
+
+                return Observable.merge(source, timeout);
+            })
             .scan((state, changeFn) => {
-                console.log('\n>>>> BEFORE ');
-                console.log(state);
+                // console.log('\n>>>> BEFORE ');
+                // console.log(state);
                 let newState = changeFn(state);
-                console.log('<<<< AFTER ');
-                console.log(newState);
+                // console.log('<<<< AFTER ');
+                // console.log(newState);
                 return newState;
             }, {
                 step: Step.WaitFirst,
@@ -443,6 +505,3 @@ export class Calculator {
         return result;
     }
 }
-
-
-

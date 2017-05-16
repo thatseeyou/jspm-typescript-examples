@@ -50,6 +50,7 @@ const tests:TestItem[] = [
     {text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen},
     {text: 'operator:   add/operator/distinct', action: operator.testDistinct},
     {text: 'operator:   add/operator/repeat', action: operator.testRepeat},
+    {text: 'operator:   add/operator/repeat - 2', action: operator.testRepeat2},
     {text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1},
     {text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2},
     {text: 'operator:   add/operator/window', action: operator.testWindow},
@@ -59,6 +60,7 @@ const tests:TestItem[] = [
     {text: 'operator:   add/operator/groupBy', action: operator.testGroupBy},
     {text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements},
     {text: 'operator:   add/operator/single', action: operator.testSingle},
+    {text: 'operator:   add/operator/timeoutWith', action: operator.testTimeoutWith},
 
     {text: 'as scan:   map as scan', action: asscan.mapAsScan},
     {text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1},

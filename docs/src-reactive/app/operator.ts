@@ -1,3 +1,5 @@
+import { buttonForTest, inputForTest, simpleObserver } from './helper';
+
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Subject } from 'rxjs/Subject';
@@ -15,7 +17,9 @@ import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/timeInterval';
 import 'rxjs/add/operator/mergeMap'; // flatMap
+import 'rxjs/add/operator/mergeMapTo'; // flatMap
 import 'rxjs/add/operator/concatMap'; 
+import 'rxjs/add/operator/concatMapTo'; 
 import 'rxjs/add/operator/merge'; 
 import 'rxjs/add/operator/buffer'; 
 import 'rxjs/add/operator/bufferCount'; 
@@ -44,8 +48,8 @@ import 'rxjs/add/operator/isEmpty';
 import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/single';
 import 'rxjs/add/operator/race';
+import 'rxjs/add/operator/timeoutWith';
 
-import { buttonForTest, inputForTest, simpleObserver } from './helper';
 
 export function testPluck(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     Observable.from([
@@ -425,3 +429,29 @@ export function testSingle(testButton:HTMLButtonElement, placeholder:HTMLElement
 
     single.subscribe(simpleObserver('single'));
 }
+
+export function testTimeoutWith(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let timeout = Observable
+        .of(100)
+        .delay(2000)
+        .timeoutWith(1000, Observable.of(42))
+        .subscribe(simpleObserver('timeout'));
+}
+
+export function testRepeat2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button1 = buttonForTest('click', placeholder);
+    let down = Observable.fromEvent<MouseEvent>(button1, 'mousedown');
+
+    let merge:any = down.mergeMap(key => {
+        let keyOb = Observable.of(key);
+        let timeout = Observable
+            .timer(1000)
+            .mergeMapTo(Observable.of(42).repeat(2))
+            .takeUntil(down)
+
+        return Observable.merge(keyOb, timeout);
+    })
+
+    merge.subscribe(simpleObserver('repeat2'));
+}
+

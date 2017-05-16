@@ -1628,6 +1628,156 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/timeInterval.js', ['npm:rxjs
   var timeInterval_1 = $__require('npm:rxjs@5.2.0/operator/timeInterval.js');
   Observable_1.Observable.prototype.timeInterval = timeInterval_1.timeInterval;
 });
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/mergeMapTo.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mergeMapTo.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var mergeMapTo_1 = $__require('npm:rxjs@5.2.0/operator/mergeMapTo.js');
+  Observable_1.Observable.prototype.flatMapTo = mergeMapTo_1.mergeMapTo;
+  Observable_1.Observable.prototype.mergeMapTo = mergeMapTo_1.mergeMapTo;
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/mergeMapTo.js', ['npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
+  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
+  function mergeMapTo(innerObservable, resultSelector, concurrent) {
+    if (concurrent === void 0) {
+      concurrent = Number.POSITIVE_INFINITY;
+    }
+    if (typeof resultSelector === 'number') {
+      concurrent = resultSelector;
+      resultSelector = null;
+    }
+    return this.lift(new MergeMapToOperator(innerObservable, resultSelector, concurrent));
+  }
+  exports.mergeMapTo = mergeMapTo;
+  var MergeMapToOperator = function () {
+    function MergeMapToOperator(ish, resultSelector, concurrent) {
+      if (concurrent === void 0) {
+        concurrent = Number.POSITIVE_INFINITY;
+      }
+      this.ish = ish;
+      this.resultSelector = resultSelector;
+      this.concurrent = concurrent;
+    }
+    MergeMapToOperator.prototype.call = function (observer, source) {
+      return source.subscribe(new MergeMapToSubscriber(observer, this.ish, this.resultSelector, this.concurrent));
+    };
+    return MergeMapToOperator;
+  }();
+  exports.MergeMapToOperator = MergeMapToOperator;
+  var MergeMapToSubscriber = function (_super) {
+    __extends(MergeMapToSubscriber, _super);
+    function MergeMapToSubscriber(destination, ish, resultSelector, concurrent) {
+      if (concurrent === void 0) {
+        concurrent = Number.POSITIVE_INFINITY;
+      }
+      _super.call(this, destination);
+      this.ish = ish;
+      this.resultSelector = resultSelector;
+      this.concurrent = concurrent;
+      this.hasCompleted = false;
+      this.buffer = [];
+      this.active = 0;
+      this.index = 0;
+    }
+    MergeMapToSubscriber.prototype._next = function (value) {
+      if (this.active < this.concurrent) {
+        var resultSelector = this.resultSelector;
+        var index = this.index++;
+        var ish = this.ish;
+        var destination = this.destination;
+        this.active++;
+        this._innerSub(ish, destination, resultSelector, value, index);
+      } else {
+        this.buffer.push(value);
+      }
+    };
+    MergeMapToSubscriber.prototype._innerSub = function (ish, destination, resultSelector, value, index) {
+      this.add(subscribeToResult_1.subscribeToResult(this, ish, value, index));
+    };
+    MergeMapToSubscriber.prototype._complete = function () {
+      this.hasCompleted = true;
+      if (this.active === 0 && this.buffer.length === 0) {
+        this.destination.complete();
+      }
+    };
+    MergeMapToSubscriber.prototype.notifyNext = function (outerValue, innerValue, outerIndex, innerIndex, innerSub) {
+      var _a = this,
+          resultSelector = _a.resultSelector,
+          destination = _a.destination;
+      if (resultSelector) {
+        this.trySelectResult(outerValue, innerValue, outerIndex, innerIndex);
+      } else {
+        destination.next(innerValue);
+      }
+    };
+    MergeMapToSubscriber.prototype.trySelectResult = function (outerValue, innerValue, outerIndex, innerIndex) {
+      var _a = this,
+          resultSelector = _a.resultSelector,
+          destination = _a.destination;
+      var result;
+      try {
+        result = resultSelector(outerValue, innerValue, outerIndex, innerIndex);
+      } catch (err) {
+        destination.error(err);
+        return;
+      }
+      destination.next(result);
+    };
+    MergeMapToSubscriber.prototype.notifyError = function (err) {
+      this.destination.error(err);
+    };
+    MergeMapToSubscriber.prototype.notifyComplete = function (innerSub) {
+      var buffer = this.buffer;
+      this.remove(innerSub);
+      this.active--;
+      if (buffer.length > 0) {
+        this._next(buffer.shift());
+      } else if (this.active === 0 && this.hasCompleted) {
+        this.destination.complete();
+      }
+    };
+    return MergeMapToSubscriber;
+  }(OuterSubscriber_1.OuterSubscriber);
+  exports.MergeMapToSubscriber = MergeMapToSubscriber;
+});
+System.registerDynamic("npm:rxjs@5.2.0/operator/concatMapTo.js", ["npm:rxjs@5.2.0/operator/mergeMapTo.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var mergeMapTo_1 = $__require("npm:rxjs@5.2.0/operator/mergeMapTo.js");
+  function concatMapTo(innerObservable, resultSelector) {
+    return this.lift(new mergeMapTo_1.MergeMapToOperator(innerObservable, resultSelector, 1));
+  }
+  exports.concatMapTo = concatMapTo;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/concatMapTo.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/concatMapTo.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var concatMapTo_1 = $__require('npm:rxjs@5.2.0/operator/concatMapTo.js');
+  Observable_1.Observable.prototype.concatMapTo = concatMapTo_1.concatMapTo;
+});
 System.registerDynamic('npm:rxjs@5.2.0/add/operator/merge.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/merge.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -5790,12 +5940,132 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/race.js', ['npm:rxjs@5.2.0/O
   var race_1 = $__require('npm:rxjs@5.2.0/operator/race.js');
   Observable_1.Observable.prototype.race = race_1.race;
 });
-System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/timer.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/observable/throw.js", "npm:rxjs@5.2.0/add/observable/concat.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/timeInterval.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/concatMap.js", "npm:rxjs@5.2.0/add/operator/merge.js", "npm:rxjs@5.2.0/add/operator/buffer.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/bufferWhen.js", "npm:rxjs@5.2.0/add/operator/bufferToggle.js", "npm:rxjs@5.2.0/add/operator/pairwise.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/partition.js", "npm:rxjs@5.2.0/add/operator/mapTo.js", "npm:rxjs@5.2.0/add/operator/expand.js", "npm:rxjs@5.2.0/add/operator/combineLatest.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/audit.js", "npm:rxjs@5.2.0/add/operator/debounce.js", "npm:rxjs@5.2.0/add/operator/sample.js", "npm:rxjs@5.2.0/add/operator/delayWhen.js", "npm:rxjs@5.2.0/add/operator/distinct.js", "npm:rxjs@5.2.0/add/operator/repeat.js", "npm:rxjs@5.2.0/add/operator/repeatWhen.js", "npm:rxjs@5.2.0/add/operator/multicast.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/windowCount.js", "npm:rxjs@5.2.0/add/operator/windowWhen.js", "npm:rxjs@5.2.0/add/operator/groupBy.js", "npm:rxjs@5.2.0/add/operator/isEmpty.js", "npm:rxjs@5.2.0/add/operator/ignoreElements.js", "npm:rxjs@5.2.0/add/operator/single.js", "npm:rxjs@5.2.0/add/operator/race.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+System.registerDynamic('npm:rxjs@5.2.0/operator/timeoutWith.js', ['npm:rxjs@5.2.0/scheduler/async.js', 'npm:rxjs@5.2.0/util/isDate.js', 'npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var async_1 = $__require('npm:rxjs@5.2.0/scheduler/async.js');
+  var isDate_1 = $__require('npm:rxjs@5.2.0/util/isDate.js');
+  var OuterSubscriber_1 = $__require('npm:rxjs@5.2.0/OuterSubscriber.js');
+  var subscribeToResult_1 = $__require('npm:rxjs@5.2.0/util/subscribeToResult.js');
+  function timeoutWith(due, withObservable, scheduler) {
+    if (scheduler === void 0) {
+      scheduler = async_1.async;
+    }
+    var absoluteTimeout = isDate_1.isDate(due);
+    var waitFor = absoluteTimeout ? +due - scheduler.now() : Math.abs(due);
+    return this.lift(new TimeoutWithOperator(waitFor, absoluteTimeout, withObservable, scheduler));
+  }
+  exports.timeoutWith = timeoutWith;
+  var TimeoutWithOperator = function () {
+    function TimeoutWithOperator(waitFor, absoluteTimeout, withObservable, scheduler) {
+      this.waitFor = waitFor;
+      this.absoluteTimeout = absoluteTimeout;
+      this.withObservable = withObservable;
+      this.scheduler = scheduler;
+    }
+    TimeoutWithOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new TimeoutWithSubscriber(subscriber, this.absoluteTimeout, this.waitFor, this.withObservable, this.scheduler));
+    };
+    return TimeoutWithOperator;
+  }();
+  var TimeoutWithSubscriber = function (_super) {
+    __extends(TimeoutWithSubscriber, _super);
+    function TimeoutWithSubscriber(destination, absoluteTimeout, waitFor, withObservable, scheduler) {
+      _super.call(this);
+      this.destination = destination;
+      this.absoluteTimeout = absoluteTimeout;
+      this.waitFor = waitFor;
+      this.withObservable = withObservable;
+      this.scheduler = scheduler;
+      this.timeoutSubscription = undefined;
+      this.index = 0;
+      this._previousIndex = 0;
+      this._hasCompleted = false;
+      destination.add(this);
+      this.scheduleTimeout();
+    }
+    Object.defineProperty(TimeoutWithSubscriber.prototype, "previousIndex", {
+      get: function () {
+        return this._previousIndex;
+      },
+      enumerable: true,
+      configurable: true
+    });
+    Object.defineProperty(TimeoutWithSubscriber.prototype, "hasCompleted", {
+      get: function () {
+        return this._hasCompleted;
+      },
+      enumerable: true,
+      configurable: true
+    });
+    TimeoutWithSubscriber.dispatchTimeout = function (state) {
+      var source = state.subscriber;
+      var currentIndex = state.index;
+      if (!source.hasCompleted && source.previousIndex === currentIndex) {
+        source.handleTimeout();
+      }
+    };
+    TimeoutWithSubscriber.prototype.scheduleTimeout = function () {
+      var currentIndex = this.index;
+      var timeoutState = {
+        subscriber: this,
+        index: currentIndex
+      };
+      this.scheduler.schedule(TimeoutWithSubscriber.dispatchTimeout, this.waitFor, timeoutState);
+      this.index++;
+      this._previousIndex = currentIndex;
+    };
+    TimeoutWithSubscriber.prototype._next = function (value) {
+      this.destination.next(value);
+      if (!this.absoluteTimeout) {
+        this.scheduleTimeout();
+      }
+    };
+    TimeoutWithSubscriber.prototype._error = function (err) {
+      this.destination.error(err);
+      this._hasCompleted = true;
+    };
+    TimeoutWithSubscriber.prototype._complete = function () {
+      this.destination.complete();
+      this._hasCompleted = true;
+    };
+    TimeoutWithSubscriber.prototype.handleTimeout = function () {
+      if (!this.closed) {
+        var withObservable = this.withObservable;
+        this.unsubscribe();
+        this.destination.add(this.timeoutSubscription = subscribeToResult_1.subscribeToResult(this, withObservable));
+      }
+    };
+    return TimeoutWithSubscriber;
+  }(OuterSubscriber_1.OuterSubscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/timeoutWith.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/timeoutWith.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var timeoutWith_1 = $__require('npm:rxjs@5.2.0/operator/timeoutWith.js');
+  Observable_1.Observable.prototype.timeoutWith = timeoutWith_1.timeoutWith;
+});
+System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper.js", "npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/timer.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/observable/throw.js", "npm:rxjs@5.2.0/add/observable/concat.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/timeInterval.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/mergeMapTo.js", "npm:rxjs@5.2.0/add/operator/concatMap.js", "npm:rxjs@5.2.0/add/operator/concatMapTo.js", "npm:rxjs@5.2.0/add/operator/merge.js", "npm:rxjs@5.2.0/add/operator/buffer.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/bufferWhen.js", "npm:rxjs@5.2.0/add/operator/bufferToggle.js", "npm:rxjs@5.2.0/add/operator/pairwise.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/partition.js", "npm:rxjs@5.2.0/add/operator/mapTo.js", "npm:rxjs@5.2.0/add/operator/expand.js", "npm:rxjs@5.2.0/add/operator/combineLatest.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/audit.js", "npm:rxjs@5.2.0/add/operator/debounce.js", "npm:rxjs@5.2.0/add/operator/sample.js", "npm:rxjs@5.2.0/add/operator/delayWhen.js", "npm:rxjs@5.2.0/add/operator/distinct.js", "npm:rxjs@5.2.0/add/operator/repeat.js", "npm:rxjs@5.2.0/add/operator/repeatWhen.js", "npm:rxjs@5.2.0/add/operator/multicast.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/windowCount.js", "npm:rxjs@5.2.0/add/operator/windowWhen.js", "npm:rxjs@5.2.0/add/operator/groupBy.js", "npm:rxjs@5.2.0/add/operator/isEmpty.js", "npm:rxjs@5.2.0/add/operator/ignoreElements.js", "npm:rxjs@5.2.0/add/operator/single.js", "npm:rxjs@5.2.0/add/operator/race.js", "npm:rxjs@5.2.0/add/operator/timeoutWith.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
+    var helper_1 = $__require("src-reactive/app/helper.js");
     var Observable_1 = $__require("npm:rxjs@5.2.0/Observable.js");
     $__require("npm:rxjs@5.2.0/add/observable/of.js");
     $__require("npm:rxjs@5.2.0/add/observable/interval.js");
@@ -5808,7 +6078,9 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
     $__require("npm:rxjs@5.2.0/add/operator/delay.js");
     $__require("npm:rxjs@5.2.0/add/operator/timeInterval.js");
     $__require("npm:rxjs@5.2.0/add/operator/mergeMap.js"); // flatMap
+    $__require("npm:rxjs@5.2.0/add/operator/mergeMapTo.js"); // flatMap
     $__require("npm:rxjs@5.2.0/add/operator/concatMap.js");
+    $__require("npm:rxjs@5.2.0/add/operator/concatMapTo.js");
     $__require("npm:rxjs@5.2.0/add/operator/merge.js");
     $__require("npm:rxjs@5.2.0/add/operator/buffer.js");
     $__require("npm:rxjs@5.2.0/add/operator/bufferCount.js");
@@ -5837,7 +6109,7 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
     $__require("npm:rxjs@5.2.0/add/operator/ignoreElements.js");
     $__require("npm:rxjs@5.2.0/add/operator/single.js");
     $__require("npm:rxjs@5.2.0/add/operator/race.js");
-    var helper_1 = $__require("src-reactive/app/helper.js");
+    $__require("npm:rxjs@5.2.0/add/operator/timeoutWith.js");
     function testPluck(testButton, placeholder) {
         Observable_1.Observable.from([{ name: { first: 'jaein', last: 'moon' } }, { name: { first: 'cheolsu', last: 'ahn' } }, { name: { first: 'sangjeong', last: 'shim' } }]).pluck('name', 'first').subscribe(helper_1.simpleObserver('pluck'));
     }
@@ -6142,6 +6414,21 @@ System.registerDynamic("src-reactive/app/operator.js", ["npm:rxjs@5.2.0/Observab
         single.subscribe(helper_1.simpleObserver('single'));
     }
     exports.testSingle = testSingle;
+    function testTimeoutWith(testButton, placeholder) {
+        var timeout = Observable_1.Observable.of(100).delay(2000).timeoutWith(1000, Observable_1.Observable.of(42)).subscribe(helper_1.simpleObserver('timeout'));
+    }
+    exports.testTimeoutWith = testTimeoutWith;
+    function testRepeat2(testButton, placeholder) {
+        var button1 = helper_1.buttonForTest('click', placeholder);
+        var down = Observable_1.Observable.fromEvent(button1, 'mousedown');
+        var merge = down.mergeMap(function (key) {
+            var keyOb = Observable_1.Observable.of(key);
+            var timeout = Observable_1.Observable.timer(1000).mergeMapTo(Observable_1.Observable.of(42).repeat(2)).takeUntil(down);
+            return Observable_1.Observable.merge(keyOb, timeout);
+        });
+        merge.subscribe(helper_1.simpleObserver('repeat2'));
+    }
+    exports.testRepeat2 = testRepeat2;
 });
 System.registerDynamic("npm:rxjs@5.2.0/operator/filter.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
   /* */
@@ -16453,10 +16740,12 @@ System.registerDynamic("src-reactive/app/helper.js", [], true, function ($__requ
     function simpleObserver(prefix) {
         return {
             next: function (value) {
-                return console.log(prefix + ": " + value);
+                console.log(prefix + ": NEXT:");
+                console.log(value);
             },
             error: function (err) {
-                return console.log(prefix + ": ERROR: " + err);
+                console.log(prefix + ": ERROR:");
+                console.log(err);
             },
             complete: function () {
                 return console.log(prefix + ": Completed");
@@ -16502,7 +16791,7 @@ System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "np
     var playground = $__require("src-reactive/app/playground.js");
     var asscan = $__require("src-reactive/app/asscan.js");
     var notification = $__require("src-reactive/app/notification.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }, { text: 'playground: fromPromise', action: playground.fromPromise }, { text: 'playground: fromPromise & defer', action: playground.fromPromise2 }];
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeat - 2', action: operator.testRepeat2 }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'operator:   add/operator/timeoutWith', action: operator.testTimeoutWith }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }, { text: 'playground: fromPromise', action: playground.fromPromise }, { text: 'playground: fromPromise & defer', action: playground.fromPromise2 }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);
