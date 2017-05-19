@@ -93,6 +93,18 @@ const tests:TestItem[] = [
     {text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath},
     {text: 'playground: fromPromise', action: playground.fromPromise},
     {text: 'playground: fromPromise & defer', action: playground.fromPromise2},
+    {text: 'playground: conditional', action: playground.conditional},
+    {text: 'playground: conditional skip', action: playground.conditionalSkip},
+    {text: 'playground: self window', action: playground.selfWindow},
+    {text: 'playground: inverse throttle', action: playground.inverseThrottle},
+    {text: 'playground: wait concurrent Two', action: playground.waitTwo},
+    {text: 'playground: count down', action: playground.countDown},
+    {text: 'playground: interval + delay', action: playground.interval_delay},
+    {text: 'playground: window queue', action: playground.window_queue},
+    {text: 'playground: delay observable', action: playground.delayObservable},
+    {text: 'playground: completed while delay', action: playground.completedWhileDelay},
+    {text: 'playground: completed with summary', action: playground.summary},
+    {text: 'playground: completed with summary catch', action: playground.summary2},
 ];
 
 domready(() => {

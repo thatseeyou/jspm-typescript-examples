@@ -1,9 +1,3 @@
-
-// alternative import method
-import * as Rx from 'rxjs';
-// Rx.Observable.from(args);
-
-
 import { Observable } from 'rxjs/Observable';
 import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 import { Subject } from 'rxjs/Subject';

@@ -1,19 +1,31 @@
 import { Observable } from 'rxjs/Observable';
 import { Map, fromJS } from 'immutable';
 
+import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/zip';
 import 'rxjs/add/observable/defer';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/observable/empty';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeAll';
+import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/share';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/throttleTime';
+import 'rxjs/add/operator/window';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/bufferCount';
+import 'rxjs/add/operator/withLatestFrom';
+import 'rxjs/add/operator/takeLast';
 
 import { simpleObserver, buttonForTest, inputForTest } from './helper';
 
@@ -230,4 +242,290 @@ export function fromPromise2(testButton:HTMLButtonElement, placeholder:HTMLEleme
 
     deleteUser('exist');
     deleteUser('not exist');
+}
+
+export function selfWindow(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(500).take(5).share();
+
+    source.subscribe(value => console.log(`source = ${value}`));
+
+    source.window(source).mergeAll().subscribe(value => console.log(`cut = ${value}`));
+}
+
+// http://stackoverflow.com/questions/43991496/how-to-get-throttled-value-in-rxjs
+export function inverseThrottle(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    var times = [
+        { value: 0, time: 100 },
+        { value: 1, time: 600 },
+        { value: 2, time: 400 },
+        { value: 3, time: 900 },
+        { value: 4, time: 200 }
+    ];
+
+    // Delay each item by time and project value;
+    var source = Observable.from(times)
+        .mergeMap(function (item) {
+            return Observable
+                .of(item.value)
+                .delay(item.time);
+        });
+
+    var indexedSource = source
+        .scan((_, value, index) => {
+            // console.log(`value = ${value}, index = ${index}`)
+            return [value, index];
+        }, undefined)
+        .share();
+
+    var indexedThrottled = indexedSource
+        .throttleTime(300 /* ms */);
+
+    var throttled = indexedThrottled
+        .map(value => value[0]);
+
+    var notThrottled = Observable.combineLatest(indexedThrottled, indexedSource)
+        .filter(combined => {
+            var filteredIndex = combined[0][1];
+            var sourceIndex = combined[1][1];
+
+            return sourceIndex > filteredIndex ? true : false;
+        })
+        .map(combined => {
+            return combined[1][0];
+        });
+
+    source.subscribe(value => console.log(`source : ${value}`));
+    throttled.subscribe(value => console.log(`++++++ : ${value}`));
+    notThrottled.subscribe(value => console.log(`------ : ${value}`));
+}
+
+// http://stackoverflow.com/questions/43978581/handle-different-conditions-with-observables
+export function conditional(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    function registerTask(task:string, forceError = false) {
+        // console.log('registerTask called');
+        return Observable.defer(() => {
+            return Observable.of(1).delay(1000)
+                .map(value => {
+                    if (forceError)
+                        throw 'ERROR';
+                    return value;
+                });
+        });
+    }
+
+    function registerUser(user:string) {
+        // console.log('registerUser called');
+        return Observable.of('userID').delay(1000);
+    }
+
+    function searchTaskByName(task:string) {
+        // console.log('searchTaskByName called');
+        return Observable.of(2).delay(1000);
+    }
+
+    // registerTask('task', true)  // forceError
+    registerTask('task')
+        .catch((err, caught) => {
+            return searchTaskByName('task');
+        })
+        .mergeMap(taskID => {
+            console.log(`taskID = ${taskID}`)
+            return registerUser('user');
+        })
+        .subscribe(userID => console.log(userID));
+}
+
+
+// http://stackoverflow.com/questions/43995864/rxjs-skip-functions-if-some-condition-is-met
+export function conditionalSkip(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    function getClients(city:string) {
+        return Observable.of(city == 'Seoul' ? ['c1', 'c2'] : []).delay(100);
+    }
+    function getSales(client:string, article:string) {
+        let sales:any = {
+            'c1': {
+                'item1': 10,
+                'item2': 20
+            },
+            'c2': {
+                'item1': 30,
+                'item2': 40
+            }
+        };
+
+        return Observable.of(sales[client][article]).delay(100);
+    }
+
+    let city = 'Seou';
+    let article = 'item2';
+
+    // getClients(city)
+    //     .mergeMap(clients => {
+    //         console.log('>> mergeMap');
+    //         let salesObs = clients.map<Observable<number>>(client => getSales(client, article));
+    //         return Observable.merge(salesObs).mergeAll();
+    //     })
+    //     .reduce((sum, sales) => {
+    //         console.log('>> reduce');
+    //         return sum + sales;
+    //     }, 0)
+    //     .subscribe(value => console.log(`sum = ${value}`));
+
+    getClients(city)
+        .map(clients => {
+            // some skip condition
+            if (clients.length == 0)
+                throw 0 /* default value */;
+
+            return clients;
+        })
+        .mergeMap(clients => {
+            console.log('>> mergeMap');
+            let salesObs = clients.map<Observable<number>>(client => getSales(client, article));
+            return Observable.merge(salesObs).mergeAll();
+        })
+        .reduce((sum, sales) => {
+            console.log('>> reduce');
+            return sum + sales;
+        }, 0)
+        .catch((err, caught) => {
+            console.log('>> catch');
+            // default value
+            return Observable.of(err);
+        })
+        .subscribe(value => console.log(`sum = ${value}`));
+}
+
+// http://stackoverflow.com/questions/44004144/how-to-wait-for-two-observables-in-rxjs
+export function waitTwo(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    function getName() {
+        return Observable.of('some name').delay(100);
+    }
+
+    function getDocument() {
+        return Observable.of('some document').delay(200);
+    }
+
+    // CASE1 : concurrent requests
+    Observable.zip(getName(), getDocument(), (name, document) => {
+        return `${name}-${document}`;
+    })
+        .subscribe(value => console.log(`concurrent: ${value}`));
+
+    // CASE2 : sequencial requests
+    getName().concat(getDocument())
+        .bufferCount(2)
+        .map(values => `${values[0]}-${values[1]}`)
+        .subscribe(value => console.log(`sequential: ${value}`));
+}
+
+export function countDown(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let button= buttonForTest('start', placeholder);
+    let start = Observable.fromEvent<MouseEvent>(button, 'click');
+
+    let duration = 10;
+
+    start
+        .switchMap(() => {
+            return Observable
+                .timer(0, 1000)
+                .take(duration + 1)
+        })
+        .map((value) => {
+            let remain = duration - value;
+            return 'Timer (second): ' + remain;
+        })
+        .subscribe(simpleObserver('countDown'));
+}
+
+// http://stackoverflow.com/questions/44033322/chaining-rx-interval-and-delay
+export function interval_delay(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let interval = Observable.interval(1000).take(10).startWith(-1);
+    let interval_delay = Observable.interval(1000).delay(1000).take(10).startWith(-2);
+
+    interval.subscribe(value       => console.log('interval         : ' + value));
+    interval_delay.subscribe(value => console.log('interval + delay : ' + value));
+}
+
+// http://stackoverflow.com/questions/44036533/queue-operator-for-rxjs
+export function window_queue(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    // let button= buttonForTest('fire', placeholder);
+    // let signal = Observable.fromEvent<MouseEvent>(button, 'click');
+
+    let signal = Observable.interval(1000).take(4);
+
+    let input = Observable.interval(300).take(10).share();
+
+    let output = input
+        .do(value => console.log(`input = ${value}`))
+        .window(signal)
+        .do(() => console.log(`*** signal : end OLD and start NEW subObservable`))
+        .mergeMap(subObservable => {
+            return subObservable.takeLast(100);
+        })
+        .share()
+
+    output.subscribe(value => console.log(`    output = ${value}`));
+
+    Observable.merge(input.mapTo(1), output.mapTo(-1))
+        .scan((count, diff) => {
+            return count + diff;
+        }, 0)
+        .subscribe(count => console.log(`            count = ${count}`));
+}
+
+// NOTICE: delay observable(not value) has the problems
+//         Observable can not be delayed.
+export function delayObservable(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.concat(Observable.interval(1000).take(10), Observable.empty().delay(3000));
+
+    source
+        .do(value => console.log(`source = ${value}`))
+        .window(Observable.interval(3000).do(value => console.log('***** signal')))
+        .do(value => console.log('>>> start concatAll dead zone'))
+        .delay(1000)
+        .do(value => console.log('<<< end concatAll dead zone'))
+        .concatAll()
+        .startWith(999)
+        .subscribe(simpleObserver('subscribe'));
+}
+
+export function completedWhileDelay(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(100).take(3);
+
+    source
+        .delay(1000)
+        .subscribe(simpleObserver('completed while long delay'));
+
+    source
+        .delay(1)
+        .subscribe(simpleObserver('completed while short delay'));
+}
+
+// RxJS: How to emit original values, then reduce upon completion?
+// http://stackoverflow.com/questions/44059390/rxjs-how-to-emit-original-values-then-reduce-upon-completion
+export function summary(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.range(1, 3).share();
+
+    let totalOb = source
+        .reduce((total, value) => total + value, 0);
+
+    source
+        .concat(totalOb)
+        .subscribe( value => console.log(`Next: ${value}`) );
+}
+
+export function summary2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.range(1, 3).share();
+
+    let totalOb = source
+        .reduce((total, value) => total + value, 0)
+        .mergeMap(total => Observable.throw(total));
+
+    source
+        .concat(totalOb)
+        .subscribe(
+            value => console.log(`Next: ${value}`),
+            value => console.log(`Total: ${value}`)
+        );
 }

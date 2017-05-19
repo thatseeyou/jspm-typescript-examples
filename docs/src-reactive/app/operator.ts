@@ -17,7 +17,7 @@ import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/delay';
 import 'rxjs/add/operator/timeInterval';
 import 'rxjs/add/operator/mergeMap'; // flatMap
-import 'rxjs/add/operator/mergeMapTo'; // flatMap
+import 'rxjs/add/operator/mergeMapTo'; 
 import 'rxjs/add/operator/concatMap'; 
 import 'rxjs/add/operator/concatMapTo'; 
 import 'rxjs/add/operator/merge'; 

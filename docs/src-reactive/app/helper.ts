@@ -26,6 +26,19 @@ export function inputForTest(label: string, parent?:HTMLElement) {
 export function simpleObserver<T>(prefix: string):Observer<T> {
     return {
         next: (value) => {
+            console.log(`${prefix}: NEXT: ${value}`)
+        },
+        error: (err) => {
+            console.log(`${prefix}: ERROR:`)
+            console.log(err)
+        },
+        complete: () => console.log(`${prefix}: Completed`)
+    }
+}
+
+export function simpleValueObserver<T>(prefix: string):Observer<T> {
+    return {
+        next: (value) => {
             console.log(`${prefix}: NEXT:`)
             console.log(value)
         },
