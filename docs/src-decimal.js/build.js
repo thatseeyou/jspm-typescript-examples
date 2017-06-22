@@ -225,12 +225,16 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
     exports.makeTestButtons = makeTestButtons;
     function makeTestButton(parent, text, action) {
         var _this = this;
+        // 1. make button
         var button = document.createElement('button');
         button.innerText = text;
         button.style.display = 'block';
+        // 2. make placeholder below button
         var placeholder = document.createElement('div');
+        // 3. append to parent
         parent.appendChild(button);
         parent.appendChild(placeholder);
+        // 4. listen click event 
         button.addEventListener('click', function (event) {
             action(_this, placeholder);
         });

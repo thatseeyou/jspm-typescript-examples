@@ -137,7 +137,7 @@ export function testPublish(testButton:HTMLButtonElement, placeholder:HTMLElemen
             console.log('do Called');
         })
         .publish()
-        .refCount();;
+        .refCount();
 
     buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 1'));
     buttonObservable.subscribe(simpleObserver('click from ConnectableObservable - 2'));

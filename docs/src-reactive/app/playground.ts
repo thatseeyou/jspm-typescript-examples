@@ -1,7 +1,11 @@
 import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 import { Map, fromJS } from 'immutable';
+import { ConnectableObservable } from 'rxjs/observable/ConnectableObservable';
 
 import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromEvent';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/observable/zip';
@@ -12,6 +16,7 @@ import 'rxjs/add/observable/empty';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mapTo';
 import 'rxjs/add/operator/mergeAll';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/do';
@@ -26,6 +31,7 @@ import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/bufferCount';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/takeLast';
+import 'rxjs/add/operator/publishReplay';
 
 import { simpleObserver, buttonForTest, inputForTest } from './helper';
 
@@ -528,4 +534,190 @@ export function summary2(testButton:HTMLButtonElement, placeholder:HTMLElement) 
             value => console.log(`Next: ${value}`),
             value => console.log(`Total: ${value}`)
         );
+}
+
+export function loadImage(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    var image = new Image();
+
+    Observable
+        .fromEvent(image, 'load')
+        .subscribe(simpleObserver('load'));
+
+    image.src = 'https://placehold.it/500x100';
+}
+
+export function loadImages(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let imagesDOM = placeholder;
+
+    var imageURLList = [
+        'https://placehold.it/500x100',
+        'https://placehold.it/500x200',
+        'https://placehold.it/500x300',
+        'https://placehold.it/500x400',
+        'https://placehold.it/500x500'
+    ];
+
+    Observable
+        .from(imageURLList)
+        .concatMap(function (imageURL) {
+            console.log(`imageURL = ${imageURL}`);
+            var image = new Image();
+
+            var loadedImageStream = Observable
+                .fromEvent(image, 'load')
+                .mapTo(image)
+                .take(1);
+
+            image.src = imageURL;
+
+            return loadedImageStream;
+        })
+        .subscribe(
+            image => { console.log('NEXT'); imagesDOM.appendChild(image)},
+            // image => console.log(`NEXT: `),
+            error => console.log(`ERROR : ${error}`),
+            () => console.log('Completed')
+        );
+        
+}
+
+export function loadImages2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let imageContainer = placeholder;
+
+    var imageURLList = [
+        'https://placehold.it/500x100',
+        'https://placehold.it/500x200',
+        'https://xplacehold.it/500x300',
+        'https://placehold.it/500x400',
+        'https://placehold.it/500x500'
+    ];
+
+    Observable
+        .from(imageURLList)
+        .do(() => {
+            imageContainer.appendChild(new Image() /* placeholder */); 
+        })
+        .mergeMap<string, [HTMLImageElement, number]>((imageURL, index) => {
+            let image = new Image();
+
+            var loadedImageStream = Observable
+                .fromEvent(image, 'load')
+                .mapTo([image, index])
+                .take(1);
+
+            image.src = imageURL;
+            return loadedImageStream;
+        })
+        .subscribe(([image, index]) =>{
+            imageContainer.replaceChild(image, imageContainer.childNodes[index]);
+        })
+}
+
+// https://stackoverflow.com/questions/44195200/is-it-possible-to-use-observables-in-a-way-where-i-can-constant-feedback
+export function progress(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    interface Route {
+        length: number;
+    }
+
+    let routeSubject = new Subject<Route>();
+
+    function update(route:Route) {
+        routeSubject.next(route);
+    }
+
+    function doThing(route:Route) {
+        route.length++;
+    }
+
+    function calculateBestRoute(observable: Observable<Route>) {
+        let bestRoute:Route = { length: 0};
+
+        doThing(bestRoute);
+        update(bestRoute);
+        doThing(bestRoute);
+        update(bestRoute);
+        doThing(bestRoute);
+        update(bestRoute);
+        doThing(bestRoute);
+        update(bestRoute);
+    }
+
+    routeSubject.subscribe(value => console.log(`updated: ${value.length}`));
+    calculateBestRoute(routeSubject); 
+}
+
+// https://stackoverflow.com/questions/44230511/how-to-pipe-observables
+export function validateWithCatch(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.of(1,2,3);
+
+    source
+        .mergeMap(value => {
+            if (value > 1) {  // condition
+                return Observable.throw(`Out Of Condifition: ${value}`);
+            }
+            return Observable.of(value);
+        })
+        .subscribe(
+            value => console.log(`Next: ${value}`),
+            error => console.log(`Error: ${error}`),
+            () => console.log('completed')
+        );
+}
+
+// https://stackoverflow.com/questions/44230511/how-to-pipe-observables
+export function validateWithError(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    const stdout = 1;
+    const stderr = 2;
+    let source = Observable.of(1,2,3);
+
+    source
+        .map(value => {
+            if (value > 1) {  // condition
+                return [stderr, value];
+            }
+            return [stdout, value];
+        })
+        .subscribe(channel_value => {
+            let channel = channel_value[0];
+            let value = channel_value[1];
+
+            if (channel == stdout) {
+                console.log(`stdout: ${value}`);
+            }
+            else if (channel == stderr) {
+                console.log(`stderr: ${value}`);
+            }
+        });
+}
+
+// https://stackoverflow.com/questions/41364814/how-to-loop-in-rxjs-v5
+export function requestLoop(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    interface RSP {
+        header:string;
+        value:string;
+    };
+
+    function requestMaker(numChunk:number) {
+        return () => {
+            numChunk > 0 ? numChunk-- : 0;
+            return Observable.of(numChunk > 0 ? ['CONT', 'value'] : ['END', 'value']).delay(300);
+        }
+    }
+
+    let simulateRequest = requestMaker(5);
+
+    simulateRequest()
+        .expand(([header, value]) => {
+            if (header == 'CONT') {
+                return simulateRequest();
+            }
+            else {
+                return Observable.empty();
+            }
+        })
+        .subscribe(
+            ([header, value]) => console.log(`NEXT: ${header}-${value}`),
+            error => console.log(`ERROR: ${error}`),
+            () => console.log('completed')
+        )
 }

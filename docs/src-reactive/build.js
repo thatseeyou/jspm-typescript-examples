@@ -224,12 +224,16 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
     exports.makeTestButtons = makeTestButtons;
     function makeTestButton(parent, text, action) {
         var _this = this;
+        // 1. make button
         var button = document.createElement('button');
         button.innerText = text;
         button.style.display = 'block';
+        // 2. make placeholder below button
         var placeholder = document.createElement('div');
+        // 3. append to parent
         parent.appendChild(button);
         parent.appendChild(placeholder);
+        // 4. listen click event 
         button.addEventListener('click', function (event) {
             action(_this, placeholder);
         });
@@ -477,191 +481,6 @@ System.registerDynamic("src-reactive/app/creating.js", ["npm:rxjs@5.2.0/Observab
     }
     exports.testDefer = testDefer;
 });
-System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueAction.js", ["npm:rxjs@5.2.0/scheduler/AsyncAction.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var AsyncAction_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncAction.js");
-  var QueueAction = function (_super) {
-    __extends(QueueAction, _super);
-    function QueueAction(scheduler, work) {
-      _super.call(this, scheduler, work);
-      this.scheduler = scheduler;
-      this.work = work;
-    }
-    QueueAction.prototype.schedule = function (state, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      if (delay > 0) {
-        return _super.prototype.schedule.call(this, state, delay);
-      }
-      this.delay = delay;
-      this.state = state;
-      this.scheduler.flush(this);
-      return this;
-    };
-    QueueAction.prototype.execute = function (state, delay) {
-      return delay > 0 || this.closed ? _super.prototype.execute.call(this, state, delay) : this._execute(state, delay);
-    };
-    QueueAction.prototype.requestAsyncId = function (scheduler, id, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      if (delay !== null && delay > 0 || delay === null && this.delay > 0) {
-        return _super.prototype.requestAsyncId.call(this, scheduler, id, delay);
-      }
-      return scheduler.flush(this);
-    };
-    return QueueAction;
-  }(AsyncAction_1.AsyncAction);
-  exports.QueueAction = QueueAction;
-});
-System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueScheduler.js", ["npm:rxjs@5.2.0/scheduler/AsyncScheduler.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var AsyncScheduler_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncScheduler.js");
-  var QueueScheduler = function (_super) {
-    __extends(QueueScheduler, _super);
-    function QueueScheduler() {
-      _super.apply(this, arguments);
-    }
-    return QueueScheduler;
-  }(AsyncScheduler_1.AsyncScheduler);
-  exports.QueueScheduler = QueueScheduler;
-});
-System.registerDynamic('npm:rxjs@5.2.0/scheduler/queue.js', ['npm:rxjs@5.2.0/scheduler/QueueAction.js', 'npm:rxjs@5.2.0/scheduler/QueueScheduler.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var QueueAction_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueAction.js');
-  var QueueScheduler_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueScheduler.js');
-  exports.queue = new QueueScheduler_1.QueueScheduler(QueueAction_1.QueueAction);
-});
-System.registerDynamic('npm:rxjs@5.2.0/ReplaySubject.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/scheduler/queue.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
-  var queue_1 = $__require('npm:rxjs@5.2.0/scheduler/queue.js');
-  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
-  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
-  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
-  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
-  var ReplaySubject = function (_super) {
-    __extends(ReplaySubject, _super);
-    function ReplaySubject(bufferSize, windowTime, scheduler) {
-      if (bufferSize === void 0) {
-        bufferSize = Number.POSITIVE_INFINITY;
-      }
-      if (windowTime === void 0) {
-        windowTime = Number.POSITIVE_INFINITY;
-      }
-      _super.call(this);
-      this.scheduler = scheduler;
-      this._events = [];
-      this._bufferSize = bufferSize < 1 ? 1 : bufferSize;
-      this._windowTime = windowTime < 1 ? 1 : windowTime;
-    }
-    ReplaySubject.prototype.next = function (value) {
-      var now = this._getNow();
-      this._events.push(new ReplayEvent(now, value));
-      this._trimBufferThenGetEvents();
-      _super.prototype.next.call(this, value);
-    };
-    ReplaySubject.prototype._subscribe = function (subscriber) {
-      var _events = this._trimBufferThenGetEvents();
-      var scheduler = this.scheduler;
-      var subscription;
-      if (this.closed) {
-        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
-      } else if (this.hasError) {
-        subscription = Subscription_1.Subscription.EMPTY;
-      } else if (this.isStopped) {
-        subscription = Subscription_1.Subscription.EMPTY;
-      } else {
-        this.observers.push(subscriber);
-        subscription = new SubjectSubscription_1.SubjectSubscription(this, subscriber);
-      }
-      if (scheduler) {
-        subscriber.add(subscriber = new observeOn_1.ObserveOnSubscriber(subscriber, scheduler));
-      }
-      var len = _events.length;
-      for (var i = 0; i < len && !subscriber.closed; i++) {
-        subscriber.next(_events[i].value);
-      }
-      if (this.hasError) {
-        subscriber.error(this.thrownError);
-      } else if (this.isStopped) {
-        subscriber.complete();
-      }
-      return subscription;
-    };
-    ReplaySubject.prototype._getNow = function () {
-      return (this.scheduler || queue_1.queue).now();
-    };
-    ReplaySubject.prototype._trimBufferThenGetEvents = function () {
-      var now = this._getNow();
-      var _bufferSize = this._bufferSize;
-      var _windowTime = this._windowTime;
-      var _events = this._events;
-      var eventsCount = _events.length;
-      var spliceCount = 0;
-      while (spliceCount < eventsCount) {
-        if (now - _events[spliceCount].time < _windowTime) {
-          break;
-        }
-        spliceCount++;
-      }
-      if (eventsCount > _bufferSize) {
-        spliceCount = Math.max(spliceCount, eventsCount - _bufferSize);
-      }
-      if (spliceCount > 0) {
-        _events.splice(0, spliceCount);
-      }
-      return _events;
-    };
-    return ReplaySubject;
-  }(Subject_1.Subject);
-  exports.ReplaySubject = ReplaySubject;
-  var ReplayEvent = function () {
-    function ReplayEvent(time, value) {
-      this.time = time;
-      this.value = value;
-    }
-    return ReplayEvent;
-  }();
-});
 System.registerDynamic('npm:rxjs@5.2.0/operator/timestamp.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/scheduler/async.js'], true, function ($__require, exports, module) {
   /* */
   "use strict";
@@ -907,428 +726,10 @@ System.registerDynamic("src-reactive/app/subject.js", ["npm:rxjs@5.2.0/Observabl
         var buttonObservable = Observable_1.Observable.fromEvent(button, 'click').take(2).do(function (value) {
             console.log('do Called');
         }).publish().refCount();
-        ;
         buttonObservable.subscribe(helper_1.simpleObserver('click from ConnectableObservable - 1'));
         buttonObservable.subscribe(helper_1.simpleObserver('click from ConnectableObservable - 2'));
     }
     exports.testPublish = testPublish;
-});
-System.registerDynamic('npm:rxjs@5.2.0/observable/IteratorObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/symbol/iterator.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
-  var IteratorObservable = function (_super) {
-    __extends(IteratorObservable, _super);
-    function IteratorObservable(iterator, scheduler) {
-      _super.call(this);
-      this.scheduler = scheduler;
-      if (iterator == null) {
-        throw new Error('iterator cannot be null.');
-      }
-      this.iterator = getIterator(iterator);
-    }
-    IteratorObservable.create = function (iterator, scheduler) {
-      return new IteratorObservable(iterator, scheduler);
-    };
-    IteratorObservable.dispatch = function (state) {
-      var index = state.index,
-          hasError = state.hasError,
-          iterator = state.iterator,
-          subscriber = state.subscriber;
-      if (hasError) {
-        subscriber.error(state.error);
-        return;
-      }
-      var result = iterator.next();
-      if (result.done) {
-        subscriber.complete();
-        return;
-      }
-      subscriber.next(result.value);
-      state.index = index + 1;
-      if (subscriber.closed) {
-        if (typeof iterator.return === 'function') {
-          iterator.return();
-        }
-        return;
-      }
-      this.schedule(state);
-    };
-    IteratorObservable.prototype._subscribe = function (subscriber) {
-      var index = 0;
-      var _a = this,
-          iterator = _a.iterator,
-          scheduler = _a.scheduler;
-      if (scheduler) {
-        return scheduler.schedule(IteratorObservable.dispatch, 0, {
-          index: index,
-          iterator: iterator,
-          subscriber: subscriber
-        });
-      } else {
-        do {
-          var result = iterator.next();
-          if (result.done) {
-            subscriber.complete();
-            break;
-          } else {
-            subscriber.next(result.value);
-          }
-          if (subscriber.closed) {
-            if (typeof iterator.return === 'function') {
-              iterator.return();
-            }
-            break;
-          }
-        } while (true);
-      }
-    };
-    return IteratorObservable;
-  }(Observable_1.Observable);
-  exports.IteratorObservable = IteratorObservable;
-  var StringIterator = function () {
-    function StringIterator(str, idx, len) {
-      if (idx === void 0) {
-        idx = 0;
-      }
-      if (len === void 0) {
-        len = str.length;
-      }
-      this.str = str;
-      this.idx = idx;
-      this.len = len;
-    }
-    StringIterator.prototype[iterator_1.$$iterator] = function () {
-      return this;
-    };
-    StringIterator.prototype.next = function () {
-      return this.idx < this.len ? {
-        done: false,
-        value: this.str.charAt(this.idx++)
-      } : {
-        done: true,
-        value: undefined
-      };
-    };
-    return StringIterator;
-  }();
-  var ArrayIterator = function () {
-    function ArrayIterator(arr, idx, len) {
-      if (idx === void 0) {
-        idx = 0;
-      }
-      if (len === void 0) {
-        len = toLength(arr);
-      }
-      this.arr = arr;
-      this.idx = idx;
-      this.len = len;
-    }
-    ArrayIterator.prototype[iterator_1.$$iterator] = function () {
-      return this;
-    };
-    ArrayIterator.prototype.next = function () {
-      return this.idx < this.len ? {
-        done: false,
-        value: this.arr[this.idx++]
-      } : {
-        done: true,
-        value: undefined
-      };
-    };
-    return ArrayIterator;
-  }();
-  function getIterator(obj) {
-    var i = obj[iterator_1.$$iterator];
-    if (!i && typeof obj === 'string') {
-      return new StringIterator(obj);
-    }
-    if (!i && obj.length !== undefined) {
-      return new ArrayIterator(obj);
-    }
-    if (!i) {
-      throw new TypeError('object is not iterable');
-    }
-    return obj[iterator_1.$$iterator]();
-  }
-  var maxSafeInteger = Math.pow(2, 53) - 1;
-  function toLength(o) {
-    var len = +o.length;
-    if (isNaN(len)) {
-      return 0;
-    }
-    if (len === 0 || !numberIsFinite(len)) {
-      return len;
-    }
-    len = sign(len) * Math.floor(Math.abs(len));
-    if (len <= 0) {
-      return 0;
-    }
-    if (len > maxSafeInteger) {
-      return maxSafeInteger;
-    }
-    return len;
-  }
-  function numberIsFinite(value) {
-    return typeof value === 'number' && root_1.root.isFinite(value);
-  }
-  function sign(value) {
-    var valueAsNumber = +value;
-    if (valueAsNumber === 0) {
-      return valueAsNumber;
-    }
-    if (isNaN(valueAsNumber)) {
-      return valueAsNumber;
-    }
-    return valueAsNumber < 0 ? -1 : 1;
-  }
-});
-System.registerDynamic('npm:rxjs@5.2.0/observable/ArrayLikeObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/ScalarObservable.js', 'npm:rxjs@5.2.0/observable/EmptyObservable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var ScalarObservable_1 = $__require('npm:rxjs@5.2.0/observable/ScalarObservable.js');
-  var EmptyObservable_1 = $__require('npm:rxjs@5.2.0/observable/EmptyObservable.js');
-  var ArrayLikeObservable = function (_super) {
-    __extends(ArrayLikeObservable, _super);
-    function ArrayLikeObservable(arrayLike, scheduler) {
-      _super.call(this);
-      this.arrayLike = arrayLike;
-      this.scheduler = scheduler;
-      if (!scheduler && arrayLike.length === 1) {
-        this._isScalar = true;
-        this.value = arrayLike[0];
-      }
-    }
-    ArrayLikeObservable.create = function (arrayLike, scheduler) {
-      var length = arrayLike.length;
-      if (length === 0) {
-        return new EmptyObservable_1.EmptyObservable();
-      } else if (length === 1) {
-        return new ScalarObservable_1.ScalarObservable(arrayLike[0], scheduler);
-      } else {
-        return new ArrayLikeObservable(arrayLike, scheduler);
-      }
-    };
-    ArrayLikeObservable.dispatch = function (state) {
-      var arrayLike = state.arrayLike,
-          index = state.index,
-          length = state.length,
-          subscriber = state.subscriber;
-      if (subscriber.closed) {
-        return;
-      }
-      if (index >= length) {
-        subscriber.complete();
-        return;
-      }
-      subscriber.next(arrayLike[index]);
-      state.index = index + 1;
-      this.schedule(state);
-    };
-    ArrayLikeObservable.prototype._subscribe = function (subscriber) {
-      var index = 0;
-      var _a = this,
-          arrayLike = _a.arrayLike,
-          scheduler = _a.scheduler;
-      var length = arrayLike.length;
-      if (scheduler) {
-        return scheduler.schedule(ArrayLikeObservable.dispatch, 0, {
-          arrayLike: arrayLike,
-          index: index,
-          length: length,
-          subscriber: subscriber
-        });
-      } else {
-        for (var i = 0; i < length && !subscriber.closed; i++) {
-          subscriber.next(arrayLike[i]);
-        }
-        subscriber.complete();
-      }
-    };
-    return ArrayLikeObservable;
-  }(Observable_1.Observable);
-  exports.ArrayLikeObservable = ArrayLikeObservable;
-});
-System.registerDynamic('npm:rxjs@5.2.0/operator/observeOn.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Notification.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
-  var Notification_1 = $__require('npm:rxjs@5.2.0/Notification.js');
-  function observeOn(scheduler, delay) {
-    if (delay === void 0) {
-      delay = 0;
-    }
-    return this.lift(new ObserveOnOperator(scheduler, delay));
-  }
-  exports.observeOn = observeOn;
-  var ObserveOnOperator = function () {
-    function ObserveOnOperator(scheduler, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      this.scheduler = scheduler;
-      this.delay = delay;
-    }
-    ObserveOnOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new ObserveOnSubscriber(subscriber, this.scheduler, this.delay));
-    };
-    return ObserveOnOperator;
-  }();
-  exports.ObserveOnOperator = ObserveOnOperator;
-  var ObserveOnSubscriber = function (_super) {
-    __extends(ObserveOnSubscriber, _super);
-    function ObserveOnSubscriber(destination, scheduler, delay) {
-      if (delay === void 0) {
-        delay = 0;
-      }
-      _super.call(this, destination);
-      this.scheduler = scheduler;
-      this.delay = delay;
-    }
-    ObserveOnSubscriber.dispatch = function (arg) {
-      var notification = arg.notification,
-          destination = arg.destination;
-      notification.observe(destination);
-      this.unsubscribe();
-    };
-    ObserveOnSubscriber.prototype.scheduleMessage = function (notification) {
-      this.add(this.scheduler.schedule(ObserveOnSubscriber.dispatch, this.delay, new ObserveOnMessage(notification, this.destination)));
-    };
-    ObserveOnSubscriber.prototype._next = function (value) {
-      this.scheduleMessage(Notification_1.Notification.createNext(value));
-    };
-    ObserveOnSubscriber.prototype._error = function (err) {
-      this.scheduleMessage(Notification_1.Notification.createError(err));
-    };
-    ObserveOnSubscriber.prototype._complete = function () {
-      this.scheduleMessage(Notification_1.Notification.createComplete());
-    };
-    return ObserveOnSubscriber;
-  }(Subscriber_1.Subscriber);
-  exports.ObserveOnSubscriber = ObserveOnSubscriber;
-  var ObserveOnMessage = function () {
-    function ObserveOnMessage(notification, destination) {
-      this.notification = notification;
-      this.destination = destination;
-    }
-    return ObserveOnMessage;
-  }();
-  exports.ObserveOnMessage = ObserveOnMessage;
-});
-System.registerDynamic('npm:rxjs@5.2.0/observable/FromObservable.js', ['npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/util/isArrayLike.js', 'npm:rxjs@5.2.0/util/isPromise.js', 'npm:rxjs@5.2.0/observable/PromiseObservable.js', 'npm:rxjs@5.2.0/observable/IteratorObservable.js', 'npm:rxjs@5.2.0/observable/ArrayObservable.js', 'npm:rxjs@5.2.0/observable/ArrayLikeObservable.js', 'npm:rxjs@5.2.0/symbol/iterator.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
-  var isArrayLike_1 = $__require('npm:rxjs@5.2.0/util/isArrayLike.js');
-  var isPromise_1 = $__require('npm:rxjs@5.2.0/util/isPromise.js');
-  var PromiseObservable_1 = $__require('npm:rxjs@5.2.0/observable/PromiseObservable.js');
-  var IteratorObservable_1 = $__require('npm:rxjs@5.2.0/observable/IteratorObservable.js');
-  var ArrayObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayObservable.js');
-  var ArrayLikeObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayLikeObservable.js');
-  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
-  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
-  var FromObservable = function (_super) {
-    __extends(FromObservable, _super);
-    function FromObservable(ish, scheduler) {
-      _super.call(this, null);
-      this.ish = ish;
-      this.scheduler = scheduler;
-    }
-    FromObservable.create = function (ish, scheduler) {
-      if (ish != null) {
-        if (typeof ish[observable_1.$$observable] === 'function') {
-          if (ish instanceof Observable_1.Observable && !scheduler) {
-            return ish;
-          }
-          return new FromObservable(ish, scheduler);
-        } else if (isArray_1.isArray(ish)) {
-          return new ArrayObservable_1.ArrayObservable(ish, scheduler);
-        } else if (isPromise_1.isPromise(ish)) {
-          return new PromiseObservable_1.PromiseObservable(ish, scheduler);
-        } else if (typeof ish[iterator_1.$$iterator] === 'function' || typeof ish === 'string') {
-          return new IteratorObservable_1.IteratorObservable(ish, scheduler);
-        } else if (isArrayLike_1.isArrayLike(ish)) {
-          return new ArrayLikeObservable_1.ArrayLikeObservable(ish, scheduler);
-        }
-      }
-      throw new TypeError((ish !== null && typeof ish || ish) + ' is not observable');
-    };
-    FromObservable.prototype._subscribe = function (subscriber) {
-      var ish = this.ish;
-      var scheduler = this.scheduler;
-      if (scheduler == null) {
-        return ish[observable_1.$$observable]().subscribe(subscriber);
-      } else {
-        return ish[observable_1.$$observable]().subscribe(new observeOn_1.ObserveOnSubscriber(subscriber, scheduler, 0));
-      }
-    };
-    return FromObservable;
-  }(Observable_1.Observable);
-  exports.FromObservable = FromObservable;
-});
-System.registerDynamic("npm:rxjs@5.2.0/observable/from.js", ["npm:rxjs@5.2.0/observable/FromObservable.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var FromObservable_1 = $__require("npm:rxjs@5.2.0/observable/FromObservable.js");
-  exports.from = FromObservable_1.FromObservable.create;
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/observable/from.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/from.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var from_1 = $__require('npm:rxjs@5.2.0/observable/from.js');
-  Observable_1.Observable.from = from_1.from;
 });
 System.registerDynamic("src-reactive/app/converting.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/observable/from.js"], true, function ($__require, exports, module) {
     "use strict";
@@ -2148,55 +1549,6 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/partition.js', ['npm:rxjs@5.
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var partition_1 = $__require('npm:rxjs@5.2.0/operator/partition.js');
   Observable_1.Observable.prototype.partition = partition_1.partition;
-});
-System.registerDynamic("npm:rxjs@5.2.0/operator/mapTo.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var __extends = this && this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() {
-      this.constructor = d;
-    }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-  };
-  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
-  function mapTo(value) {
-    return this.lift(new MapToOperator(value));
-  }
-  exports.mapTo = mapTo;
-  var MapToOperator = function () {
-    function MapToOperator(value) {
-      this.value = value;
-    }
-    MapToOperator.prototype.call = function (subscriber, source) {
-      return source.subscribe(new MapToSubscriber(subscriber, this.value));
-    };
-    return MapToOperator;
-  }();
-  var MapToSubscriber = function (_super) {
-    __extends(MapToSubscriber, _super);
-    function MapToSubscriber(destination, value) {
-      _super.call(this, destination);
-      this.value = value;
-    }
-    MapToSubscriber.prototype._next = function (x) {
-      this.destination.next(this.value);
-    };
-    return MapToSubscriber;
-  }(Subscriber_1.Subscriber);
-});
-System.registerDynamic('npm:rxjs@5.2.0/add/operator/mapTo.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mapTo.js'], true, function ($__require, exports, module) {
-  /* */
-  "use strict";
-
-  var global = this || self,
-      GLOBAL = global;
-  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
-  var mapTo_1 = $__require('npm:rxjs@5.2.0/operator/mapTo.js');
-  Observable_1.Observable.prototype.mapTo = mapTo_1.mapTo;
 });
 System.registerDynamic('npm:rxjs@5.2.0/operator/expand.js', ['npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/OuterSubscriber.js', 'npm:rxjs@5.2.0/util/subscribeToResult.js'], true, function ($__require, exports, module) {
   /* */
@@ -3897,7 +3249,36 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/timeoutWith.js', ['npm:rxjs@
   var timeoutWith_1 = $__require('npm:rxjs@5.2.0/operator/timeoutWith.js');
   Observable_1.Observable.prototype.timeoutWith = timeoutWith_1.timeoutWith;
 });
-System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper.js", "npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/timer.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/observable/throw.js", "npm:rxjs@5.2.0/add/observable/concat.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/timeInterval.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/mergeMapTo.js", "npm:rxjs@5.2.0/add/operator/concatMap.js", "npm:rxjs@5.2.0/add/operator/concatMapTo.js", "npm:rxjs@5.2.0/add/operator/merge.js", "npm:rxjs@5.2.0/add/operator/buffer.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/bufferWhen.js", "npm:rxjs@5.2.0/add/operator/bufferToggle.js", "npm:rxjs@5.2.0/add/operator/pairwise.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/partition.js", "npm:rxjs@5.2.0/add/operator/mapTo.js", "npm:rxjs@5.2.0/add/operator/expand.js", "npm:rxjs@5.2.0/add/operator/combineLatest.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/audit.js", "npm:rxjs@5.2.0/add/operator/debounce.js", "npm:rxjs@5.2.0/add/operator/sample.js", "npm:rxjs@5.2.0/add/operator/delayWhen.js", "npm:rxjs@5.2.0/add/operator/distinct.js", "npm:rxjs@5.2.0/add/operator/repeat.js", "npm:rxjs@5.2.0/add/operator/repeatWhen.js", "npm:rxjs@5.2.0/add/operator/multicast.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/windowCount.js", "npm:rxjs@5.2.0/add/operator/windowWhen.js", "npm:rxjs@5.2.0/add/operator/groupBy.js", "npm:rxjs@5.2.0/add/operator/isEmpty.js", "npm:rxjs@5.2.0/add/operator/ignoreElements.js", "npm:rxjs@5.2.0/add/operator/single.js", "npm:rxjs@5.2.0/add/operator/race.js", "npm:rxjs@5.2.0/add/operator/timeoutWith.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:rxjs@5.2.0/operator/let.js", [], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+  /**
+   * @param func
+   * @return {Observable<R>}
+   * @method let
+   * @owner Observable
+   */
+
+  var global = this || self,
+      GLOBAL = global;
+  function letProto(func) {
+    return func(this);
+  }
+  exports.letProto = letProto;
+  
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/let.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/let.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var let_1 = $__require('npm:rxjs@5.2.0/operator/let.js');
+  Observable_1.Observable.prototype.let = let_1.letProto;
+  Observable_1.Observable.prototype.letBind = let_1.letProto;
+});
+System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper.js", "npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/timer.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/observable/throw.js", "npm:rxjs@5.2.0/add/observable/concat.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/timeInterval.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/mergeMapTo.js", "npm:rxjs@5.2.0/add/operator/concatMap.js", "npm:rxjs@5.2.0/add/operator/concatMapTo.js", "npm:rxjs@5.2.0/add/operator/merge.js", "npm:rxjs@5.2.0/add/operator/buffer.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/bufferWhen.js", "npm:rxjs@5.2.0/add/operator/bufferToggle.js", "npm:rxjs@5.2.0/add/operator/pairwise.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/partition.js", "npm:rxjs@5.2.0/add/operator/mapTo.js", "npm:rxjs@5.2.0/add/operator/expand.js", "npm:rxjs@5.2.0/add/operator/combineLatest.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/audit.js", "npm:rxjs@5.2.0/add/operator/debounce.js", "npm:rxjs@5.2.0/add/operator/sample.js", "npm:rxjs@5.2.0/add/operator/delayWhen.js", "npm:rxjs@5.2.0/add/operator/distinct.js", "npm:rxjs@5.2.0/add/operator/repeat.js", "npm:rxjs@5.2.0/add/operator/repeatWhen.js", "npm:rxjs@5.2.0/add/operator/multicast.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/windowCount.js", "npm:rxjs@5.2.0/add/operator/windowWhen.js", "npm:rxjs@5.2.0/add/operator/groupBy.js", "npm:rxjs@5.2.0/add/operator/isEmpty.js", "npm:rxjs@5.2.0/add/operator/ignoreElements.js", "npm:rxjs@5.2.0/add/operator/single.js", "npm:rxjs@5.2.0/add/operator/race.js", "npm:rxjs@5.2.0/add/operator/timeoutWith.js", "npm:rxjs@5.2.0/add/operator/let.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -3948,6 +3329,7 @@ System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper
     $__require("npm:rxjs@5.2.0/add/operator/single.js");
     $__require("npm:rxjs@5.2.0/add/operator/race.js");
     $__require("npm:rxjs@5.2.0/add/operator/timeoutWith.js");
+    $__require("npm:rxjs@5.2.0/add/operator/let.js");
     function testPluck(testButton, placeholder) {
         Observable_1.Observable.from([{ name: { first: 'jaein', last: 'moon' } }, { name: { first: 'cheolsu', last: 'ahn' } }, { name: { first: 'sangjeong', last: 'shim' } }]).pluck('name', 'first').subscribe(helper_1.simpleObserver('pluck'));
     }
@@ -4004,6 +3386,22 @@ System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper
         });
     }
     exports.testExpand = testExpand;
+    function testExpand2(testButton, placeholder) {
+        var source = Observable_1.Observable.of(1, 2, 3);
+        /* repeat 3 times */
+        source.map(function (value) {
+            return [value * 2, 1];
+        }).expand(function (_a) {
+            var value = _a[0],
+                countPerSource = _a[1];
+            return countPerSource < 3 /* post condition after next */ ? Observable_1.Observable.of([value, countPerSource + 1]) : Observable_1.Observable.empty();
+        }).map(function (_a) {
+            var value = _a[0],
+                indexPerSource = _a[1];
+            return value;
+        }).subscribe(helper_1.simpleObserver('sub'));
+    }
+    exports.testExpand2 = testExpand2;
     function testMerge(testButton, placeholder) {
         var key1Button = helper_1.buttonForTest('1', placeholder);
         var key1 = Observable_1.Observable.fromEvent(key1Button, 'click').mapTo(1);
@@ -4267,6 +3665,20 @@ System.registerDynamic("src-reactive/app/operator.js", ["src-reactive/app/helper
         merge.subscribe(helper_1.simpleObserver('repeat2'));
     }
     exports.testRepeat2 = testRepeat2;
+    function testLet(testButton, placeholder) {
+        var obs = Observable_1.Observable.interval(1000).take(3);
+        var source = obs.let(function (ob) {
+            return ob.concat(ob);
+        });
+        var source2 = Observable_1.Observable.of(obs).concatMap(function (ob) {
+            return ob.concat(ob);
+        });
+        source.subscribe(helper_1.simpleObserver('subscriber1'));
+        source.subscribe(helper_1.simpleObserver('subscriber2'));
+        source2.subscribe(helper_1.simpleObserver('subscriber3'));
+        source2.subscribe(helper_1.simpleObserver('subscriber4'));
+    }
+    exports.testLet = testLet;
 });
 System.registerDynamic("npm:rxjs@5.2.0/operator/filter.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
   /* */
@@ -5087,6 +4499,347 @@ System.registerDynamic('npm:rxjs@5.2.0/add/observable/of.js', ['npm:rxjs@5.2.0/O
   var of_1 = $__require('npm:rxjs@5.2.0/observable/of.js');
   Observable_1.Observable.of = of_1.of;
 });
+System.registerDynamic('npm:rxjs@5.2.0/observable/IteratorObservable.js', ['npm:rxjs@5.2.0/util/root.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/symbol/iterator.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var root_1 = $__require('npm:rxjs@5.2.0/util/root.js');
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
+  var IteratorObservable = function (_super) {
+    __extends(IteratorObservable, _super);
+    function IteratorObservable(iterator, scheduler) {
+      _super.call(this);
+      this.scheduler = scheduler;
+      if (iterator == null) {
+        throw new Error('iterator cannot be null.');
+      }
+      this.iterator = getIterator(iterator);
+    }
+    IteratorObservable.create = function (iterator, scheduler) {
+      return new IteratorObservable(iterator, scheduler);
+    };
+    IteratorObservable.dispatch = function (state) {
+      var index = state.index,
+          hasError = state.hasError,
+          iterator = state.iterator,
+          subscriber = state.subscriber;
+      if (hasError) {
+        subscriber.error(state.error);
+        return;
+      }
+      var result = iterator.next();
+      if (result.done) {
+        subscriber.complete();
+        return;
+      }
+      subscriber.next(result.value);
+      state.index = index + 1;
+      if (subscriber.closed) {
+        if (typeof iterator.return === 'function') {
+          iterator.return();
+        }
+        return;
+      }
+      this.schedule(state);
+    };
+    IteratorObservable.prototype._subscribe = function (subscriber) {
+      var index = 0;
+      var _a = this,
+          iterator = _a.iterator,
+          scheduler = _a.scheduler;
+      if (scheduler) {
+        return scheduler.schedule(IteratorObservable.dispatch, 0, {
+          index: index,
+          iterator: iterator,
+          subscriber: subscriber
+        });
+      } else {
+        do {
+          var result = iterator.next();
+          if (result.done) {
+            subscriber.complete();
+            break;
+          } else {
+            subscriber.next(result.value);
+          }
+          if (subscriber.closed) {
+            if (typeof iterator.return === 'function') {
+              iterator.return();
+            }
+            break;
+          }
+        } while (true);
+      }
+    };
+    return IteratorObservable;
+  }(Observable_1.Observable);
+  exports.IteratorObservable = IteratorObservable;
+  var StringIterator = function () {
+    function StringIterator(str, idx, len) {
+      if (idx === void 0) {
+        idx = 0;
+      }
+      if (len === void 0) {
+        len = str.length;
+      }
+      this.str = str;
+      this.idx = idx;
+      this.len = len;
+    }
+    StringIterator.prototype[iterator_1.$$iterator] = function () {
+      return this;
+    };
+    StringIterator.prototype.next = function () {
+      return this.idx < this.len ? {
+        done: false,
+        value: this.str.charAt(this.idx++)
+      } : {
+        done: true,
+        value: undefined
+      };
+    };
+    return StringIterator;
+  }();
+  var ArrayIterator = function () {
+    function ArrayIterator(arr, idx, len) {
+      if (idx === void 0) {
+        idx = 0;
+      }
+      if (len === void 0) {
+        len = toLength(arr);
+      }
+      this.arr = arr;
+      this.idx = idx;
+      this.len = len;
+    }
+    ArrayIterator.prototype[iterator_1.$$iterator] = function () {
+      return this;
+    };
+    ArrayIterator.prototype.next = function () {
+      return this.idx < this.len ? {
+        done: false,
+        value: this.arr[this.idx++]
+      } : {
+        done: true,
+        value: undefined
+      };
+    };
+    return ArrayIterator;
+  }();
+  function getIterator(obj) {
+    var i = obj[iterator_1.$$iterator];
+    if (!i && typeof obj === 'string') {
+      return new StringIterator(obj);
+    }
+    if (!i && obj.length !== undefined) {
+      return new ArrayIterator(obj);
+    }
+    if (!i) {
+      throw new TypeError('object is not iterable');
+    }
+    return obj[iterator_1.$$iterator]();
+  }
+  var maxSafeInteger = Math.pow(2, 53) - 1;
+  function toLength(o) {
+    var len = +o.length;
+    if (isNaN(len)) {
+      return 0;
+    }
+    if (len === 0 || !numberIsFinite(len)) {
+      return len;
+    }
+    len = sign(len) * Math.floor(Math.abs(len));
+    if (len <= 0) {
+      return 0;
+    }
+    if (len > maxSafeInteger) {
+      return maxSafeInteger;
+    }
+    return len;
+  }
+  function numberIsFinite(value) {
+    return typeof value === 'number' && root_1.root.isFinite(value);
+  }
+  function sign(value) {
+    var valueAsNumber = +value;
+    if (valueAsNumber === 0) {
+      return valueAsNumber;
+    }
+    if (isNaN(valueAsNumber)) {
+      return valueAsNumber;
+    }
+    return valueAsNumber < 0 ? -1 : 1;
+  }
+});
+System.registerDynamic('npm:rxjs@5.2.0/observable/ArrayLikeObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/ScalarObservable.js', 'npm:rxjs@5.2.0/observable/EmptyObservable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var ScalarObservable_1 = $__require('npm:rxjs@5.2.0/observable/ScalarObservable.js');
+  var EmptyObservable_1 = $__require('npm:rxjs@5.2.0/observable/EmptyObservable.js');
+  var ArrayLikeObservable = function (_super) {
+    __extends(ArrayLikeObservable, _super);
+    function ArrayLikeObservable(arrayLike, scheduler) {
+      _super.call(this);
+      this.arrayLike = arrayLike;
+      this.scheduler = scheduler;
+      if (!scheduler && arrayLike.length === 1) {
+        this._isScalar = true;
+        this.value = arrayLike[0];
+      }
+    }
+    ArrayLikeObservable.create = function (arrayLike, scheduler) {
+      var length = arrayLike.length;
+      if (length === 0) {
+        return new EmptyObservable_1.EmptyObservable();
+      } else if (length === 1) {
+        return new ScalarObservable_1.ScalarObservable(arrayLike[0], scheduler);
+      } else {
+        return new ArrayLikeObservable(arrayLike, scheduler);
+      }
+    };
+    ArrayLikeObservable.dispatch = function (state) {
+      var arrayLike = state.arrayLike,
+          index = state.index,
+          length = state.length,
+          subscriber = state.subscriber;
+      if (subscriber.closed) {
+        return;
+      }
+      if (index >= length) {
+        subscriber.complete();
+        return;
+      }
+      subscriber.next(arrayLike[index]);
+      state.index = index + 1;
+      this.schedule(state);
+    };
+    ArrayLikeObservable.prototype._subscribe = function (subscriber) {
+      var index = 0;
+      var _a = this,
+          arrayLike = _a.arrayLike,
+          scheduler = _a.scheduler;
+      var length = arrayLike.length;
+      if (scheduler) {
+        return scheduler.schedule(ArrayLikeObservable.dispatch, 0, {
+          arrayLike: arrayLike,
+          index: index,
+          length: length,
+          subscriber: subscriber
+        });
+      } else {
+        for (var i = 0; i < length && !subscriber.closed; i++) {
+          subscriber.next(arrayLike[i]);
+        }
+        subscriber.complete();
+      }
+    };
+    return ArrayLikeObservable;
+  }(Observable_1.Observable);
+  exports.ArrayLikeObservable = ArrayLikeObservable;
+});
+System.registerDynamic('npm:rxjs@5.2.0/observable/FromObservable.js', ['npm:rxjs@5.2.0/util/isArray.js', 'npm:rxjs@5.2.0/util/isArrayLike.js', 'npm:rxjs@5.2.0/util/isPromise.js', 'npm:rxjs@5.2.0/observable/PromiseObservable.js', 'npm:rxjs@5.2.0/observable/IteratorObservable.js', 'npm:rxjs@5.2.0/observable/ArrayObservable.js', 'npm:rxjs@5.2.0/observable/ArrayLikeObservable.js', 'npm:rxjs@5.2.0/symbol/iterator.js', 'npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/symbol/observable.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var isArray_1 = $__require('npm:rxjs@5.2.0/util/isArray.js');
+  var isArrayLike_1 = $__require('npm:rxjs@5.2.0/util/isArrayLike.js');
+  var isPromise_1 = $__require('npm:rxjs@5.2.0/util/isPromise.js');
+  var PromiseObservable_1 = $__require('npm:rxjs@5.2.0/observable/PromiseObservable.js');
+  var IteratorObservable_1 = $__require('npm:rxjs@5.2.0/observable/IteratorObservable.js');
+  var ArrayObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayObservable.js');
+  var ArrayLikeObservable_1 = $__require('npm:rxjs@5.2.0/observable/ArrayLikeObservable.js');
+  var iterator_1 = $__require('npm:rxjs@5.2.0/symbol/iterator.js');
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
+  var observable_1 = $__require('npm:rxjs@5.2.0/symbol/observable.js');
+  var FromObservable = function (_super) {
+    __extends(FromObservable, _super);
+    function FromObservable(ish, scheduler) {
+      _super.call(this, null);
+      this.ish = ish;
+      this.scheduler = scheduler;
+    }
+    FromObservable.create = function (ish, scheduler) {
+      if (ish != null) {
+        if (typeof ish[observable_1.$$observable] === 'function') {
+          if (ish instanceof Observable_1.Observable && !scheduler) {
+            return ish;
+          }
+          return new FromObservable(ish, scheduler);
+        } else if (isArray_1.isArray(ish)) {
+          return new ArrayObservable_1.ArrayObservable(ish, scheduler);
+        } else if (isPromise_1.isPromise(ish)) {
+          return new PromiseObservable_1.PromiseObservable(ish, scheduler);
+        } else if (typeof ish[iterator_1.$$iterator] === 'function' || typeof ish === 'string') {
+          return new IteratorObservable_1.IteratorObservable(ish, scheduler);
+        } else if (isArrayLike_1.isArrayLike(ish)) {
+          return new ArrayLikeObservable_1.ArrayLikeObservable(ish, scheduler);
+        }
+      }
+      throw new TypeError((ish !== null && typeof ish || ish) + ' is not observable');
+    };
+    FromObservable.prototype._subscribe = function (subscriber) {
+      var ish = this.ish;
+      var scheduler = this.scheduler;
+      if (scheduler == null) {
+        return ish[observable_1.$$observable]().subscribe(subscriber);
+      } else {
+        return ish[observable_1.$$observable]().subscribe(new observeOn_1.ObserveOnSubscriber(subscriber, scheduler, 0));
+      }
+    };
+    return FromObservable;
+  }(Observable_1.Observable);
+  exports.FromObservable = FromObservable;
+});
+System.registerDynamic("npm:rxjs@5.2.0/observable/from.js", ["npm:rxjs@5.2.0/observable/FromObservable.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var FromObservable_1 = $__require("npm:rxjs@5.2.0/observable/FromObservable.js");
+  exports.from = FromObservable_1.FromObservable.create;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/observable/from.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/observable/from.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var from_1 = $__require('npm:rxjs@5.2.0/observable/from.js');
+  Observable_1.Observable.from = from_1.from;
+});
 System.registerDynamic('npm:rxjs@5.2.0/observable/FromEventObservable.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/util/tryCatch.js', 'npm:rxjs@5.2.0/util/isFunction.js', 'npm:rxjs@5.2.0/util/errorObject.js', 'npm:rxjs@5.2.0/Subscription.js', 'github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
@@ -5850,6 +5603,55 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/pluck.js', ['npm:rxjs@5.2.0/
   var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
   var pluck_1 = $__require('npm:rxjs@5.2.0/operator/pluck.js');
   Observable_1.Observable.prototype.pluck = pluck_1.pluck;
+});
+System.registerDynamic("npm:rxjs@5.2.0/operator/mapTo.js", ["npm:rxjs@5.2.0/Subscriber.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require("npm:rxjs@5.2.0/Subscriber.js");
+  function mapTo(value) {
+    return this.lift(new MapToOperator(value));
+  }
+  exports.mapTo = mapTo;
+  var MapToOperator = function () {
+    function MapToOperator(value) {
+      this.value = value;
+    }
+    MapToOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new MapToSubscriber(subscriber, this.value));
+    };
+    return MapToOperator;
+  }();
+  var MapToSubscriber = function (_super) {
+    __extends(MapToSubscriber, _super);
+    function MapToSubscriber(destination, value) {
+      _super.call(this, destination);
+      this.value = value;
+    }
+    MapToSubscriber.prototype._next = function (x) {
+      this.destination.next(this.value);
+    };
+    return MapToSubscriber;
+  }(Subscriber_1.Subscriber);
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/mapTo.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mapTo.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var mapTo_1 = $__require('npm:rxjs@5.2.0/operator/mapTo.js');
+  Observable_1.Observable.prototype.mapTo = mapTo_1.mapTo;
 });
 System.registerDynamic('npm:rxjs@5.2.0/add/operator/mergeAll.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/mergeAll.js'], true, function ($__require, exports, module) {
   /* */
@@ -8593,15 +8395,307 @@ System.registerDynamic('npm:rxjs@5.2.0/add/operator/takeLast.js', ['npm:rxjs@5.2
   var takeLast_1 = $__require('npm:rxjs@5.2.0/operator/takeLast.js');
   Observable_1.Observable.prototype.takeLast = takeLast_1.takeLast;
 });
-System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/observable/fromPromise.js", "npm:rxjs@5.2.0/add/observable/combineLatest.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/do.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/share.js", "npm:rxjs@5.2.0/add/operator/catch.js", "npm:rxjs@5.2.0/add/operator/throttleTime.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/switchMap.js", "npm:rxjs@5.2.0/add/operator/startWith.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/takeLast.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueAction.js", ["npm:rxjs@5.2.0/scheduler/AsyncAction.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var AsyncAction_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncAction.js");
+  var QueueAction = function (_super) {
+    __extends(QueueAction, _super);
+    function QueueAction(scheduler, work) {
+      _super.call(this, scheduler, work);
+      this.scheduler = scheduler;
+      this.work = work;
+    }
+    QueueAction.prototype.schedule = function (state, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      if (delay > 0) {
+        return _super.prototype.schedule.call(this, state, delay);
+      }
+      this.delay = delay;
+      this.state = state;
+      this.scheduler.flush(this);
+      return this;
+    };
+    QueueAction.prototype.execute = function (state, delay) {
+      return delay > 0 || this.closed ? _super.prototype.execute.call(this, state, delay) : this._execute(state, delay);
+    };
+    QueueAction.prototype.requestAsyncId = function (scheduler, id, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      if (delay !== null && delay > 0 || delay === null && this.delay > 0) {
+        return _super.prototype.requestAsyncId.call(this, scheduler, id, delay);
+      }
+      return scheduler.flush(this);
+    };
+    return QueueAction;
+  }(AsyncAction_1.AsyncAction);
+  exports.QueueAction = QueueAction;
+});
+System.registerDynamic("npm:rxjs@5.2.0/scheduler/QueueScheduler.js", ["npm:rxjs@5.2.0/scheduler/AsyncScheduler.js"], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var AsyncScheduler_1 = $__require("npm:rxjs@5.2.0/scheduler/AsyncScheduler.js");
+  var QueueScheduler = function (_super) {
+    __extends(QueueScheduler, _super);
+    function QueueScheduler() {
+      _super.apply(this, arguments);
+    }
+    return QueueScheduler;
+  }(AsyncScheduler_1.AsyncScheduler);
+  exports.QueueScheduler = QueueScheduler;
+});
+System.registerDynamic('npm:rxjs@5.2.0/scheduler/queue.js', ['npm:rxjs@5.2.0/scheduler/QueueAction.js', 'npm:rxjs@5.2.0/scheduler/QueueScheduler.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var QueueAction_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueAction.js');
+  var QueueScheduler_1 = $__require('npm:rxjs@5.2.0/scheduler/QueueScheduler.js');
+  exports.queue = new QueueScheduler_1.QueueScheduler(QueueAction_1.QueueAction);
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/observeOn.js', ['npm:rxjs@5.2.0/Subscriber.js', 'npm:rxjs@5.2.0/Notification.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subscriber_1 = $__require('npm:rxjs@5.2.0/Subscriber.js');
+  var Notification_1 = $__require('npm:rxjs@5.2.0/Notification.js');
+  function observeOn(scheduler, delay) {
+    if (delay === void 0) {
+      delay = 0;
+    }
+    return this.lift(new ObserveOnOperator(scheduler, delay));
+  }
+  exports.observeOn = observeOn;
+  var ObserveOnOperator = function () {
+    function ObserveOnOperator(scheduler, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      this.scheduler = scheduler;
+      this.delay = delay;
+    }
+    ObserveOnOperator.prototype.call = function (subscriber, source) {
+      return source.subscribe(new ObserveOnSubscriber(subscriber, this.scheduler, this.delay));
+    };
+    return ObserveOnOperator;
+  }();
+  exports.ObserveOnOperator = ObserveOnOperator;
+  var ObserveOnSubscriber = function (_super) {
+    __extends(ObserveOnSubscriber, _super);
+    function ObserveOnSubscriber(destination, scheduler, delay) {
+      if (delay === void 0) {
+        delay = 0;
+      }
+      _super.call(this, destination);
+      this.scheduler = scheduler;
+      this.delay = delay;
+    }
+    ObserveOnSubscriber.dispatch = function (arg) {
+      var notification = arg.notification,
+          destination = arg.destination;
+      notification.observe(destination);
+      this.unsubscribe();
+    };
+    ObserveOnSubscriber.prototype.scheduleMessage = function (notification) {
+      this.add(this.scheduler.schedule(ObserveOnSubscriber.dispatch, this.delay, new ObserveOnMessage(notification, this.destination)));
+    };
+    ObserveOnSubscriber.prototype._next = function (value) {
+      this.scheduleMessage(Notification_1.Notification.createNext(value));
+    };
+    ObserveOnSubscriber.prototype._error = function (err) {
+      this.scheduleMessage(Notification_1.Notification.createError(err));
+    };
+    ObserveOnSubscriber.prototype._complete = function () {
+      this.scheduleMessage(Notification_1.Notification.createComplete());
+    };
+    return ObserveOnSubscriber;
+  }(Subscriber_1.Subscriber);
+  exports.ObserveOnSubscriber = ObserveOnSubscriber;
+  var ObserveOnMessage = function () {
+    function ObserveOnMessage(notification, destination) {
+      this.notification = notification;
+      this.destination = destination;
+    }
+    return ObserveOnMessage;
+  }();
+  exports.ObserveOnMessage = ObserveOnMessage;
+});
+System.registerDynamic('npm:rxjs@5.2.0/ReplaySubject.js', ['npm:rxjs@5.2.0/Subject.js', 'npm:rxjs@5.2.0/scheduler/queue.js', 'npm:rxjs@5.2.0/Subscription.js', 'npm:rxjs@5.2.0/operator/observeOn.js', 'npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js', 'npm:rxjs@5.2.0/SubjectSubscription.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var __extends = this && this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() {
+      this.constructor = d;
+    }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+  };
+  var Subject_1 = $__require('npm:rxjs@5.2.0/Subject.js');
+  var queue_1 = $__require('npm:rxjs@5.2.0/scheduler/queue.js');
+  var Subscription_1 = $__require('npm:rxjs@5.2.0/Subscription.js');
+  var observeOn_1 = $__require('npm:rxjs@5.2.0/operator/observeOn.js');
+  var ObjectUnsubscribedError_1 = $__require('npm:rxjs@5.2.0/util/ObjectUnsubscribedError.js');
+  var SubjectSubscription_1 = $__require('npm:rxjs@5.2.0/SubjectSubscription.js');
+  var ReplaySubject = function (_super) {
+    __extends(ReplaySubject, _super);
+    function ReplaySubject(bufferSize, windowTime, scheduler) {
+      if (bufferSize === void 0) {
+        bufferSize = Number.POSITIVE_INFINITY;
+      }
+      if (windowTime === void 0) {
+        windowTime = Number.POSITIVE_INFINITY;
+      }
+      _super.call(this);
+      this.scheduler = scheduler;
+      this._events = [];
+      this._bufferSize = bufferSize < 1 ? 1 : bufferSize;
+      this._windowTime = windowTime < 1 ? 1 : windowTime;
+    }
+    ReplaySubject.prototype.next = function (value) {
+      var now = this._getNow();
+      this._events.push(new ReplayEvent(now, value));
+      this._trimBufferThenGetEvents();
+      _super.prototype.next.call(this, value);
+    };
+    ReplaySubject.prototype._subscribe = function (subscriber) {
+      var _events = this._trimBufferThenGetEvents();
+      var scheduler = this.scheduler;
+      var subscription;
+      if (this.closed) {
+        throw new ObjectUnsubscribedError_1.ObjectUnsubscribedError();
+      } else if (this.hasError) {
+        subscription = Subscription_1.Subscription.EMPTY;
+      } else if (this.isStopped) {
+        subscription = Subscription_1.Subscription.EMPTY;
+      } else {
+        this.observers.push(subscriber);
+        subscription = new SubjectSubscription_1.SubjectSubscription(this, subscriber);
+      }
+      if (scheduler) {
+        subscriber.add(subscriber = new observeOn_1.ObserveOnSubscriber(subscriber, scheduler));
+      }
+      var len = _events.length;
+      for (var i = 0; i < len && !subscriber.closed; i++) {
+        subscriber.next(_events[i].value);
+      }
+      if (this.hasError) {
+        subscriber.error(this.thrownError);
+      } else if (this.isStopped) {
+        subscriber.complete();
+      }
+      return subscription;
+    };
+    ReplaySubject.prototype._getNow = function () {
+      return (this.scheduler || queue_1.queue).now();
+    };
+    ReplaySubject.prototype._trimBufferThenGetEvents = function () {
+      var now = this._getNow();
+      var _bufferSize = this._bufferSize;
+      var _windowTime = this._windowTime;
+      var _events = this._events;
+      var eventsCount = _events.length;
+      var spliceCount = 0;
+      while (spliceCount < eventsCount) {
+        if (now - _events[spliceCount].time < _windowTime) {
+          break;
+        }
+        spliceCount++;
+      }
+      if (eventsCount > _bufferSize) {
+        spliceCount = Math.max(spliceCount, eventsCount - _bufferSize);
+      }
+      if (spliceCount > 0) {
+        _events.splice(0, spliceCount);
+      }
+      return _events;
+    };
+    return ReplaySubject;
+  }(Subject_1.Subject);
+  exports.ReplaySubject = ReplaySubject;
+  var ReplayEvent = function () {
+    function ReplayEvent(time, value) {
+      this.time = time;
+      this.value = value;
+    }
+    return ReplayEvent;
+  }();
+});
+System.registerDynamic('npm:rxjs@5.2.0/operator/publishReplay.js', ['npm:rxjs@5.2.0/ReplaySubject.js', 'npm:rxjs@5.2.0/operator/multicast.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var ReplaySubject_1 = $__require('npm:rxjs@5.2.0/ReplaySubject.js');
+  var multicast_1 = $__require('npm:rxjs@5.2.0/operator/multicast.js');
+  function publishReplay(bufferSize, windowTime, scheduler) {
+    if (bufferSize === void 0) {
+      bufferSize = Number.POSITIVE_INFINITY;
+    }
+    if (windowTime === void 0) {
+      windowTime = Number.POSITIVE_INFINITY;
+    }
+    return multicast_1.multicast.call(this, new ReplaySubject_1.ReplaySubject(bufferSize, windowTime, scheduler));
+  }
+  exports.publishReplay = publishReplay;
+});
+System.registerDynamic('npm:rxjs@5.2.0/add/operator/publishReplay.js', ['npm:rxjs@5.2.0/Observable.js', 'npm:rxjs@5.2.0/operator/publishReplay.js'], true, function ($__require, exports, module) {
+  /* */
+  "use strict";
+
+  var global = this || self,
+      GLOBAL = global;
+  var Observable_1 = $__require('npm:rxjs@5.2.0/Observable.js');
+  var publishReplay_1 = $__require('npm:rxjs@5.2.0/operator/publishReplay.js');
+  Observable_1.Observable.prototype.publishReplay = publishReplay_1.publishReplay;
+});
+System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observable.js", "npm:rxjs@5.2.0/Subject.js", "npm:immutable@3.8.1.js", "npm:rxjs@5.2.0/add/observable/of.js", "npm:rxjs@5.2.0/add/observable/from.js", "npm:rxjs@5.2.0/add/observable/fromEvent.js", "npm:rxjs@5.2.0/add/observable/interval.js", "npm:rxjs@5.2.0/add/observable/zip.js", "npm:rxjs@5.2.0/add/observable/defer.js", "npm:rxjs@5.2.0/add/observable/fromPromise.js", "npm:rxjs@5.2.0/add/observable/combineLatest.js", "npm:rxjs@5.2.0/add/observable/empty.js", "npm:rxjs@5.2.0/add/operator/pluck.js", "npm:rxjs@5.2.0/add/operator/map.js", "npm:rxjs@5.2.0/add/operator/mapTo.js", "npm:rxjs@5.2.0/add/operator/mergeAll.js", "npm:rxjs@5.2.0/add/operator/mergeMap.js", "npm:rxjs@5.2.0/add/operator/do.js", "npm:rxjs@5.2.0/add/operator/delay.js", "npm:rxjs@5.2.0/add/operator/take.js", "npm:rxjs@5.2.0/add/operator/share.js", "npm:rxjs@5.2.0/add/operator/catch.js", "npm:rxjs@5.2.0/add/operator/throttleTime.js", "npm:rxjs@5.2.0/add/operator/window.js", "npm:rxjs@5.2.0/add/operator/switchMap.js", "npm:rxjs@5.2.0/add/operator/startWith.js", "npm:rxjs@5.2.0/add/operator/bufferCount.js", "npm:rxjs@5.2.0/add/operator/withLatestFrom.js", "npm:rxjs@5.2.0/add/operator/takeLast.js", "npm:rxjs@5.2.0/add/operator/publishReplay.js", "src-reactive/app/helper.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     var Observable_1 = $__require("npm:rxjs@5.2.0/Observable.js");
+    var Subject_1 = $__require("npm:rxjs@5.2.0/Subject.js");
     var immutable_1 = $__require("npm:immutable@3.8.1.js");
     $__require("npm:rxjs@5.2.0/add/observable/of.js");
+    $__require("npm:rxjs@5.2.0/add/observable/from.js");
     $__require("npm:rxjs@5.2.0/add/observable/fromEvent.js");
     $__require("npm:rxjs@5.2.0/add/observable/interval.js");
     $__require("npm:rxjs@5.2.0/add/observable/zip.js");
@@ -8611,6 +8705,7 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
     $__require("npm:rxjs@5.2.0/add/observable/empty.js");
     $__require("npm:rxjs@5.2.0/add/operator/pluck.js");
     $__require("npm:rxjs@5.2.0/add/operator/map.js");
+    $__require("npm:rxjs@5.2.0/add/operator/mapTo.js");
     $__require("npm:rxjs@5.2.0/add/operator/mergeAll.js");
     $__require("npm:rxjs@5.2.0/add/operator/mergeMap.js");
     $__require("npm:rxjs@5.2.0/add/operator/do.js");
@@ -8625,6 +8720,7 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
     $__require("npm:rxjs@5.2.0/add/operator/bufferCount.js");
     $__require("npm:rxjs@5.2.0/add/operator/withLatestFrom.js");
     $__require("npm:rxjs@5.2.0/add/operator/takeLast.js");
+    $__require("npm:rxjs@5.2.0/add/operator/publishReplay.js");
     var helper_1 = $__require("src-reactive/app/helper.js");
     function pluckAndZip() {
         var contacts = Observable_1.Observable.from([{
@@ -9050,16 +9146,6 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
         var source = Observable_1.Observable.range(1, 3).share();
         var totalOb = source.reduce(function (total, value) {
             return total + value;
-        }, 0);
-        source.concat(totalOb).subscribe(function (value) {
-            return console.log("Next: " + value);
-        });
-    }
-    exports.summary2 = summary2;
-    function summary3(testButton, placeholder) {
-        var source = Observable_1.Observable.range(1, 3).share();
-        var totalOb = source.reduce(function (total, value) {
-            return total + value;
         }, 0).mergeMap(function (total) {
             return Observable_1.Observable.throw(total);
         });
@@ -9069,7 +9155,143 @@ System.registerDynamic("src-reactive/app/playground.js", ["npm:rxjs@5.2.0/Observ
             return console.log("Total: " + value);
         });
     }
-    exports.summary3 = summary3;
+    exports.summary2 = summary2;
+    function loadImage(testButton, placeholder) {
+        var image = new Image();
+        Observable_1.Observable.fromEvent(image, 'load').subscribe(helper_1.simpleObserver('load'));
+        image.src = 'https://placehold.it/500x100';
+    }
+    exports.loadImage = loadImage;
+    function loadImages(testButton, placeholder) {
+        var imagesDOM = placeholder;
+        var imageURLList = ['https://placehold.it/500x100', 'https://placehold.it/500x200', 'https://placehold.it/500x300', 'https://placehold.it/500x400', 'https://placehold.it/500x500'];
+        Observable_1.Observable.from(imageURLList).concatMap(function (imageURL) {
+            console.log("imageURL = " + imageURL);
+            var image = new Image();
+            var loadedImageStream = Observable_1.Observable.fromEvent(image, 'load').mapTo(image).take(1);
+            image.src = imageURL;
+            return loadedImageStream;
+        }).subscribe(function (image) {
+            console.log('NEXT');imagesDOM.appendChild(image);
+        },
+        // image => console.log(`NEXT: `),
+        function (error) {
+            return console.log("ERROR : " + error);
+        }, function () {
+            return console.log('Completed');
+        });
+    }
+    exports.loadImages = loadImages;
+    function loadImages2(testButton, placeholder) {
+        var imageContainer = placeholder;
+        var imageURLList = ['https://placehold.it/500x100', 'https://placehold.it/500x200', 'https://xplacehold.it/500x300', 'https://placehold.it/500x400', 'https://placehold.it/500x500'];
+        Observable_1.Observable.from(imageURLList).do(function () {
+            imageContainer.appendChild(new Image() /* placeholder */);
+        }).mergeMap(function (imageURL, index) {
+            var image = new Image();
+            var loadedImageStream = Observable_1.Observable.fromEvent(image, 'load').mapTo([image, index]).take(1);
+            image.src = imageURL;
+            return loadedImageStream;
+        }).subscribe(function (_a) {
+            var image = _a[0],
+                index = _a[1];
+            imageContainer.replaceChild(image, imageContainer.childNodes[index]);
+        });
+    }
+    exports.loadImages2 = loadImages2;
+    // https://stackoverflow.com/questions/44195200/is-it-possible-to-use-observables-in-a-way-where-i-can-constant-feedback
+    function progress(testButton, placeholder) {
+        var routeSubject = new Subject_1.Subject();
+        function update(route) {
+            routeSubject.next(route);
+        }
+        function doThing(route) {
+            route.length++;
+        }
+        function calculateBestRoute(observable) {
+            var bestRoute = { length: 0 };
+            doThing(bestRoute);
+            update(bestRoute);
+            doThing(bestRoute);
+            update(bestRoute);
+            doThing(bestRoute);
+            update(bestRoute);
+            doThing(bestRoute);
+            update(bestRoute);
+        }
+        routeSubject.subscribe(function (value) {
+            return console.log("updated: " + value.length);
+        });
+        calculateBestRoute(routeSubject);
+    }
+    exports.progress = progress;
+    // https://stackoverflow.com/questions/44230511/how-to-pipe-observables
+    function validateWithCatch(testButton, placeholder) {
+        var source = Observable_1.Observable.of(1, 2, 3);
+        source.mergeMap(function (value) {
+            if (value > 1) {
+                return Observable_1.Observable.throw("Out Of Condifition: " + value);
+            }
+            return Observable_1.Observable.of(value);
+        }).subscribe(function (value) {
+            return console.log("Next: " + value);
+        }, function (error) {
+            return console.log("Error: " + error);
+        }, function () {
+            return console.log('completed');
+        });
+    }
+    exports.validateWithCatch = validateWithCatch;
+    // https://stackoverflow.com/questions/44230511/how-to-pipe-observables
+    function validateWithError(testButton, placeholder) {
+        var stdout = 1;
+        var stderr = 2;
+        var source = Observable_1.Observable.of(1, 2, 3);
+        source.map(function (value) {
+            if (value > 1) {
+                return [stderr, value];
+            }
+            return [stdout, value];
+        }).subscribe(function (channel_value) {
+            var channel = channel_value[0];
+            var value = channel_value[1];
+            if (channel == stdout) {
+                console.log("stdout: " + value);
+            } else if (channel == stderr) {
+                console.log("stderr: " + value);
+            }
+        });
+    }
+    exports.validateWithError = validateWithError;
+    // https://stackoverflow.com/questions/41364814/how-to-loop-in-rxjs-v5
+    function requestLoop(testButton, placeholder) {
+        ;
+        function requestMaker(numChunk) {
+            return function () {
+                numChunk > 0 ? numChunk-- : 0;
+                return Observable_1.Observable.of(numChunk > 0 ? ['CONT', 'value'] : ['END', 'value']).delay(300);
+            };
+        }
+        var simulateRequest = requestMaker(5);
+        simulateRequest().expand(function (_a) {
+            var header = _a[0],
+                value = _a[1];
+            if (header == 'CONT') {
+                return simulateRequest();
+            } else {
+                return Observable_1.Observable.empty();
+            }
+        }).subscribe(function (_a) {
+            var header = _a[0],
+                value = _a[1];
+            return console.log("NEXT: " + header + "-" + value);
+        }, function (error) {
+            return console.log("ERROR: " + error);
+        }, function () {
+            return console.log('completed');
+        });
+    }
+    exports.requestLoop = requestLoop;
 });
 System.registerDynamic("npm:rxjs@5.2.0/observable/RangeObservable.js", ["npm:rxjs@5.2.0/Observable.js"], true, function ($__require, exports, module) {
   /* */
@@ -17401,7 +17623,7 @@ System.registerDynamic("src-reactive/app/main.js", ["npm:domready@1.0.8.js", "np
     var playground = $__require("src-reactive/app/playground.js");
     var asscan = $__require("src-reactive/app/asscan.js");
     var notification = $__require("src-reactive/app/notification.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeat - 2', action: operator.testRepeat2 }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'operator:   add/operator/timeoutWith', action: operator.testTimeoutWith }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }, { text: 'playground: fromPromise', action: playground.fromPromise }, { text: 'playground: fromPromise & defer', action: playground.fromPromise2 }, { text: 'playground: conditional', action: playground.conditional }, { text: 'playground: conditional skip', action: playground.conditionalSkip }, { text: 'playground: self window', action: playground.selfWindow }, { text: 'playground: inverse throttle', action: playground.inverseThrottle }, { text: 'playground: wait concurrent Two', action: playground.waitTwo }, { text: 'playground: count down', action: playground.countDown }, { text: 'playground: interval + delay', action: playground.interval_delay }, { text: 'playground: window queue', action: playground.window_queue }, { text: 'playground: delay observable', action: playground.delayObservable }, { text: 'playground: completed while delay', action: playground.completedWhileDelay }, { text: 'playground: completed with summary', action: playground.summary }, { text: 'playground: completed with summary catch', action: playground.summary2 }];
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'converting: add/observable/from', action: converting.testFrom }, { text: 'creating:   add/observable/create - 1', action: creating.testCreate1 }, { text: 'creating:   add/observable/create - 2', action: creating.testCreate2 }, { text: 'creating:   Merge', action: creating.testMerge }, { text: 'creating:   add/observable/range', action: creating.testRange }, { text: 'creating:   add/observable/zip', action: creating.testZip }, { text: 'creating:   add/observable/defer', action: creating.testDefer }, { text: 'subject:   Subject - 1', action: subject.testSubject1 }, { text: 'subject:   Subject - 2', action: subject.testSubject2 }, { text: 'subject:   Subject - 3', action: subject.testSubject3 }, { text: 'subject:   ReplaySubject - 1', action: subject.testReplaySubject1 }, { text: 'subject:   ReplaySubject - 2', action: subject.testReplaySubject2 }, { text: 'subject:   ReplaySubject - 3', action: subject.testReplaySubject3 }, { text: 'subject:   ReplaySubject - 4', action: subject.testReplaySubject4 }, { text: 'subject:   multicast Observable', action: subject.testMulticast }, { text: 'subject:   refCount()', action: subject.testMulticast3 }, { text: 'subject:   publish()', action: subject.testPublish }, { text: 'operator:   add/operator/pluck', action: operator.testPluck }, { text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap }, { text: 'operator:   add/operator/concatMap', action: operator.testConcatMap }, { text: 'operator:   add/operator/expand', action: operator.testExpand }, { text: 'operator:   add/operator/expand2', action: operator.testExpand2 }, { text: 'operator:   add/operator/merge', action: operator.testMerge }, { text: 'operator:   add/operator/buffer', action: operator.testBuffer }, { text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen }, { text: 'operator:   add/operator/bufferToggle', action: operator.testBufferToggle }, { text: 'operator:   add/operator/pairwise', action: operator.testPairwise }, { text: 'operator:   add/operator/partition', action: operator.testPartition }, { text: 'operator:   add/operator/combineLatest', action: operator.testCombineLatest }, { text: 'operator:   add/operator/withLatestFrom', action: operator.testWithLatestFrom }, { text: 'operator:   add/operator/race', action: operator.testRace }, { text: 'operator:   add/operator/debounce', action: operator.testDebounce }, { text: 'operator:   add/operator/delayWhen', action: operator.testDelayWhen }, { text: 'operator:   add/operator/distinct', action: operator.testDistinct }, { text: 'operator:   add/operator/repeat', action: operator.testRepeat }, { text: 'operator:   add/operator/repeat - 2', action: operator.testRepeat2 }, { text: 'operator:   add/operator/repeatWhen - complete', action: operator.testRepeatWhen1 }, { text: 'operator:   add/operator/repeatWhen - error', action: operator.testRepeatWhen2 }, { text: 'operator:   add/operator/window', action: operator.testWindow }, { text: 'operator:   add/operator/windowWhen', action: operator.testWindowWhen }, { text: 'operator:   add/operator/windowCount(5,3)', action: operator.testWindowCount1 }, { text: 'operator:   add/operator/windowCount(3,5)', action: operator.testWindowCount2 }, { text: 'operator:   add/operator/groupBy', action: operator.testGroupBy }, { text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements }, { text: 'operator:   add/operator/single', action: operator.testSingle }, { text: 'operator:   add/operator/timeoutWith', action: operator.testTimeoutWith }, { text: 'operator:   add/operator/let', action: operator.testLet }, { text: 'as scan:   map as scan', action: asscan.mapAsScan }, { text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1 }, { text: 'as scan:   buffer as scan 2', action: asscan.bufferAsScan2 }, { text: 'as scan:   audit as scan', action: asscan.auditAsScan }, { text: 'as scan:   count as scan', action: asscan.countAsScan }, { text: 'as scan:   filter as scan', action: asscan.filterAsScan }, { text: 'as scan:   distinct as scan', action: asscan.distinctAsScan }, { text: 'as scan:   find as scan', action: asscan.findAsScan }, { text: 'as scan:   isEmpty as scan', action: asscan.isEmptyAsScan }, { text: 'notification:   observe vs. toObservable', action: notification.testNotification1 }, { text: 'learnrx: ex5 - map', action: learnrx.ex5 }, { text: 'learnrx: ex8 - filter', action: learnrx.ex8 }, { text: 'learnrx: ex12 - concatAll', action: learnrx.ex12 }, { text: 'learnrx: ex14 - concatMap', action: learnrx.ex14 }, { text: 'learnrx: ex17 - reduce', action: learnrx.ex17 }, { text: 'learnrx: ex20 - reduce', action: learnrx.ex20 }, { text: 'learnrx: ex24 - zip', action: learnrx.ex24 }, { text: 'learnrx: ex29 - unsubscribe', action: learnrx.ex29 }, { text: 'learnrx: ex30 - take', action: learnrx.ex30 }, { text: 'learnrx: ex33 - takeUntil', action: learnrx.ex33 }, { text: 'learnrx: ex38 - throttle', action: learnrx.ex38 }, { text: 'learnrx: ex40 - distinctUntilChanged', action: learnrx.ex40 }, { text: 'playground: pluck and zip', action: playground.pluckAndZip }, { text: 'playground: stateStore', action: playground.stateStore }, { text: 'playground: immutableStore', action: playground.immutableStore }, { text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath }, { text: 'playground: fromPromise', action: playground.fromPromise }, { text: 'playground: fromPromise & defer', action: playground.fromPromise2 }, { text: 'playground: conditional', action: playground.conditional }, { text: 'playground: conditional skip', action: playground.conditionalSkip }, { text: 'playground: self window', action: playground.selfWindow }, { text: 'playground: inverse throttle', action: playground.inverseThrottle }, { text: 'playground: wait concurrent Two', action: playground.waitTwo }, { text: 'playground: count down', action: playground.countDown }, { text: 'playground: interval + delay', action: playground.interval_delay }, { text: 'playground: window queue', action: playground.window_queue }, { text: 'playground: delay observable', action: playground.delayObservable }, { text: 'playground: completed while delay', action: playground.completedWhileDelay }, { text: 'playground: completed with summary', action: playground.summary }, { text: 'playground: completed with summary catch', action: playground.summary2 }, { text: 'playground: load image', action: playground.loadImage }, { text: 'playground: load images sequentially', action: playground.loadImages }, { text: 'playground: load images concurrently', action: playground.loadImages2 }, { text: 'playground: progress', action: playground.progress }, { text: 'playground: validate with throw', action: playground.validateWithCatch }, { text: 'playground: validate with stderr', action: playground.validateWithError }, { text: 'playground: requestLoop', action: playground.requestLoop }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

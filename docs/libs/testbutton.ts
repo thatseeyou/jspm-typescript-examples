@@ -16,15 +16,19 @@ export function makeTestButtons(items:TestItem[]) {
 }
 
 function makeTestButton(parent:HTMLElement, text:string, action:(targetButton:HTMLButtonElement, placeholder:HTMLElement) => void) {
+    // 1. make button
     let button = document.createElement('button');
     button.innerText = text;
     button.style.display = 'block';
 
+    // 2. make placeholder below button
     let placeholder = document.createElement('div');
 
+    // 3. append to parent
     parent.appendChild(button);
     parent.appendChild(placeholder);
 
+    // 4. listen click event 
     button.addEventListener('click', (event) => {
         action(this, placeholder);
     });

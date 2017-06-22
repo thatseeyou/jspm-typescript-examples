@@ -6,6 +6,7 @@ import * as cases from './cases';
 import t2 = require('./emitter-observer');
 import * as t3 from './eventlistener';
 import t4  = require ('./function2promise');
+import * as t5  from './timeout';
 
 const tests:TestItem[] = [
     {text: '---- clear log ----', action: screenLog.clear},
@@ -16,6 +17,9 @@ const tests:TestItem[] = [
     {text: 'function to promise', action: t4},
     {text: 'eventlistener to one-time promise', action: t3.test1},
     {text: 'eventlistener to continuous promise', action: t3.test2},
+    {text: 'timeout without promise', action: t5.test1},
+    {text: 'timeout with promise', action: t5.test2},
+    {text: 'timeout with RxJS', action: t5.test3},
 ];
 
 domready(() => {

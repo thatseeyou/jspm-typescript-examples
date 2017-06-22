@@ -37,6 +37,7 @@ const tests:TestItem[] = [
     {text: 'operator:   add/operator/mergeMap', action: operator.testMergeMap},
     {text: 'operator:   add/operator/concatMap', action: operator.testConcatMap},
     {text: 'operator:   add/operator/expand', action: operator.testExpand},
+    {text: 'operator:   add/operator/expand2', action: operator.testExpand2},
     {text: 'operator:   add/operator/merge', action: operator.testMerge},
     {text: 'operator:   add/operator/buffer', action: operator.testBuffer},
     {text: 'operator:   add/operator/bufferWhen', action: operator.testBufferWhen},
@@ -61,6 +62,7 @@ const tests:TestItem[] = [
     {text: 'operator:   add/operator/ignoreElements, isEmpty', action: operator.testIgnoreElements},
     {text: 'operator:   add/operator/single', action: operator.testSingle},
     {text: 'operator:   add/operator/timeoutWith', action: operator.testTimeoutWith},
+    {text: 'operator:   add/operator/let', action: operator.testLet},
 
     {text: 'as scan:   map as scan', action: asscan.mapAsScan},
     {text: 'as scan:   buffer as scan 1', action: asscan.bufferAsScan1},
@@ -105,6 +107,13 @@ const tests:TestItem[] = [
     {text: 'playground: completed while delay', action: playground.completedWhileDelay},
     {text: 'playground: completed with summary', action: playground.summary},
     {text: 'playground: completed with summary catch', action: playground.summary2},
+    {text: 'playground: load image', action: playground.loadImage},
+    {text: 'playground: load images sequentially', action: playground.loadImages},
+    {text: 'playground: load images concurrently', action: playground.loadImages2},
+    {text: 'playground: progress', action: playground.progress},
+    {text: 'playground: validate with throw', action: playground.validateWithCatch},
+    {text: 'playground: validate with stderr', action: playground.validateWithError},
+    {text: 'playground: requestLoop', action: playground.requestLoop},
 ];
 
 domready(() => {

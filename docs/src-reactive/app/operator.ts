@@ -49,6 +49,7 @@ import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/single';
 import 'rxjs/add/operator/race';
 import 'rxjs/add/operator/timeoutWith';
+import 'rxjs/add/operator/let';
 
 
 export function testPluck(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -109,6 +110,19 @@ export function testExpand(testButton:HTMLButtonElement, placeholder:HTMLElement
             return Observable.of([index, 2 * value]).filter(([index, value]) => value < 1024).delay(500);
         })
     powersOfTwo.subscribe(([index, value]) => console.log(`${index} - ${value}`));
+}
+
+export function testExpand2(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.of(1,2,3);
+
+    /* repeat 3 times */
+    source
+        .map(value => [value * 2, 1])
+        .expand(([value, countPerSource]) => {
+            return countPerSource < 3 /* post condition after next */ ? Observable.of([value, countPerSource + 1]) : Observable.empty();
+        })
+        .map(([value, indexPerSource]) => value)
+        .subscribe(simpleObserver('sub'));
 }
 
 export function testMerge(testButton:HTMLButtonElement, placeholder:HTMLElement) {
@@ -455,3 +469,15 @@ export function testRepeat2(testButton:HTMLButtonElement, placeholder:HTMLElemen
     merge.subscribe(simpleObserver('repeat2'));
 }
 
+export function testLet(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let obs = Observable.interval(1000).take(3);
+
+    let source = obs.let(ob => ob.concat(ob));
+    let source2 = Observable.of(obs).concatMap(ob => ob.concat(ob));
+
+    source.subscribe(simpleObserver('subscriber1'));
+    source.subscribe(simpleObserver('subscriber2'));
+
+    source2.subscribe(simpleObserver('subscriber3'));
+    source2.subscribe(simpleObserver('subscriber4'));
+}
