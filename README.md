@@ -150,3 +150,11 @@ Using unbundled modules requires URL start with /. Github pages which start with
     ...
     ```
 
+* [showdownjs/showdown](https://github.com/showdownjs/showdown) [[Demo](https://thatseeyou.github.io/jspm-typescript-examples/showdown.html)]
+
+    ```
+    $ jspm install showdown
+    $ npm install --save @types/showdown
+    ```
+
+

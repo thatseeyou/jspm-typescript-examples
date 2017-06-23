@@ -23,6 +23,7 @@ System.config({
     "parallax": "github:wagerfield/parallax@2.1.3",
     "rxjs": "npm:rxjs@5.2.0",
     "screenlog": "npm:screenlog@0.2.2",
+    "showdown": "github:showdownjs/showdown@1.7.1",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },
