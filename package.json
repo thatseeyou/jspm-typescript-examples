@@ -75,7 +75,6 @@
     "@types/dw-bxslider-4": "^4.2.29",
     "@types/jquery": "^2.0.40",
     "@types/shelljs": "^0.7.0",
-    "@types/showdown": "^1.4.32",
-    "typescript": "^2.4.1"
+    "@types/showdown": "^1.4.32"
   }
 }
