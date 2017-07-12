@@ -177,7 +177,7 @@ export class Calculator {
     private initButtonsObservable() {
         let buttonObservables = buttonsConfig.map(([keyType, keyValue, _], index) => {
             let button = this.container.querySelectorAll('.calc-button')[index];
-            return Observable.fromEvent<MouseEvent>(button, 'click').mapTo([keyType, keyValue]);
+            return Observable.fromEvent<MouseEvent>(button, 'click').mapTo([keyType, keyValue] as [KeyType, KeyValue]);
         });
         let buttonsOb = Observable.merge(buttonObservables).mergeAll();
 

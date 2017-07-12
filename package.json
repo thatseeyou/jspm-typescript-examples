@@ -32,7 +32,7 @@
     "jspm": "^0.16.52",
     "lite-server": "^2.2.2",
     "shelljs": "^0.7.6",
-    "typescript": "^2.3.2"
+    "typescript": "^2.4.1"
   },
   "jspm": {
     "directories": {
@@ -75,6 +75,7 @@
     "@types/dw-bxslider-4": "^4.2.29",
     "@types/jquery": "^2.0.40",
     "@types/shelljs": "^0.7.0",
-    "@types/showdown": "^1.4.32"
+    "@types/showdown": "^1.4.32",
+    "typescript": "^2.4.1"
   }
 }

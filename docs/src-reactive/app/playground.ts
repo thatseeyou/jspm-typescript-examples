@@ -81,19 +81,19 @@ export function stateStore(testButton:HTMLButtonElement, placeholder:HTMLElement
     let increaseButton = buttonForTest('increase', placeholder);
     let increase = Observable.fromEvent<MouseEvent>(increaseButton, 'click')
         // We map to a function that will change our state
-        .map(() => (state: State) => Object.assign({}, state, { count: state.count + 1 }));
+        .map(() => (state: State):State => Object.assign({}, state, { count: state.count + 1 }));
 
     let decreaseButton = buttonForTest('decrease', placeholder);
     let decrease = Observable.fromEvent<MouseEvent>(decreaseButton, 'click')
         // We map to a function that will change our state
-        .map(() => (state: State) => Object.assign({}, state, { count: state.count - 1 }));
+        .map(() => (state: State):State => Object.assign({}, state, { count: state.count - 1 }));
 
     let inputElement = inputForTest('input', placeholder);
     let input = Observable.fromEvent<KeyboardEvent>(inputElement, 'keyup')
         // Let us also map the keypress events to produce an inputValue state
         .map(event => {
             //console.log(`keyup ${event.key}`);
-            return (state: State) => Object.assign({}, state, { inputValue: (event.target as HTMLInputElement).value})
+            return (state: State):State => Object.assign({}, state, { inputValue: (event.target as HTMLInputElement).value})
         });
 
     // let state = increase.scan((state, changeFn) => changeFn(state), { count: 0 });
@@ -277,7 +277,7 @@ export function inverseThrottle(testButton:HTMLButtonElement, placeholder:HTMLEl
         });
 
     var indexedSource = source
-        .scan((_, value, index) => {
+        .scan((_: [number, number], value, index) => {
             // console.log(`value = ${value}, index = ${index}`)
             return [value, index];
         }, undefined)

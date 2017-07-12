@@ -12,6 +12,7 @@ import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/fromEvent';
 
 import 'rxjs/add/operator/pluck';
 import 'rxjs/add/operator/delay';
@@ -102,7 +103,7 @@ export function testConcatMap(testButton:HTMLButtonElement, placeholder:HTMLElem
 
 export function testExpand(testButton:HTMLButtonElement, placeholder:HTMLElement) {
     let button = buttonForTest('1,,,2,,,4,,,', placeholder);
-    let clicks = Observable.fromEvent(button, 'click');
+    let clicks = Observable.fromEvent<MouseEvent>(button, 'click');
     let powersOfTwo = clicks
         .map<MouseEvent, [number, number]>((value, index) => [index, 1])
         .expand(([index, value]) => {
