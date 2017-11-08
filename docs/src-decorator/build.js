@@ -239,62 +239,157 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic("src-typescript/app/playground.js", [], true, function ($__require, exports, module) {
+System.registerDynamic("src-decorator/app/decorators.js", [], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    function stringType(testButton, placeholder) {
-        var uni;
-        var str = "C";
-        function isLit(str) {
-            return str == "A" || str == "B" || str == "C";
+    function traceFactory(enable, prefix) {
+        if (prefix === void 0) {
+            prefix = '';
         }
-        function doSomething(str) {}
-        if (isLit(str)) {
-            uni = str;
-        } else {
-            doSomething(str);
-        }
+        console.log('trace called');
+        return function (target, propertyKey, descriptor) {
+            console.log('inner trace called');
+            // console.log('target =');
+            // console.dir(target);
+            // console.dir(target.constructor.prototype);
+            // console.log('propertyKey =');
+            // console.dir(propertyKey);
+            // console.log('descriptor =');
+            // console.dir(descriptor);
+            if (enable == false) return;
+            var orgMethod = descriptor.value;
+            descriptor.value = function () {
+                console.log(prefix + ">>> ENTER " + target.constructor.name + "::" + propertyKey);
+                var retValue = orgMethod.apply(this, arguments);
+                console.log(prefix + "<<< EXIT  " + target.constructor.name + "::" + propertyKey);
+                return retValue;
+            };
+        };
     }
-    exports.stringType = stringType;
-    function stringType2(testButton, placeholder) {
-        var Lit = /** @class */function () {
-            function Lit(A, B, C) {
-                if (A === void 0) {
-                    A = 0;
-                }
-                if (B === void 0) {
-                    B = 0;
-                }
-                if (C === void 0) {
-                    C = 0;
-                }
-                this.A = A;
-                this.B = B;
-                this.C = C;
-            }
-            return Lit;
-        }();
-        var uni;
-        function isLit(str) {
-            var lit = new Lit();
-            return str in lit ? true : false;
-        }
-        function doSomething(str) {}
-        var str = "C";
-        if (isLit(str)) {
-            console.log(str + " is lit");
-            uni = str;
-        } else {
-            console.log(str + " is not lit");
-            doSomething(str);
-        }
+    exports.traceFactory = traceFactory;
+    function trace(target, propertyKey, descriptor) {
+        // console.log('trace2 called');
+        // console.log('target =');
+        // console.dir(target);
+        // console.dir(target.constructor.prototype);
+        // console.log('propertyKey =');
+        // console.dir(propertyKey);
+        // console.log('descriptor =');
+        // console.dir(descriptor);
+        var orgMethod = descriptor.value;
+        descriptor.value = function () {
+            console.log(">>> ENTER " + target.constructor.name + "::" + propertyKey);
+            var retValue = orgMethod.apply(this, arguments);
+            console.log("<<< EXIT  " + target.constructor.name + "::" + propertyKey);
+            return retValue;
+        };
     }
-    exports.stringType2 = stringType2;
+    exports.trace = trace;
+    ;
 });
-System.registerDynamic("src-typescript/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-typescript/app/playground.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-decorator/app/tests.js", ["src-decorator/app/decorators.js"], true, function ($__require, exports, module) {
+    "use strict";
+
+    var global = this || self,
+        GLOBAL = global;
+    var __extends = this && this.__extends || function () {
+        var extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function (d, b) {
+            d.__proto__ = b;
+        } || function (d, b) {
+            for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+        };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() {
+                this.constructor = d;
+            }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    }();
+    var __decorate = this && this.__decorate || function (decorators, target, key, desc) {
+        var c = arguments.length,
+            r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+            d;
+        if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+        return c > 3 && r && Object.defineProperty(target, key, r), r;
+    };
+    var __metadata = this && this.__metadata || function (k, v) {
+        if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var decorators_1 = $__require("src-decorator/app/decorators.js");
+    var ParentClass = /** @class */function () {
+        function ParentClass() {
+            this.p1 = 42;
+        }
+        ParentClass.prototype.iMethod0 = function (arg1) {
+            console.log("DO something in iMethod0(" + arg1 + "). p1 = " + this.p1);
+            return arg1;
+        };
+        ParentClass.prototype.iMethod1 = function (arg1) {
+            console.log("DO something in iMethod1(" + arg1 + "). p1 = " + this.p1);
+            return arg1;
+        };
+        ParentClass.prototype.iMethod2 = function (arg1) {
+            console.log("DO something in iMethod2(" + arg1 + "). p1 = " + this.p1);
+            return arg1;
+        };
+        ParentClass.prototype.iMethod3 = function (arg1) {
+            console.log("DO something in iMethod3(" + arg1 + "). p1 = " + this.p1);
+            return arg1;
+        };
+        __decorate([decorators_1.traceFactory(true), __metadata("design:type", Function), __metadata("design:paramtypes", [Number]), __metadata("design:returntype", void 0)], ParentClass.prototype, "iMethod1", null);
+        __decorate([decorators_1.traceFactory(true, 'IMPORTANT! '), __metadata("design:type", Function), __metadata("design:paramtypes", [Number]), __metadata("design:returntype", void 0)], ParentClass.prototype, "iMethod2", null);
+        __decorate([decorators_1.traceFactory(false), __metadata("design:type", Function), __metadata("design:paramtypes", [Number]), __metadata("design:returntype", void 0)], ParentClass.prototype, "iMethod3", null);
+        return ParentClass;
+    }();
+    var ChildClass = /** @class */function (_super) {
+        __extends(ChildClass, _super);
+        function ChildClass() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.p1 = 100;
+            return _this;
+        }
+        return ChildClass;
+    }(ParentClass);
+    var Parent2Class = /** @class */function () {
+        function Parent2Class() {
+            this.p1 = 42;
+        }
+        Parent2Class.prototype.iMethod1 = function (arg1) {
+            console.log("DO something in iMethod1(" + arg1 + "). p1 = " + this.p1);
+            return arg1;
+        };
+        __decorate([decorators_1.trace, __metadata("design:type", Function), __metadata("design:paramtypes", [Number]), __metadata("design:returntype", void 0)], Parent2Class.prototype, "iMethod1", null);
+        return Parent2Class;
+    }();
+    function test1() {
+        var parent = new ParentClass();
+        parent.iMethod0(10);
+        var ret1 = parent.iMethod1(10);
+        console.log("return = " + ret1);
+        parent.iMethod2(20);
+        parent.iMethod3(30);
+        console.log('------------');
+        var child = new ChildClass();
+        child.iMethod0(10);
+        var ret2 = child.iMethod1(10);
+        console.log("return = " + ret2);
+        child.iMethod2(20);
+        child.iMethod3(30);
+    }
+    exports.test1 = test1;
+    function test2() {
+        var parent = new Parent2Class();
+        var ret1 = parent.iMethod1(10);
+        console.log("return = " + ret1);
+    }
+    exports.test2 = test2;
+});
+System.registerDynamic("src-decorator/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "src-decorator/app/tests.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -303,8 +398,8 @@ System.registerDynamic("src-typescript/app/main.js", ["npm:domready@1.0.8.js", "
     var domready = $__require("npm:domready@1.0.8.js");
     $__require("npm:screenlog@0.2.2.js");
     var testbutton_1 = $__require("libs/testbutton.js");
-    var playground = $__require("src-typescript/app/playground.js");
-    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'playground: stringType', action: playground.stringType }, { text: 'playground: stringType2', action: playground.stringType2 }];
+    var t = $__require("src-decorator/app/tests.js");
+    var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'test decorator factory', action: t.test1 }, { text: 'test decorator', action: t.test2 }];
     domready(function () {
         screenLog.init({ autoScroll: true });
         testbutton_1.makeTestButtons(tests);

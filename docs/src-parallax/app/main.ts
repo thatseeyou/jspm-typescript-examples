@@ -4,7 +4,7 @@ import 'parallax';
 
 $(()=>{
     console.log('READY');
-    $('#scene').parallax();
+    ($('#scene') as any).parallax();
     // let scene = document.getElementById('scene');
     // let parallax = new Parallax(scene);
 });

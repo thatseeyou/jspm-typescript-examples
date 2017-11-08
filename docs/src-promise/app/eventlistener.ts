@@ -26,7 +26,7 @@ export function test1() {
 
 export function test2() {
     let button = document.createElement('button');
-    button.innerText = 'Click to resolve one-time promise';
+    button.innerText = 'Click to resolve continuous promise';
     document.body.appendChild(button);
 
     button.addEventListener('click', (event) => {

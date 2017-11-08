@@ -239,10 +239,10 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true, function ($__require, exports, module) {
+System.registerDynamic('npm:d3-selection@1.1.0/build/d3-selection.js', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
-  // https://d3js.org/d3-selection/ Version 1.0.4. Copyright 2017 Mike Bostock.
+  // https://d3js.org/d3-selection/ Version 1.1.0. Copyright 2017 Mike Bostock.
 
   var global = this || self,
       GLOBAL = global;
@@ -875,9 +875,12 @@ System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true,
     }
 
     var selection_style = function (name, value, priority) {
-      var node;
-      return arguments.length > 1 ? this.each((value == null ? styleRemove : typeof value === "function" ? styleFunction : styleConstant)(name, value, priority == null ? "" : priority)) : defaultView(node = this.node()).getComputedStyle(node, null).getPropertyValue(name);
+      return arguments.length > 1 ? this.each((value == null ? styleRemove : typeof value === "function" ? styleFunction : styleConstant)(name, value, priority == null ? "" : priority)) : styleValue(this.node(), name);
     };
+
+    function styleValue(node, name) {
+      return node.style.getPropertyValue(name) || defaultView(node).getComputedStyle(node, null).getPropertyValue(name);
+    }
 
     function propertyRemove(name) {
       return function () {
@@ -1075,7 +1078,7 @@ System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true,
       var window = defaultView(node),
           event = window.CustomEvent;
 
-      if (event) {
+      if (typeof event === "function") {
         event = new event(type, params);
       } else {
         event = window.document.createEvent("Event");
@@ -1186,6 +1189,7 @@ System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true,
     exports.selection = selection;
     exports.selector = selector;
     exports.selectorAll = selectorAll;
+    exports.style = styleValue;
     exports.touch = touch;
     exports.touches = touches;
     exports.window = defaultView;
@@ -1194,18 +1198,18 @@ System.registerDynamic('npm:d3-selection@1.0.4/build/d3-selection.js', [], true,
     Object.defineProperty(exports, '__esModule', { value: true });
   });
 });
-System.registerDynamic("npm:d3-selection@1.0.4.js", ["npm:d3-selection@1.0.4/build/d3-selection.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:d3-selection@1.1.0.js", ["npm:d3-selection@1.1.0/build/d3-selection.js"], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
-  module.exports = $__require("npm:d3-selection@1.0.4/build/d3-selection.js");
+  module.exports = $__require("npm:d3-selection@1.1.0/build/d3-selection.js");
 });
-System.registerDynamic("src-d3-selection/app/tests.js", ["npm:d3-selection@1.0.4.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-d3-selection/app/tests.js", ["npm:d3-selection@1.1.0.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    var d3 = $__require("npm:d3-selection@1.0.4.js");
+    var d3 = $__require("npm:d3-selection@1.1.0.js");
     function testHtml() {
         // selection.html()
         d3.select('#container').html("\n      <div id=\"A\">\n        <div id=\"1\">div #1</div>\n        <div id=\"2\">div #2</div>\n        <div id=\"3\">div #3</div>\n    </div>\n    <div id=\"B\">\n        <div id=\"4\">div #4</div>\n        <div id=\"5\">div #5</div>\n        <div id=\"6\">div #6</div>\n    </div>\n  ");

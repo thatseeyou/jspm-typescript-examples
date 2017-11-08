@@ -1,5 +1,5 @@
 "bundle";
-System.registerDynamic("src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.32.js", [], false, function ($__require, $__exports, $__module) {
+System.registerDynamic("src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.36.js", [], false, function ($__require, $__exports, $__module) {
   var _retrieveGlobal = System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
   (function ($__global) {})(this);
@@ -6609,13 +6609,13 @@ System.registerDynamic("github:wagerfield/parallax@2.1.3.js", ["github:wagerfiel
       GLOBAL = global;
   module.exports = $__require("github:wagerfield/parallax@2.1.3/deploy/jquery.parallax.js");
 });
-System.registerDynamic("src-parallax/app/main.js", ["src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.32.js", "npm:jquery@2.2.4.js", "github:wagerfield/parallax@2.1.3.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-parallax/app/main.js", ["src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.36.js", "npm:jquery@2.2.4.js", "github:wagerfield/parallax@2.1.3.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    $__require("src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.32.js");
+    $__require("src-parallax/css/styles.css!github:systemjs/plugin-css@0.1.36.js");
     var $ = $__require("npm:jquery@2.2.4.js");
     $__require("github:wagerfield/parallax@2.1.3.js");
     $(function () {

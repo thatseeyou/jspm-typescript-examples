@@ -9,26 +9,32 @@ System.config({
 
   map: {
     "adamschwartz/log": "github:adamschwartz/log@0.3.0",
-    "bxslider": "npm:bxslider@4.2.11",
-    "chartist": "npm:chartist@0.10.1",
-    "codemirror": "npm:codemirror@5.25.0",
-    "css": "github:systemjs/plugin-css@0.1.32",
-    "d3-selection": "npm:d3-selection@1.0.4",
-    "decimal.js": "github:MikeMcl/decimal.js@7.2.0",
+    "babel": "npm:babel-core@5.8.38",
+    "babel-runtime": "npm:babel-runtime@5.8.38",
+    "bxslider": "npm:bxslider@4.2.13",
+    "chartist": "npm:chartist@0.11.0",
+    "codemirror": "npm:codemirror@5.31.0",
+    "core-js": "npm:core-js@1.2.7",
+    "css": "github:systemjs/plugin-css@0.1.36",
+    "d3-selection": "npm:d3-selection@1.1.0",
+    "decimal.js": "github:MikeMcl/decimal.js@7.3.0",
     "domready": "npm:domready@1.0.8",
-    "immutable": "npm:immutable@3.8.1",
+    "immutable": "npm:immutable@3.8.2",
     "jquery": "npm:jquery@2.2.4",
-    "jquery-parallax.js": "npm:jquery-parallax.js@1.4.3",
+    "jquery-parallax.js": "npm:jquery-parallax.js@1.5.0",
     "log": "github:adamschwartz/log@0.3.0",
     "parallax": "github:wagerfield/parallax@2.1.3",
-    "rxjs": "npm:rxjs@5.4.2",
+    "rxjs": "npm:rxjs@5.5.2",
     "screenlog": "npm:screenlog@0.2.2",
-    "showdown": "github:showdownjs/showdown@1.7.1",
+    "showdown": "github:showdownjs/showdown@1.8.1",
     "github:jspm/nodelibs-assert@0.1.0": {
       "assert": "npm:assert@1.4.1"
     },
     "github:jspm/nodelibs-buffer@0.1.1": {
-      "buffer": "npm:buffer@5.0.6"
+      "buffer": "npm:buffer@5.0.8"
+    },
+    "github:jspm/nodelibs-path@0.1.0": {
+      "path-browserify": "npm:path-browserify@0.0.0"
     },
     "github:jspm/nodelibs-process@0.1.2": {
       "process": "npm:process@0.11.10"
@@ -45,30 +51,43 @@ System.config({
       "process": "github:jspm/nodelibs-process@0.1.2",
       "util": "npm:util@0.10.3"
     },
-    "npm:buffer@5.0.6": {
+    "npm:babel-runtime@5.8.38": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:buffer@5.0.8": {
       "base64-js": "npm:base64-js@1.2.1",
       "ieee754": "npm:ieee754@1.1.8"
     },
-    "npm:bxslider@4.2.11": {
+    "npm:bxslider@4.2.13": {
       "process": "github:jspm/nodelibs-process@0.1.2"
     },
-    "npm:codemirror@5.25.0": {
+    "npm:codemirror@5.31.0": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.1",
       "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:core-js@1.2.7": {
+      "fs": "github:jspm/nodelibs-fs@0.1.2",
+      "path": "github:jspm/nodelibs-path@0.1.0",
+      "process": "github:jspm/nodelibs-process@0.1.2",
+      "systemjs-json": "github:systemjs/plugin-json@0.1.2"
     },
     "npm:inherits@2.0.1": {
       "util": "github:jspm/nodelibs-util@0.1.0"
     },
-    "npm:jquery-parallax.js@1.4.3": {
+    "npm:jquery-parallax.js@1.5.0": {
       "jquery": "npm:jquery@2.2.4"
+    },
+    "npm:path-browserify@0.0.0": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:process@0.11.10": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
       "vm": "github:jspm/nodelibs-vm@0.1.0"
     },
-    "npm:rxjs@5.4.2": {
+    "npm:rxjs@5.5.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.1",
+      "path": "github:jspm/nodelibs-path@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2",
       "symbol-observable": "npm:symbol-observable@1.0.4"
     },

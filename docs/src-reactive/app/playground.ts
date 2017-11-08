@@ -32,6 +32,7 @@ import 'rxjs/add/operator/bufferCount';
 import 'rxjs/add/operator/withLatestFrom';
 import 'rxjs/add/operator/takeLast';
 import 'rxjs/add/operator/publishReplay';
+import 'rxjs/add/operator/toPromise';
 
 import { simpleObserver, buttonForTest, inputForTest } from './helper';
 
@@ -248,6 +249,26 @@ export function fromPromise2(testButton:HTMLButtonElement, placeholder:HTMLEleme
 
     deleteUser('exist');
     deleteUser('not exist');
+}
+
+export function toPromise(testButton:HTMLButtonElement, placeholder:HTMLElement) {
+    let source = Observable.interval(500).take(5).toPromise();
+
+    source.then(value => {
+        console.log(`then 1 : ${value}`);
+        return value + 1;
+    }).then(value => {
+        console.log(`then 1 then : ${value}`);
+        return value + 1;
+    })
+
+    source.then(value => {
+        console.log(`then 2 : ${value}`);
+        return value + 1;
+    }).then(value => {
+        console.log(`then 2 then : ${value}`);
+        return value + 1;
+    })
 }
 
 export function selfWindow(testButton:HTMLButtonElement, placeholder:HTMLElement) {

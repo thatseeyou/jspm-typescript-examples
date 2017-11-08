@@ -1317,8 +1317,7 @@ var define = System.amdDefine;
         pr,
         r,
         rm,
-        sign,
-        yIsInt,
+        s,
         x = this,
         Ctor = x.constructor,
         yn = +(y = new Ctor(y));
@@ -1332,34 +1331,40 @@ var define = System.amdDefine;
     if (y.eq(1))
       return finalise(x, pr, rm);
     e = mathfloor(y.e / LOG_BASE);
-    k = y.d.length - 1;
-    yIsInt = e >= k;
-    sign = x.s;
-    if (!yIsInt) {
-      if (sign < 0)
-        return new Ctor(NaN);
-    } else if ((k = yn < 0 ? -yn : yn) <= MAX_SAFE_INTEGER) {
+    if (e >= y.d.length - 1 && (k = yn < 0 ? -yn : yn) <= MAX_SAFE_INTEGER) {
       r = intPow(Ctor, x, k, pr);
       return y.s < 0 ? new Ctor(1).div(r) : finalise(r, pr, rm);
     }
-    sign = sign < 0 && y.d[Math.max(e, k)] & 1 ? -1 : 1;
+    s = x.s;
+    if (s < 0) {
+      if (e < y.d.length - 1)
+        return new Ctor(NaN);
+      if ((y.d[e] & 1) == 0)
+        s = 1;
+      if (x.e == 0 && x.d[0] == 1 && x.d.length == 1) {
+        x.s = s;
+        return x;
+      }
+    }
     k = mathpow(+x, yn);
     e = k == 0 || !isFinite(k) ? mathfloor(yn * (Math.log('0.' + digitsToString(x.d)) / Math.LN10 + x.e + 1)) : new Ctor(k + '').e;
     if (e > Ctor.maxE + 1 || e < Ctor.minE - 1)
-      return new Ctor(e > 0 ? sign / 0 : 0);
+      return new Ctor(e > 0 ? s / 0 : 0);
     external = false;
     Ctor.rounding = x.s = 1;
     k = Math.min(12, (e + '').length);
     r = naturalExponential(y.times(naturalLogarithm(x, pr + k)), pr);
-    r = finalise(r, pr + 5, 1);
-    if (checkRoundingDigits(r.d, pr, rm)) {
-      e = pr + 10;
-      r = finalise(naturalExponential(y.times(naturalLogarithm(x, e + k)), e), e + 5, 1);
-      if (+digitsToString(r.d).slice(pr + 1, pr + 15) + 1 == 1e14) {
-        r = finalise(r, pr + 1, 0);
+    if (r.d) {
+      r = finalise(r, pr + 5, 1);
+      if (checkRoundingDigits(r.d, pr, rm)) {
+        e = pr + 10;
+        r = finalise(naturalExponential(y.times(naturalLogarithm(x, e + k)), e), e + 5, 1);
+        if (+digitsToString(r.d).slice(pr + 1, pr + 15) + 1 == 1e14) {
+          r = finalise(r, pr + 1, 0);
+        }
       }
     }
-    r.s = sign;
+    r.s = s;
     external = true;
     Ctor.rounding = rm;
     return finalise(r, pr, rm);
@@ -2747,14 +2752,15 @@ var define = System.amdDefine;
     return finalise(x = new this(x), x.e + 1, 1);
   }
   Decimal = clone(Decimal);
+  Decimal['default'] = Decimal.Decimal = Decimal;
   LN10 = new Decimal(LN10);
   PI = new Decimal(PI);
   if (typeof define == 'function' && define.amd) {
-    define("github:MikeMcl/decimal.js@7.2.0/decimal.js", [], function() {
+    define("github:MikeMcl/decimal.js@7.3.0/decimal.js", [], function() {
       return Decimal;
     });
   } else if (typeof module != 'undefined' && module.exports) {
-    module.exports = Decimal['default'] = Decimal.Decimal = Decimal;
+    module.exports = Decimal;
   } else {
     if (!globalScope) {
       globalScope = typeof self != 'undefined' && self && self.self == self ? self : Function('return this')();
@@ -2771,12 +2777,12 @@ var define = System.amdDefine;
 })();
 (function() {
 var define = System.amdDefine;
-define("github:MikeMcl/decimal.js@7.2.0.js", ["github:MikeMcl/decimal.js@7.2.0/decimal.js"], function(main) {
+define("github:MikeMcl/decimal.js@7.3.0.js", ["github:MikeMcl/decimal.js@7.3.0/decimal.js"], function(main) {
   return main;
 });
 
 })();
-System.registerDynamic("src-decimal.js/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "github:MikeMcl/decimal.js@7.2.0.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-decimal.js/app/main.js", ["npm:domready@1.0.8.js", "npm:screenlog@0.2.2.js", "libs/testbutton.js", "github:MikeMcl/decimal.js@7.3.0.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
@@ -2785,7 +2791,7 @@ System.registerDynamic("src-decimal.js/app/main.js", ["npm:domready@1.0.8.js", "
     var domready = $__require("npm:domready@1.0.8.js");
     $__require("npm:screenlog@0.2.2.js");
     var testbutton_1 = $__require("libs/testbutton.js");
-    var Decimal = $__require("github:MikeMcl/decimal.js@7.2.0.js");
+    var Decimal = $__require("github:MikeMcl/decimal.js@7.3.0.js");
     var tests = [{ text: '---- clear log ----', action: screenLog.clear }, { text: 'allowed type', action: allowedType }, { text: 'binarya/hexa/octal', action: binaryRepresentation }, { text: 'immutability', action: immutability }, { text: 'chaning', action: chaining }, { text: 'minus zero', action: minusZero }, { text: 'from string', action: fromString }];
     domready(function () {
         screenLog.init({ autoScroll: true });

@@ -1,5 +1,5 @@
 "bundle";
-System.registerDynamic("src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.32.js", [], false, function ($__require, $__exports, $__module) {
+System.registerDynamic("src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.36.js", [], false, function ($__require, $__exports, $__module) {
   var _retrieveGlobal = System.get("@@global-helpers").prepareGlobal($__module.id, null, null);
 
   (function ($__global) {})(this);
@@ -6033,7 +6033,7 @@ define("npm:jquery@2.2.4.js", ["npm:jquery@2.2.4/dist/jquery.js"], function(main
 });
 
 })();
-System.registerDynamic('npm:process@0.11.9/browser.js', [], true, function ($__require, exports, module) {
+System.registerDynamic('npm:process@0.11.10/browser.js', [], true, function ($__require, exports, module) {
     var global = this || self,
         GLOBAL = global;
     // shim for using process in browser
@@ -6201,6 +6201,12 @@ System.registerDynamic('npm:process@0.11.9/browser.js', [], true, function ($__r
     process.removeListener = noop;
     process.removeAllListeners = noop;
     process.emit = noop;
+    process.prependListener = noop;
+    process.prependOnceListener = noop;
+
+    process.listeners = function (name) {
+        return [];
+    };
 
     process.binding = function (name) {
         throw new Error('process.binding is not supported');
@@ -6216,22 +6222,22 @@ System.registerDynamic('npm:process@0.11.9/browser.js', [], true, function ($__r
         return 0;
     };
 });
-System.registerDynamic("npm:process@0.11.9.js", ["npm:process@0.11.9/browser.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:process@0.11.10.js", ["npm:process@0.11.10/browser.js"], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
-  module.exports = $__require("npm:process@0.11.9/browser.js");
+  module.exports = $__require("npm:process@0.11.10/browser.js");
 });
-System.registerDynamic('github:jspm/nodelibs-process@0.1.2/index.js', ['npm:process@0.11.9.js'], true, function ($__require, exports, module) {
+System.registerDynamic('github:jspm/nodelibs-process@0.1.2/index.js', ['npm:process@0.11.10.js'], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
-  module.exports = System._nodeRequire ? process : $__require('npm:process@0.11.9.js');
+  module.exports = System._nodeRequire ? process : $__require('npm:process@0.11.10.js');
 });
 System.registerDynamic("github:jspm/nodelibs-process@0.1.2.js", ["github:jspm/nodelibs-process@0.1.2/index.js"], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
   module.exports = $__require("github:jspm/nodelibs-process@0.1.2/index.js");
 });
-System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
+System.registerDynamic('npm:bxslider@4.2.13/dist/jquery.bxslider.js', ['github:jspm/nodelibs-process@0.1.2.js'], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
   /* */
@@ -6312,6 +6318,9 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
           return true;
         },
         onSliderResize: function () {
+          return true;
+        },
+        onAutoChange: function () {
           return true;
         }
       };
@@ -6405,7 +6414,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
           });
           slider.viewport.parent().css({ maxWidth: getViewportMaxWidth() });
           slider.children.css({
-            float: slider.settings.mode === 'horizontal' ? 'left' : 'none',
+            'float': slider.settings.mode === 'horizontal' ? 'left' : 'none',
             listStyle: 'none',
             position: 'relative'
           });
@@ -6469,7 +6478,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
                 callback();
               }
             }).each(function () {
-              if (this.complete) {
+              if (this.complete || this.src == '') {
                 $(this).trigger('load');
               }
             });
@@ -6593,7 +6602,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
               slidesShowing = slider.settings.maxSlides;
             } else {
               childWidth = slider.children.first().width() + slider.settings.slideMargin;
-              slidesShowing = Math.floor((slider.viewport.width() + slider.settings.slideMargin) / childWidth);
+              slidesShowing = Math.floor((slider.viewport.width() + slider.settings.slideMargin) / childWidth) || 1;
             }
           } else if (slider.settings.mode === 'vertical') {
             slidesShowing = slider.settings.minSlides;
@@ -6613,6 +6622,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
                 breakPoint = counter + getNumberSlidesShowing();
                 counter += slider.settings.moveSlides <= getNumberSlidesShowing() ? slider.settings.moveSlides : getNumberSlidesShowing();
               }
+              return counter;
             }
           } else {
             pagerQty = Math.ceil(slider.children.length / getNumberSlidesShowing());
@@ -6884,16 +6894,18 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
             }
           }
         };
+        var windowFocusHandler = function () {
+          el.startAuto();
+        };
+        var windowBlurHandler = function () {
+          el.stopAuto();
+        };
         var initAuto = function () {
           if (slider.settings.autoDelay > 0) {
             var timeout = setTimeout(el.startAuto, slider.settings.autoDelay);
           } else {
             el.startAuto();
-            $(window).focus(function () {
-              el.startAuto();
-            }).blur(function () {
-              el.stopAuto();
-            });
+            $(window).focus(windowFocusHandler).blur(windowBlurHandler);
           }
           if (slider.settings.autoHover) {
             el.hover(function () {
@@ -7251,9 +7263,8 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
             if (typeof position !== 'undefined') {
               value = slider.settings.mode === 'horizontal' ? -(position.left - moveBy) : -position.top;
               setPositionProperty(value, 'slide', slider.settings.speed);
-            } else {
-              slider.working = false;
             }
+            slider.working = false;
           }
           if (slider.settings.ariaHidden) {
             applyAriaHiddenAttributes(slider.active.index * getMoveBy());
@@ -7263,11 +7274,17 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
           if (!slider.settings.infiniteLoop && slider.active.last) {
             return;
           }
+          if (slider.working == true) {
+            return;
+          }
           var pagerIndex = parseInt(slider.active.index) + 1;
           el.goToSlide(pagerIndex, 'next');
         };
         el.goToPrevSlide = function () {
           if (!slider.settings.infiniteLoop && slider.active.index === 0) {
+            return;
+          }
+          if (slider.working == true) {
             return;
           }
           var pagerIndex = parseInt(slider.active.index) - 1;
@@ -7284,6 +7301,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
               el.goToPrevSlide();
             }
           }, slider.settings.pause);
+          slider.settings.onAutoChange.call(el, true);
           if (slider.settings.autoControls && preventControlUpdate !== true) {
             updateAutoControls('stop');
           }
@@ -7294,6 +7312,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
           }
           clearInterval(slider.interval);
           slider.interval = null;
+          slider.settings.onAutoChange.call(el, false);
           if (slider.settings.autoControls && preventControlUpdate !== true) {
             updateAutoControls('start');
           }
@@ -7376,6 +7395,7 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
             $(document).unbind('keydown', keyPress);
           }
           $(this).removeData('bxSlider');
+          $(window).off('blur', windowBlurHandler).off('focus', windowFocusHandler);
         };
         el.reloadSlider = function (settings) {
           if (settings !== undefined) {
@@ -7392,21 +7412,21 @@ System.registerDynamic('npm:bxslider@4.2.11/dist/jquery.bxslider.js', ['github:j
     })(jQuery);
   })($__require('github:jspm/nodelibs-process@0.1.2.js'));
 });
-System.registerDynamic("npm:bxslider@4.2.11.js", ["npm:bxslider@4.2.11/dist/jquery.bxslider.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:bxslider@4.2.13.js", ["npm:bxslider@4.2.13/dist/jquery.bxslider.js"], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
-  module.exports = $__require("npm:bxslider@4.2.11/dist/jquery.bxslider.js");
+  module.exports = $__require("npm:bxslider@4.2.13/dist/jquery.bxslider.js");
 });
-System.registerDynamic("src-bxslider/app/main.js", ["src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.32.js", "npm:jquery@2.2.4.js", "npm:bxslider@4.2.11.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-bxslider/app/main.js", ["src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.36.js", "npm:jquery@2.2.4.js", "npm:bxslider@4.2.13.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
     ///<reference types="dw-bxslider-4" />
-    $__require("src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.32.js");
+    $__require("src-bxslider/css/jquery.bxslider.css!github:systemjs/plugin-css@0.1.36.js");
     var $ = $__require("npm:jquery@2.2.4.js");
-    $__require("npm:bxslider@4.2.11.js");
+    $__require("npm:bxslider@4.2.13.js");
     $(function () {
         $('.bxslider').bxSlider({
             mode: 'fade',

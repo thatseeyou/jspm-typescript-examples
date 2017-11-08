@@ -95,6 +95,7 @@ const tests:TestItem[] = [
     {text: 'playground: unbalanced path', action: playground.zipUnbalancedMultipath},
     {text: 'playground: fromPromise', action: playground.fromPromise},
     {text: 'playground: fromPromise & defer', action: playground.fromPromise2},
+    {text: 'playground: toPromise', action: playground.toPromise},
     {text: 'playground: conditional', action: playground.conditional},
     {text: 'playground: conditional skip', action: playground.conditionalSkip},
     {text: 'playground: self window', action: playground.selfWindow},

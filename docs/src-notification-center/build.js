@@ -245,7 +245,7 @@ System.registerDynamic("src-notification-center/app/notificatoncenter.js", [], t
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    var NSNotificationCenter = function () {
+    var NSNotificationCenter = /** @class */function () {
         function NSNotificationCenter() {
             this.useCapture = true;
             this.el = document;
@@ -272,9 +272,9 @@ System.registerDynamic("src-notification-center/app/notificatoncenter.js", [], t
             });
             this.el.dispatchEvent(event);
         };
+        NSNotificationCenter.nc = null;
         return NSNotificationCenter;
     }();
-    NSNotificationCenter.nc = null;
     exports.NSNotificationCenter = NSNotificationCenter;
 });
 System.registerDynamic("src-notification-center/app/tests.js", ["src-notification-center/app/notificatoncenter.js"], true, function ($__require, exports, module) {

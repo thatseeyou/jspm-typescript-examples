@@ -3,6 +3,6 @@ import * as $ from 'jquery';
 import 'jquery-parallax.js';
 
 $(()=>{
-    $('.parallax-container').parallax();
+    ($('.parallax-container') as any).parallax();
 })
     

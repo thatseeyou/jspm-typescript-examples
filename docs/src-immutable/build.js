@@ -239,13 +239,13 @@ System.registerDynamic("libs/testbutton.js", [], true, function ($__require, exp
         });
     }
 });
-System.registerDynamic("src-immutable/app/gettingstarted.js", ["npm:immutable@3.8.1.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-immutable/app/gettingstarted.js", ["npm:immutable@3.8.2.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    var immutable_1 = $__require("npm:immutable@3.8.1.js");
+    var immutable_1 = $__require("npm:immutable@3.8.2.js");
     function test1() {
         var map1 = immutable_1.Map({ a: 1, b: 2, c: 3 });
         var map2 = map1.set('b', 50);
@@ -302,16 +302,14 @@ System.registerDynamic("src-immutable/app/gettingstarted.js", ["npm:immutable@3.
     }
     exports.test5 = test5;
 });
-System.registerDynamic('npm:immutable@3.8.1/dist/immutable.js', [], true, function ($__require, exports, module) {
+System.registerDynamic('npm:immutable@3.8.2/dist/immutable.js', [], true, function ($__require, exports, module) {
   /* */
   "format cjs";
   /**
-   *  Copyright (c) 2014-2015, Facebook, Inc.
-   *  All rights reserved.
+   * Copyright (c) 2014-present, Facebook, Inc.
    *
-   *  This source code is licensed under the BSD-style license found in the
-   *  LICENSE file in the root directory of this source tree. An additional grant
-   *  of patent rights can be found in the PATENTS file in the same directory.
+   * This source code is licensed under the MIT license found in the
+   * LICENSE file in the root directory of this source tree.
    */
 
   var global = this || self,
@@ -5114,18 +5112,18 @@ System.registerDynamic('npm:immutable@3.8.1/dist/immutable.js', [], true, functi
     return Immutable;
   });
 });
-System.registerDynamic("npm:immutable@3.8.1.js", ["npm:immutable@3.8.1/dist/immutable.js"], true, function ($__require, exports, module) {
+System.registerDynamic("npm:immutable@3.8.2.js", ["npm:immutable@3.8.2/dist/immutable.js"], true, function ($__require, exports, module) {
   var global = this || self,
       GLOBAL = global;
-  module.exports = $__require("npm:immutable@3.8.1/dist/immutable.js");
+  module.exports = $__require("npm:immutable@3.8.2/dist/immutable.js");
 });
-System.registerDynamic("src-immutable/app/set.js", ["npm:immutable@3.8.1.js"], true, function ($__require, exports, module) {
+System.registerDynamic("src-immutable/app/set.js", ["npm:immutable@3.8.2.js"], true, function ($__require, exports, module) {
     "use strict";
 
     var global = this || self,
         GLOBAL = global;
     Object.defineProperty(exports, "__esModule", { value: true });
-    var immutable_1 = $__require("npm:immutable@3.8.1.js");
+    var immutable_1 = $__require("npm:immutable@3.8.2.js");
     function testAdd1() {
         var s1 = immutable_1.Set([1, 2, 3]);
         var s2 = s1.add(4);

@@ -23,9 +23,9 @@
         // related to import MODULE
         "baseUrl": "..",
         "paths": {
-            "rxjs" : ["jspm_packages/npm/rxjs@5.4.2"],
-            "rxjs/*" : ["jspm_packages/npm/rxjs@5.4.2/*"],
-            "immutable" : ["jspm_packages/npm/immutable@3.8.1/dist"],
+            "rxjs" : ["jspm_packages/npm/rxjs@5.5.2"],
+            "rxjs/*" : ["jspm_packages/npm/rxjs@5.5.2/*"],
+            "immutable" : ["jspm_packages/npm/immutable@3.8.2/dist"],
             "decimal.js" : ["types/decimal.js/index.d.ts"],
             "*": [
                 "node_modules/@types/*",
