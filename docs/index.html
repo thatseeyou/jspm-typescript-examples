@@ -2,118 +2,26 @@
 <html>
 
 <head>
-    <meta charset="utf-8" />
-    <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2
-        }
-        
-        th {
-            height: 40px;
-            background-color: #888;
-            color: white;
-        }
-        
-        th,
-        td {
-            text-align: left;
-            padding: 5px;
-        }
-    </style>
+    <meta name="google-site-verification" content="kUUZ8xlfxcdVZ3RkDYdtPRJPDBvtlqyxSsP1mKosdsw" />
+    <script src="system.js"></script>
+    <script src="systemjs.config.js"></script>
+    <script src="src-immutable/build.js"></script>
+    <script>
+        SystemJS.import('src-immutable/app/main.js');
+    </script>
 </head>
 
 <body>
-    <a href="https://github.com/thatseeyou/jspm-typescript-examples">Github repository</a>
-
-    <h3>Demos</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Demo</th>
-                <th>Reference</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><a href="typescript.html">TypeScript</a></td>
-                <td><a href="https://github.com/Microsoft/TypeScript">github:Microsoft/TypeScript</a></td>
-            </tr>
-            <tr>
-                <td><a href="promise.html">Promise</a> </td>
-                <td><a href="https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise">mdn:Promise</a></td>
-            </tr>
-            <tr>
-                <td><a href="reactive.html">RxJS</a></td>
-                <td><a href="https://github.com/ReactiveX/rxjs">github:ReactiveX/rxjs</a></td>
-            </tr>
-            <tr>
-                <td><a href="reactive-calculator.html">Reactive Calculator</a></td>
-                <td>Calculator using RxJS</td>
-            </tr>
-            <tr>
-                <td><a href="immutable.html">Immutable</a></td>
-                <td><a href="https://github.com/facebook/immutable-js">github:facebook/immutable-js</a></td>
-            </tr>
-            <tr>
-                <td><a href="d3-selection.html">d3-selection</a></td>
-                <td><a href="https://github.com/d3/d3-selection">github:d3/d3-selection</a></td>
-            </tr>
-            <tr>
-                <td><a href="chartist.html">chartist</a></td>
-                <td><a href="https://github.com/gionkunz/chartist-js">github:gionkunz/chartist-js</a></td>
-            </tr>
-            <tr>
-                <td><a href="parallax.html">parallax</a></td>
-                <td><a href="https://github.com/wagerfield/parallax">github:wagerfield/parallax</a></td>
-            </tr>
-            <tr>
-                <td><a href="jquery-parallax.js.html">parallax.js</a></td>
-                <td><a href="https://github.com/pixelcog/parallax.js">github:pixelcog/parallax.js</a></td>
-            </tr>
-            <tr>
-                <td><a href="bxslider.html">bxslider</a></td>
-                <td><a href="https://github.com/stevenwanderski/bxslider-4">github:stevenwanderski/bxslider-4</a></td>
-            </tr>
-            <tr>
-                <td><a href="screenlog.html">screenlog</a></td>
-                <td><a href="https://github.com/chinchang/screenlog.js">github:chinchang/screenlog.js</a></td>
-            </tr>
-            <tr>
-                <td><a href="log.html">log</a></td>
-                <td><a href="https://github.com/adamschwartz/log">github:adamschwartz/log</a></td>
-            </tr>
-            <tr>
-                <td><a href="codemirror.html">CodeMirror</a></td>
-                <td><a href="https://github.com/codemirror/CodeMirror">github:codemirror/CodeMirror</a></td>
-            </tr>
-            <tr>
-                <td><a href="decimal.js.html">decimal.js</a></td>
-                <td><a href="https://github.com/MikeMcl/decimal.js">github:MikeMcl/decimal.js</a></td>
-            </tr>
-            <tr>
-                <td><a href="showdown.html">showdown</a></td>
-                <td><a href="https://github.com/showdownjs/showdown">github:showdownjs/showdown</a></td>
-            </tr>
-            <tr>
-                <td><a href="notification-center.html">Mimic iOS NSNotificationCenter</a>
-                <td><a href="https://developer.apple.com/reference/foundation/notificationcenter">iOS SDK:NSNotificationCenter</a></td>
-            </tr>
-            <tr>
-                <td><a href="domevent.html">DOM events</a>
-                <td><a href="https://developer.mozilla.org/en-US/docs/Web/Events">MDN: Event References</td>
-            </tr>
-            <tr>
-                <td><a href="decorator.html">Decorators</a>
-                <td><a href="http://www.typescriptlang.org/docs/handbook/decorators.html">Typescript decorators</td>
-            </tr>
-        </tbody>
-    </table>
+    <p><a href="index.html">Go to DEMO home</a></p>
+    <h1>DEMO: Immutable</h1>
+    <p>refs:
+        <a href="https://github.com/thatseeyou/jspm-typescript-examples/blob/master/docs/immutable.html">[index.html]</a>
+        <a href="https://github.com/thatseeyou/jspm-typescript-examples/tree/master/docs/src-immutable/app">[app sources]</a>
+    </p>
+    <div id="test-buttons"></div>
+    <script>
+        console.log('END OF BODY');
+    </script>
 </body>
 
 </html>
